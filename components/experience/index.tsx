@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SectionHeading from "./section-heading";
+import SectionHeading from "../section-heading";
 import Image from "next/image"
 import { StaticImageData } from "next/image";
 import {

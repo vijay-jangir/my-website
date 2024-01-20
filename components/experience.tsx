@@ -2,19 +2,23 @@
 
 import React from "react";
 import SectionHeading from "./section-heading";
+import Image from "next/image"
+import { StaticImageData } from "next/image";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { experiencesData } from "@/lib/data";
+import { companyWebsiteMap } from "@/lib/data";
 import { useSectionInView } from "@/lib/hooks";
 import { useTheme } from "@/context/theme-context";
+import logo from "@/public/project_img/org-airtel.png"
 
 export default function Experience() {
   const { ref } = useSectionInView("Experience");
   const { theme } = useTheme();
-
+  const companyUrl = '';
   return (
     <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
       <SectionHeading>My experience</SectionHeading>
@@ -37,7 +41,20 @@ export default function Experience() {
                     : "0.4rem solid rgba(255, 255, 255, 0.5)",
               }}
               date={item.date}
-              icon={item.icon}
+              // icon={item.icon}
+              icon={item.icon && React.isValidElement(item.icon)? 
+                (
+                  item.icon
+                ) : (
+                <div
+                  style={{overflow: "hidden", borderRadius: "50%", maxHeight: "100%", maxWidth: "100%", display: "flex"}}
+                >
+                  <Image 
+                    src={item.icon as StaticImageData}
+                    alt={item.location} 
+                  ></Image>
+                </div>
+              )}
               iconStyle={{
                 background:
                   theme === "light" ? "white" : "rgba(255, 255, 255, 0.15)",
@@ -45,7 +62,16 @@ export default function Experience() {
               }}
             >
               <h3 className="font-semibold capitalize">{item.title}</h3>
-              <p className="font-normal !mt-0">{item.location}</p>
+              {companyWebsiteMap[item.location as keyof typeof companyWebsiteMap] && (
+                <a 
+                href={companyWebsiteMap[item.location as keyof typeof companyWebsiteMap]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-normal !mt-0"
+                >
+                  {item.location}
+                </a>
+              )}
               <p className="!mt-1 !font-normal text-gray-700 dark:text-white/75">
                 {item.description}
               </p>

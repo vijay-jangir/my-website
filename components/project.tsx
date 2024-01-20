@@ -2,10 +2,15 @@
 
 import { useRef } from "react";
 import { projectsData } from "@/lib/data";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-type ProjectProps = (typeof projectsData)[number];
+type ProjectProps = {
+  title: string;
+  description: string;
+  tags: readonly string[];
+  imageUrl?: StaticImageData; // Make imageUrl optional
+};
 
 export default function Project({
   title,
@@ -22,7 +27,6 @@ export default function Project({
   const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
   const divClass = "pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 flex flex-col h-full"
   const imageConditionalClass = imageUrl ? ' sm:max-w-[50%] sm:group-even:ml-[18rem]' : '';
-  imageUrl = null;
   return (
     <motion.div
       ref={ref}

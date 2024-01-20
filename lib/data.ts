@@ -57,7 +57,7 @@ export const experiencesData = [
     description:
       "I worked as bridge b/w data scientist and big data platforms. I worked on multitude of ML and Statistic Analysis problems. I created products and solutions to be reused by diverse client base across world, including some of the biggest retailers in the world. I created Customer Segmentation, Setup data marts, reporting platform, on demand analytics product",
     icon: dh,
-    date: "2019 - 2021",
+    date: "2018 - 2021",
   },
   {
     title: "Software Engineer",
@@ -65,7 +65,7 @@ export const experiencesData = [
     description:
       "I worked in Mainframe and Big data ecosystem as a developer for Insurance and Telecom client. My role was instrumental in migraiton from Mainfram to Spark, along with some key automations which saved more than 1000 man hours per year.",
     icon: mphasis,
-    date: "2014 - 2029",
+    date: "2014 - 2018",
   },
 ] as const;
 
@@ -75,42 +75,36 @@ export const projectsData = [
     description:
       "Created my website using nextJS. This is a portfolio website having a blog integration with WIX.",
     tags: ["React", "Next.js", "MongoDB", "Tailwind", "Prisma"],
-    // imageUrl: corpcommentImg,
   },
   {
     title: "Context Aware Rule Engine",
     description:
       "Developed a context aware platforn, which takes deisions based on user past activity in real time and to trigger business rules.",
     tags: ["Flink", "Kafka", "Java", "Elastic Stack", "Influx", "Airflow"],
-    // imageUrl: airtel,
   },
   {
     title: "Telecom - Network Datalake",
     description:
       "Designed and implemented a datalake, warehouse for network data comin from mobile towers. Managed data at petabyte scale with >2Trillion events coming every day.",
     tags: ["Flink", "Kafka", "Java", "Elastic Stack", "Influx", "Airflow", "NiFi"],
-    // imageUrl: airtel,
   },
   {
     title: "Retail - Cross Shopping Behaviour",
     description:
       "Developed solution for biggest retailers worldwide to analyse on how customers cross shop b/w departments, categories or products. This was enhanced with multiple customer segmentations",
     tags: ["Spark", "Python", "Power-BI", "Airflow"],
-    // imageUrl: rmtdevImg,
   },
   {
     title: "Retail - Association Rule Engine",
     description:
       "Developed solution for biggest retailers worldwide to analyse on how products are related, and which products, categories, or even departments are shopped together, Used Apriori algorithm at big data scale",
     tags: ["Spark", "Python", "Power-BI", "Airflow", "Statistics-Apriori"],
-    // imageUrl: rmtdevImg,
   },
   {
     title: "Retail - Category Uplift & Cannabalization",
     description:
       "Developed solution for biggest retailers worldwide to analyse on what is the impact of new product launch, how it isi adding to the sales and how much it cannibalises the other products in the same category.",
     tags: ["Spark", "Python", "Power-BI", "Airflow", "Statistics-Apriori"],
-    // imageUrl: rmtdevImg,
   },
 ] as const;
 

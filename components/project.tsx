@@ -25,8 +25,9 @@ export default function Project({
   });
   const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
-  const divClass = "pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 flex flex-col h-full"
-  const imageConditionalClass = imageUrl ? ' sm:max-w-[50%] sm:group-even:ml-[18rem]' : '';
+  // const divClass = "pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 flex flex-col h-full sm:max-w-[70%] sm:ml-[9rem]"
+  // const imageConditionalClass = imageUrl ? ' sm:max-w-[50%] sm:group-even:ml-[18rem]' : '';
+  // const tagConditionalClass = tags ? '' : '';
   return (
     <motion.div
       ref={ref}
@@ -34,45 +35,29 @@ export default function Project({
         scale: scaleProgess,
         opacity: opacityProgess,
       }}
-      className="group mb-3 sm:mb-8 last:mb-0"
+      className=" mb-3 sm:mb-8 last:mb-0"
     >
-      <section className="bg-gray-100 max-w-[42rem] border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:min-h-[10rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
-        <div className={divClass + imageConditionalClass}>
-          <h3 className="text-2xl font-semibold text-center">{title}</h3>
-          <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
-            {description}
-          </p>
-          <ul className="flex flex-wrap mt-4 gap-2 sm:mt-auto">
-            {tags.map((tag, index) => (
-              <li
-                className="bg-black/[0.7] px-3 py-1 text-[0.7rem] uppercase tracking-wider text-white rounded-full dark:text-white/70"
-                key={index}
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
+      <section className="bg-gray-100 max-w-[38rem] h-full border border-black/5 rounded-lg overflow-hidden sm:pr-4 sm:pl-4 relative sm:min-h-[10rem] hover:bg-gray-200 transition dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
+        <h3 className="text-xl font-semibold text-center sm:pt-1 border-b">{title}</h3>
+        <div className="pb-0 sm:pr-0 flex flex-row h-full" >
+          <div className="flex sm:max-w-[30%] rounded-t-lg h-full">
+            <ul className="flex flex-wrap mt-2 gap-2 sm:pb-0 sm:mr-auto sm:mb-auto">
+              {tags.map((tag, index) => (
+                <li
+                  className="bg-black/[0.7] px-3 py-1 text-[0.7rem] uppercase tracking-wider text-white rounded-full dark:text-white/70"
+                  key={index}
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex sm:max-w-[70%] sm:ml-[1rem] h-full ">
+            <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
+              {description}
+            </p>
+          </div>
         </div>
-
-        {imageUrl && (
-        <Image
-          src={imageUrl}
-          alt="Project I worked on"
-          quality={95}
-          className="absolute hidden sm:block top-8 -right-40 w-[28.25rem] rounded-t-lg shadow-2xl
-        transition 
-        group-hover:scale-[1.04]
-        group-hover:-translate-x-3
-        group-hover:translate-y-3
-        group-hover:-rotate-2
-
-        group-even:group-hover:translate-x-3
-        group-even:group-hover:translate-y-3
-        group-even:group-hover:rotate-2
-
-        group-even:right-[initial] group-even:-left-40"
-        />
-      )}
       </section>
     </motion.div>
   );

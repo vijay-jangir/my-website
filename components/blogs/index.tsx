@@ -1,3 +1,4 @@
+"use server"
 import React from 'react';
 import Blog from './blog';
 import type { BlogProp } from './blog';
@@ -10,6 +11,11 @@ import getBlogs from "./providers"
  
 export default async function Blogs() {
   const blogs = await getBlogs()
+  const displayBlog = blogs.map((blog:BlogProp) => (
+    <React.Fragment key={blog.id}>
+      <Blog {...blog} />
+    </React.Fragment>
+  ))
 
   return (
     // <SectionHeading>My Blogs</SectionHeading>
@@ -21,11 +27,7 @@ export default async function Blogs() {
         </div>
       ) : (
         <div className="flex sm:mb-[2rem] flex-wrap flex-col justify-around gap-2 sm:gap-1 md:gap-1 lg:gap-1 xl:gap-1">
-          {blogs.map((blog:BlogProp) => (
-            <React.Fragment key={blog.id}>
-              <Blog {...blog} />
-            </React.Fragment>
-          ))}
+          {displayBlog}
         </div>
       )}
     </>

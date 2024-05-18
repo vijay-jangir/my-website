@@ -31,7 +31,7 @@ export default function Intro() {
             }}
           >
             <Image
-              src="https://media.licdn.com/dms/image/C4D03AQHj5-5s6epdNw/profile-displayphoto-shrink_800_800/0/1621148172247?e=1708560000&v=beta&t=xgh0DYQEYOBbK4BVDdyO2yiYOpcUpnk5YdmaznbHrbE"
+              src="/profile-pic.jpeg"
               alt="Vijay Jangir"
               width="192"
               height="192"

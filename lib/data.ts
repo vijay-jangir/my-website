@@ -71,6 +71,24 @@ export const experiencesData = [
 
 export const projectsData = [
   {
+    title: "Observability.",
+    description:
+      "Designed and implemented inhouse alerting and monitoring framework using elastic stack and custom applications.",
+    tags: ["Elastic Stack", "Node.js", "MS Teams", "Kafka"],
+  },
+  {
+    title: "Setup of Datamesh.",
+    description:
+      "Enabled DataMesh architecture using kyuubi, ranger, trino, s3, airflow, datahub, dbt & spark.",
+    tags: ["Apache Kyuubi", "Trino", "Alluxio", "Datahub", "Jupyter"],
+  },
+  {
+    title: "Automatic engine selection for Kyuubi.",
+    description:
+      "Patched codebase for dynamically allocating interactive or batch engine based on user AD groups.",
+    tags: ["Apache Kyuubi", "java", "Apache Spark", "Trino"],
+  },
+  {
     title: "Portfolio website",
     description:
       "Created my website using nextJS. This is a portfolio website having a blog integration with WIX.",

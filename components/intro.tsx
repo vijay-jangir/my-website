@@ -53,7 +53,6 @@ export default function Intro() {
         | Data Analyst 
         | Platform Engineer 
         | DevOps
-        | SRE
         </span>.
       </motion.h1>
 
@@ -73,7 +72,7 @@ export default function Intro() {
             setTimeOfLastClick(Date.now());
           }}
         >
-          Contact me here{" "}
+          Connect with me {" "}
           <BsArrowRight className="opacity-70 group-hover:translate-x-1 transition" />
         </Link>
 

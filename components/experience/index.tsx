@@ -1,80 +1,82 @@
 "use client";
 
 import React from "react";
-import SectionHeading from "../section-heading";
-import Image from "next/image"
-import { StaticImageData } from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
-import { experiencesData } from "@/lib/data";
-import { companyWebsiteMap } from "@/lib/data";
-import { useSectionInView } from "@/lib/hooks";
+
+import SectionHeading from "../section-heading";
+import { experiences } from "@/content/portfolio";
 import { useTheme } from "@/context/theme-context";
-import logo from "@/public/project_img/org-airtel.png"
+import { useSectionInView } from "@/lib/hooks";
 
 export default function Experience() {
   const { ref } = useSectionInView("Experience");
   const { theme } = useTheme();
-  const companyUrl = '';
+
   return (
-    <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
-      <SectionHeading>My experience</SectionHeading>
+    <section className="mb-28 scroll-mt-28 sm:mb-40" id="experience" ref={ref}>
+      <SectionHeading>Experience</SectionHeading>
       <VerticalTimeline lineColor="">
-        {experiencesData.map((item, index) => (
-          <React.Fragment key={index}>
+        {experiences.map((item) => (
+          <React.Fragment key={item.id}>
             <VerticalTimelineElement
-              contentStyle={{
-                background:
-                  theme === "light" ? "#f3f4f6" : "rgba(255, 255, 255, 0.05)",
-                boxShadow: "none",
-                border: "1px solid rgba(0, 0, 0, 0.05)",
-                textAlign: "left",
-                padding: "1.3rem 2rem",
-              }}
               contentArrowStyle={{
                 borderRight:
                   theme === "light"
                     ? "0.4rem solid #9ca3af"
                     : "0.4rem solid rgba(255, 255, 255, 0.5)",
               }}
+              contentStyle={{
+                background:
+                  theme === "light" ? "#f3f4f6" : "rgba(255, 255, 255, 0.05)",
+                boxShadow: "none",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
+                textAlign: "left",
+                padding: "1.4rem 2rem",
+              }}
               date={item.date}
-              // icon={item.icon}
-              icon={item.icon && React.isValidElement(item.icon)? 
-                (
-                  item.icon
-                ) : (
+              icon={
                 <div
-                  style={{overflow: "hidden", borderRadius: "50%", maxHeight: "100%", maxWidth: "100%", display: "flex"}}
+                  style={{
+                    overflow: "hidden",
+                    borderRadius: "50%",
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    display: "flex",
+                  }}
                 >
-                  <Image 
-                    src={item.icon as StaticImageData}
-                    alt={item.location} 
-                  ></Image>
+                  <Image alt={item.company} src={item.icon as StaticImageData} />
                 </div>
-              )}
+              }
               iconStyle={{
                 background:
                   theme === "light" ? "white" : "rgba(255, 255, 255, 0.15)",
                 fontSize: "1.5rem",
               }}
             >
-              <h3 className="font-semibold capitalize">{item.title}</h3>
-              {companyWebsiteMap[item.location as keyof typeof companyWebsiteMap] && (
-                <a 
-                href={companyWebsiteMap[item.location as keyof typeof companyWebsiteMap]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-normal !mt-0"
+              <div className="flex flex-col gap-2">
+                <h3 className="font-semibold capitalize">{item.title}</h3>
+                <a
+                  className="text-sm font-medium underline-offset-4 hover:underline"
+                  href={item.companyUrl}
+                  rel="noreferrer"
+                  target="_blank"
                 >
-                  {item.location}
+                  {item.company}
                 </a>
-              )}
-              <p className="!mt-1 !font-normal text-gray-700 dark:text-white/75">
-                {item.description}
-              </p>
+                <p className="text-sm leading-6 text-gray-700 dark:text-white/75">
+                  {item.description}
+                </p>
+                <ul className="mt-2 space-y-2 text-sm leading-6 text-gray-700 dark:text-white/70">
+                  {item.bullets.slice(0, 2).map((bullet) => (
+                    <li key={bullet.id}>• {bullet.text}</li>
+                  ))}
+                </ul>
+              </div>
             </VerticalTimelineElement>
           </React.Fragment>
         ))}

@@ -1,4 +1,3 @@
-"use server"
 import React from 'react';
 import Blog from './blog';
 import type { BlogProp } from './blog';
@@ -18,8 +17,6 @@ export default async function Blogs() {
   ))
 
   return (
-    // <SectionHeading>My Blogs</SectionHeading>
-    // {blogs.length > 0 && (
     <>
       {blogs.length === 0 ? (
         <div className='sm:mb-[25%]'>
@@ -31,10 +28,5 @@ export default async function Blogs() {
         </div>
       )}
     </>
-
-
-    // )}
-    // {blogs.length === 0 && <p>No blogs found.</p>}
-
   )
 }

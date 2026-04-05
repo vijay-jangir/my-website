@@ -1,14 +1,19 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { FaGithubSquare } from "react-icons/fa";
-import { useSectionInView } from "@/lib/hooks";
+
+import { siteProfile } from "@/content/portfolio";
 import { useActiveSectionContext } from "@/context/active-section-context";
+import { useSectionInView } from "@/lib/hooks";
+import { getHighlightedFocuses } from "@/lib/portfolio";
+
+const highlightedFocuses = getHighlightedFocuses().slice(0, 5);
 
 export default function Intro() {
   const { ref } = useSectionInView("Home", 0.5);
@@ -18,86 +23,126 @@ export default function Intro() {
     <section
       ref={ref}
       id="home"
-      className="mb-28 max-w-[50rem] text-center sm:mb-0 scroll-mt-[100rem]"
+      className="mb-24 max-w-[62rem] text-center sm:mb-0 scroll-mt-[100rem]"
     >
       <div className="flex items-center justify-center">
         <div className="relative">
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0 }}
             transition={{
               type: "tween",
               duration: 0.2,
             }}
           >
             <Image
-              src="/profile-pic.jpeg"
               alt="Vijay Jangir"
-              width="192"
+              className="h-34 w-34 rounded-full border-[0.35rem] border-white object-cover shadow-xl"
               height="192"
-              quality="95"
-              priority={true}
-              className="h-34 w-34 rounded-full object-cover border-[0.35rem] border-white shadow-xl"
+              priority
+              quality={95}
+              src="/profile-pic.jpeg"
+              width="192"
             />
           </motion.div>
         </div>
       </div>
 
-      <motion.h1
-        className="mb-10 mt-4 px-4 text-2xl font-medium !leading-[1.5] sm:text-4xl"
-        initial={{ opacity: 0, y: 100 }}
+      <motion.p
         animate={{ opacity: 1, y: 0 }}
+        className="mt-8 text-sm font-semibold uppercase tracking-[0.28em] text-gray-500"
+        initial={{ opacity: 0, y: 60 }}
       >
-        <span className="font-bold">
-        Data Engineer 
-        | Data Analyst 
-        | Platform Engineer 
-        | DevOps
-        | SRE
-        </span>.
+        {siteProfile.title}
+      </motion.p>
+
+      <motion.h1
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-auto mt-5 max-w-4xl px-4 text-3xl font-semibold leading-[1.2] sm:text-5xl"
+        initial={{ opacity: 0, y: 80 }}
+      >
+        {siteProfile.heroLabel}
       </motion.h1>
 
-      <motion.div
-        className="flex flex-col sm:flex-row items-center justify-center gap-2 px-4 text-lg font-medium"
-        initial={{ opacity: 0, y: 100 }}
+      <motion.p
         animate={{ opacity: 1, y: 0 }}
+        className="mx-auto mt-6 max-w-3xl px-4 text-base leading-7 text-gray-700 dark:text-white/75"
+        initial={{ opacity: 0, y: 80 }}
         transition={{
-          delay: 0.1,
+          delay: 0.05,
+        }}
+      >
+        {siteProfile.recruiterPitch}
+      </motion.p>
+
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 flex flex-wrap justify-center gap-3 px-4"
+        initial={{ opacity: 0, y: 80 }}
+        transition={{
+          delay: 0.08,
+        }}
+      >
+        {highlightedFocuses.map((focus) => (
+          <Link
+            className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-black/20 hover:bg-black/5 dark:border-white/10 dark:bg-transparent dark:text-white/80 dark:hover:bg-white/10"
+            href={`/resume?focus=${focus.id}`}
+            key={focus.id}
+          >
+            {focus.shortLabel}
+          </Link>
+        ))}
+      </motion.div>
+
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-10 flex flex-col items-center justify-center gap-3 px-4 text-lg font-medium sm:flex-row"
+        initial={{ opacity: 0, y: 100 }}
+        transition={{
+          delay: 0.12,
         }}
       >
         <Link
+          className="group flex items-center gap-2 rounded-full bg-gray-900 px-7 py-3 text-white outline-none transition hover:scale-105 hover:bg-gray-950 focus:scale-105 active:scale-100"
           href="#contact"
-          className="group bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 hover:bg-gray-950 active:scale-105 transition"
           onClick={() => {
             setActiveSection("Contact");
             setTimeOfLastClick(Date.now());
           }}
         >
-          Contact me here{" "}
-          <BsArrowRight className="opacity-70 group-hover:translate-x-1 transition" />
+          Contact me
+          <BsArrowRight className="opacity-70 transition group-hover:translate-x-1" />
         </Link>
 
-        <a
-          className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
-          href="https://resume.vijayjangir.com/"
-          download
+        <Link
+          className="group flex items-center gap-2 rounded-full border border-black/10 bg-white px-7 py-3 outline-none transition hover:scale-105 hover:border-black/20 hover:bg-black/5 focus:scale-105 active:scale-100 dark:border-white/10 dark:bg-white/10"
+          href="/resume"
         >
-          Download Resume{" "}
-          <HiDownload className="opacity-60 group-hover:translate-y-1 transition" />
-        </a>
+          Tailored resume
+          <HiDownload className="opacity-60 transition group-hover:translate-y-1" />
+        </Link>
 
-        <div className="flex flex-row">
+        <Link
+          className="rounded-full border border-black/10 px-7 py-3 text-base outline-none transition hover:scale-105 hover:border-black/20 hover:bg-black/5 focus:scale-105 active:scale-100 dark:border-white/10 dark:hover:bg-white/10"
+          href="/work"
+        >
+          Selected work
+        </Link>
+
+        <div className="flex flex-row gap-3">
           <a
-            className="bg-white p-4 text-gray-700 hover:text-gray-950 flex items-center gap-2 rounded-full focus:scale-[1.15] hover:scale-[1.15] active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10 dark:text-white/60"
-            href="https://linkedin.com/in/vijayjangir"
+            className="flex items-center gap-2 rounded-full border border-black/10 bg-white p-4 text-gray-700 transition hover:scale-[1.1] hover:text-gray-950 focus:scale-[1.1] active:scale-100 dark:border-white/10 dark:bg-white/10 dark:text-white/60"
+            href={siteProfile.linkedinUrl}
+            rel="noreferrer"
             target="_blank"
           >
             <BsLinkedin />
           </a>
 
           <a
-            className="bg-white p-4 text-gray-700 flex items-center gap-2 text-[1.35rem] rounded-full focus:scale-[1.15] hover:scale-[1.15] hover:text-gray-950 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10 dark:text-white/60"
-            href="https://github.com/vijay-jangir"
+            className="flex items-center gap-2 rounded-full border border-black/10 bg-white p-4 text-[1.35rem] text-gray-700 transition hover:scale-[1.1] hover:text-gray-950 focus:scale-[1.1] active:scale-100 dark:border-white/10 dark:bg-white/10 dark:text-white/60"
+            href={siteProfile.githubUrl}
+            rel="noreferrer"
             target="_blank"
           >
             <FaGithubSquare />

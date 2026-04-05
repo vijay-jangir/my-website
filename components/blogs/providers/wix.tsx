@@ -1,31 +1,44 @@
-import axios from 'axios'
 import type { BlogProp } from '../blog';
+import { env } from "@/lib/env";
+
+type WixPostResponse = {
+  posts?: BlogProp[];
+};
 
 export default async function getWixBlogs() {
-    let posts:  BlogProp[]
-    try{
-      const response = await axios.post(
-        'https://www.wixapis.com/v3/posts/query',
-        '{"fieldsets":["URL"]}',
-        {
-          headers: {
-            // 'Access-Control-Allow-Origin': '*',
-            // 'Access-Control-Allow-Methods': 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
-            // 'Access-Control-Allow-Headers': "wix-site-id",
-            'wix-site-id': 'e02544df-019e-47c2-9a69-ebffa6a06dbb',
-            'Content-Type': 'application/json',
-            'Authorization': process.env.WIX_API_KEY
-          },
-        }
-      ); 
-      posts = response.data.posts ?? []
-      posts.map((post) => {post.blog_id = "wix"})
-      console.error(posts[0])
-    }
-    catch (error) {
-      console.error("Error while calling WIX api", error)
-      posts = []
-    }
-   
-    return posts
+  const apiKey = env.wixApiKey;
+
+  if (!apiKey) {
+    return [];
   }
+
+  try {
+    const response = await fetch("https://www.wixapis.com/v3/posts/query", {
+      method: "POST",
+      headers: {
+        "wix-site-id": env.wixSiteId,
+        "Content-Type": "application/json",
+        Authorization: apiKey,
+      },
+      body: JSON.stringify({
+        fieldsets: ["URL"],
+      }),
+      next: {
+        revalidate: 3600,
+      },
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = (await response.json()) as WixPostResponse;
+
+    return (data.posts ?? []).map((post) => ({
+      ...post,
+      blog_id: "wix",
+    }));
+  } catch {
+    return [];
+  }
+}

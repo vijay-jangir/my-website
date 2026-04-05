@@ -17,8 +17,6 @@ export  type BlogProp = {
 };
   
 export default function Blog({
-  blog_id,
-  // id,
   title,
   excerpt,
   url,
@@ -50,15 +48,7 @@ export default function Blog({
       >
 
         <section className="bg-gray-100 h-full border border-black/5 rounded-lg overflow-hidden sm:pr-4 sm:pl-4 relative sm:min-h-[7rem] hover:bg-gray-200 transition dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
-          {blog_id && (
-            <div className="absolute left-0 top-0 h-16 w-16">
-              <div
-                className="absolute transform -rotate-45 bg-gray-600 bg-opacity-40 text-center text-white font-semibold py-1 left-[-50px] top-[30px] w-[170px]">
-                {blog_id}
-              </div>
-            </div>       
-          )}
-              <h3 className="text-xl font-semibold text-center sm:pt-1 border-b">{title}</h3>
+          <h3 className="text-xl font-semibold text-center sm:pt-1 border-b">{title}</h3>
 
           <div className="pb-0 sm:pr-0 flex flex-row h-full max-w-[75%] ml-[15%]" >
             <div className="flex flex-row sm:ml-[1rem] h-full ">
@@ -67,6 +57,9 @@ export default function Blog({
               </p>
             </div>
           </div>
+          <p className="border-t px-4 py-2 text-sm text-center text-gray-500 dark:text-white/50">
+            Read on the blog
+          </p>
         </section>
       </a>
     </motion.div>

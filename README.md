@@ -21,14 +21,14 @@ Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backe
 
 ## Runtime
 
-- Node `22+`
+- Node `24.x`
 - Astro `6`
 - Vercel adapter in server mode
 
 Local shell note for this machine:
 
 ```bash
-export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+export PATH="/opt/homebrew/opt/node@24/bin:$PATH"
 ```
 
 ## Environment

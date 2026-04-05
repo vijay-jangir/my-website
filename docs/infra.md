@@ -3,7 +3,7 @@
 ## Required
 
 - `Vercel Hobby` for hosting
-- `Node 22+` locally and in Vercel project settings
+- `Node 24.x` locally and in Vercel project settings
 - `Wix` API key and site ID for blog fetches
 - `Neon Postgres` with `db/schema.sql` applied
 - `GitHub OAuth app` for admin-only resume tooling

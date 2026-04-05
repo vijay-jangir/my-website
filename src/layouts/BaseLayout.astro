@@ -5,26 +5,33 @@ import "@/src/styles/global.css";
 type Props = {
   title?: string;
   description?: string;
+  showAdminNav?: boolean;
+  showRouteHeader?: boolean;
 };
 
 const {
   title = siteProfile.name,
-  description = "Data and platform engineer focused on streaming systems, backend services, and recruiter-friendly proof of work.",
+  description = "Portfolio, resume, and selected work for Vijay Jangir across data platforms, backend systems, and streaming infrastructure.",
+  showAdminNav = false,
+  showRouteHeader = true,
 } = Astro.props;
 
-const navItems = [
+const routeNavItems = [
   { href: "/", label: "Home" },
   { href: "/resume", label: "Resume" },
   { href: "/work", label: "Work" },
   { href: "/blog", label: "Blog" },
-  { href: "/admin", label: "Admin" },
 ];
+
+if (showAdminNav) {
+  routeNavItems.push({ href: "/admin", label: "Admin" });
+}
 
 const pathname = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="en">
+<html class="scroll-smooth" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -44,80 +51,99 @@ const pathname = Astro.url.pathname;
       href={new URL(Astro.url.pathname, Astro.site).toString()}
       rel="canonical"
     />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <title>{title}</title>
   </head>
-  <body>
-    <div class="shell pb-20 pt-6 sm:pt-8">
-      <header
-        class="glass-panel sticky top-4 z-20 rounded-[2rem] px-4 py-4 sm:px-6"
-      >
-        <div
-          class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
-        >
-          <div>
-            <a class="text-lg font-semibold tracking-tight" href="/">
+  <body
+    class="min-h-screen bg-[radial-gradient(circle_at_18%_10%,rgba(176,177,255,0.34),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(255,214,223,0.42),transparent_24%),radial-gradient(circle_at_50%_72%,rgba(255,255,255,0.82),transparent_38%),linear-gradient(180deg,#fbfbff_0%,#f6f7fe_48%,#ffffff_100%)] font-[Manrope] text-[#0e1528] antialiased"
+  >
+    {
+      showRouteHeader ? (
+        <header class="fixed inset-x-0 top-4 z-40 flex justify-center px-4">
+          <div class="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl">
+            <a
+              class="px-3 py-2 text-sm font-bold tracking-tight text-[#0e1528]"
+              href="/"
+            >
               {siteProfile.name}
             </a>
-            <p class="mt-1 text-sm text-[var(--muted)]">{siteProfile.title}</p>
+            {routeNavItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <a
+                  aria-current={active ? "page" : undefined}
+                  class:list={[
+                    "rounded-full px-4 py-2 text-sm font-semibold transition",
+                    active
+                      ? "bg-white text-[#0e1528] shadow-[0_6px_18px_rgba(31,44,75,0.08)]"
+                      : "text-slate-500 hover:bg-white/80 hover:text-[#0e1528]",
+                  ]}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </div>
+        </header>
+      ) : null
+    }
 
-          <nav class="flex flex-wrap gap-2">
-            {
-              navItems.map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <a
-                    class:list={[
-                      "rounded-full px-4 py-2 text-sm font-semibold",
-                      active
-                        ? "bg-[var(--ink)] text-white"
-                        : "border border-[var(--line)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]",
-                    ]}
-                    href={item.href}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })
-            }
-          </nav>
-        </div>
-      </header>
-
+    <div
+      class:list={[
+        "mx-auto w-full max-w-[84rem] px-4",
+        showRouteHeader ? "pt-28" : "pt-0",
+      ]}
+    >
       <slot />
 
-      <footer
-        class="mt-16 border-t border-[var(--line)] py-8 text-sm text-[var(--muted)]"
-      >
+      <footer class="pb-10 pt-8 text-sm text-slate-500">
         <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          class="rounded-[2rem] border border-white/70 bg-white/65 px-6 py-6 shadow-[0_18px_46px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-8"
         >
-          <p>
-            Built for recruiter clarity, manager depth, and low-debt extension.
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <a
-              class="hover:text-[var(--ink)]"
-              href={siteProfile.githubUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              GitHub
-            </a>
-            <a
-              class="hover:text-[var(--ink)]"
-              href={siteProfile.linkedinUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              LinkedIn
-            </a>
-            <a
-              class="hover:text-[var(--ink)]"
-              href={`mailto:${siteProfile.email}`}
-            >
-              {siteProfile.email}
-            </a>
+          <div
+            class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div class="max-w-2xl">
+              <p
+                class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+              >
+                About this site
+              </p>
+              <p class="mt-3 text-base leading-7 text-slate-600">
+                Built to make a strong first impression and still hold up under
+                a closer read.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-5">
+              <a
+                class="font-semibold hover:text-[#0e1528]"
+                href={siteProfile.githubUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                GitHub
+              </a>
+              <a
+                class="font-semibold hover:text-[#0e1528]"
+                href={siteProfile.linkedinUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                LinkedIn
+              </a>
+              <a
+                class="font-semibold hover:text-[#0e1528]"
+                href={`mailto:${siteProfile.email}`}
+              >
+                {siteProfile.email}
+              </a>
+            </div>
           </div>
         </div>
       </footer>

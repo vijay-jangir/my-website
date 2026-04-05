@@ -11,20 +11,20 @@ import type {
 
 export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
-  title: "Data and Platform Engineer",
+  title: "Data Platform and Backend Engineer",
   location: "India",
   timezone: "Asia/Kolkata",
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   heroLabel:
-    "Data engineer building reliable platforms, streaming systems, and recruiter-friendly proof of work.",
+    "I build data platforms, streaming systems, and backend tools that stay reliable in production.",
   recruiterPitch:
-    "I build data and platform systems that stay reliable at scale, and I can reframe the story for AI, streaming, backend, or platform-focused roles without inventing new facts.",
+    "Over the last decade I have worked across telecom, retail, analytics, streaming, and platform engineering, usually on systems that multiple teams depend on. Start with the homepage for the short story, then open the resume or selected work when you want the deeper version.",
   overview: [
-    "I have spent the last decade working across data engineering, streaming systems, platform reliability, analytics, and internal developer tooling.",
-    "My strongest work is where systems design, product thinking, and operational discipline meet: large-scale data pipelines, event-driven platforms, and reusable engineering foundations.",
-    "This site is designed to support two journeys at once: a fast recruiter scan and a deeper manager-level review of the work, tradeoffs, and outcomes behind each project.",
+    "Most of my work has been on systems that move a lot of data, serve multiple teams, and cannot afford to be fragile.",
+    "I am strongest where platform thinking meets product reality: streaming pipelines, reusable data products, backend services, and engineering foundations that hold up over time.",
+    "This site is designed to be easy to scan first and rewarding to read more closely when you want the detail.",
   ],
 };
 
@@ -73,11 +73,10 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     label: "Overall profile",
     shortLabel: "General",
     category: "role",
-    headline: "Data and Platform Engineer",
+    headline: "Data Platform and Backend Engineer",
     summary:
-      "I build reliable data and platform systems across streaming, analytics, backend services, and operational tooling. My strongest work combines system design, delivery discipline, and business context.",
-    description:
-      "Balanced profile for recruiters or managers who want the full picture.",
+      "I build data and backend systems with a strong bias toward reliability, scale, and clear ownership. My best work spans streaming, platform foundations, analytics, and product-facing services.",
+    description: "Best starting point if you want the full picture.",
     aliases: ["general", "overall", "profile", "resume", "full stack profile"],
     relatedSkillIds: ["python", "java", "kafka", "flink", "spark", "sql"],
   },
@@ -86,11 +85,11 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     label: "AI",
     shortLabel: "AI",
     category: "domain",
-    headline: "AI and Data Platform Engineer",
+    headline: "AI Infrastructure and Backend Engineer",
     summary:
-      "I approach AI work from an engineering perspective: production Python, data pipelines, evaluation-friendly systems, backend services, and the platform foundations needed to make AI features reliable.",
+      "I focus on the engineering layer around AI: Python services, retrieval foundations, data pipelines, and the guardrails needed to run AI features in production.",
     description:
-      "For AI engineering, applied ML infrastructure, and data-heavy product roles.",
+      "For AI engineering, ML infrastructure, and data-heavy product roles.",
     aliases: [
       "ai",
       "ml",
@@ -112,9 +111,9 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     label: "Agentic development",
     shortLabel: "Agentic",
     category: "domain",
-    headline: "Agentic Development and AI Workflow Engineer",
+    headline: "Agentic Systems and Workflow Engineer",
     summary:
-      "I design practical AI workflows around structured data, deterministic fallbacks, model-assisted reasoning, and operational safeguards. The focus is useful systems, not novelty for its own sake.",
+      "I build agent-style workflows around structured inputs, deterministic fallbacks, and clear operational boundaries. The goal is useful automation, not magic.",
     description:
       "For agent tooling, workflow automation, and LLM-backed product engineering.",
     aliases: [
@@ -137,9 +136,9 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     label: "Backend engineering",
     shortLabel: "Backend",
     category: "role",
-    headline: "Backend and Data Infrastructure Engineer",
+    headline: "Backend Engineer for Data-Heavy Systems",
     summary:
-      "I build backend services and data-facing APIs with an emphasis on reliability, clear interfaces, and systems that survive production realities such as scale, latency, and operational load.",
+      "I build backend services and data-facing APIs with an emphasis on clean interfaces, reliable behavior, and systems that hold up under real production load.",
     description:
       "For backend-heavy roles that value data systems and platform thinking.",
     aliases: [
@@ -159,7 +158,7 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     category: "role",
     headline: "Platform and Reliability Engineer",
     summary:
-      "My platform work focuses on reusable foundations: data products, operational visibility, pipeline reliability, and developer workflows that make teams faster without creating fragile systems.",
+      "I build reusable platform foundations: data products, observability, operational tooling, and engineering workflows that make teams faster without making systems fragile.",
     description:
       "For platform, reliability, DevOps, and internal tooling roles.",
     aliases: [
@@ -177,11 +176,11 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     label: "Data platform",
     shortLabel: "Data Platform",
     category: "domain",
-    headline: "Data Platform and Streaming Engineer",
+    headline: "Data Platform Engineer",
     summary:
-      "I build data platforms that support ingestion, transformation, discovery, and downstream product use. The emphasis is durable architecture, developer ergonomics, and operating at meaningful scale.",
+      "I build data platforms for ingestion, transformation, discovery, and downstream product use. The value is durable architecture, clear ownership, and dependable operation.",
     description:
-      "For platform/data engineering roles centred on pipelines and data products.",
+      "For platform and data engineering roles centered on pipelines and data products.",
     aliases: [
       "data platform",
       "data engineer",
@@ -199,7 +198,7 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     category: "technology",
     headline: "Streaming Systems Engineer with Flink",
     summary:
-      "I use Flink where low-latency processing, event-driven decisioning, and operational control matter. The value is not the framework itself, but the systems and products it enables.",
+      "I use Flink for real-time systems where latency, throughput, and operational clarity all matter. The framework is only useful if the surrounding system is reliable.",
     description:
       "For real-time streaming systems, event pipelines, and Flink-heavy roles.",
     aliases: [
@@ -217,7 +216,7 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     category: "technology",
     headline: "Event-Driven Backend and Data Engineer",
     summary:
-      "Kafka has been central to my work in streaming pipelines, event-driven services, and product-level data flows. I use it where durability, throughput, and decoupled system boundaries matter.",
+      "Kafka has been central to my work in streaming pipelines, event-driven services, and product-level data flows. I use it where scale, durability, and clear system boundaries matter.",
     description:
       "For event-driven architecture, messaging, and streaming platform roles.",
     aliases: ["kafka", "apache kafka", "messaging", "event driven"],
@@ -230,7 +229,7 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     category: "technology",
     headline: "Python Engineer for Data, APIs, and Automation",
     summary:
-      "I use Python to build data products, automation, API layers, and AI-adjacent workflows. The strength is applying Python where it accelerates delivery without compromising operational clarity.",
+      "I use Python to build data products, APIs, automation, and AI-adjacent workflows. The value is faster delivery without losing operational clarity.",
     description: "For Python-first backend, data, and automation roles.",
     aliases: ["python", "python3", "pandas", "fastapi"],
     relatedSkillIds: ["python", "fastapi", "postgres", "airflow", "spark"],
@@ -306,6 +305,17 @@ export const skillDefinitions: readonly SkillDefinition[] = [
       "agentic-development": 0.8,
       "backend-engineering": 1,
       python: 0.9,
+    },
+  },
+  {
+    id: "astro",
+    label: "Astro",
+    category: "framework",
+    aliases: ["astro"],
+    focusWeights: {
+      general: 0.2,
+      "agentic-development": 0.2,
+      "backend-engineering": 0.2,
     },
   },
   {
@@ -446,14 +456,14 @@ export const projects: readonly ProjectDefinition[] = [
   {
     id: "portfolio-website",
     slug: "portfolio-website",
-    title: "Portfolio platform",
+    title: "Portfolio and resume platform",
     summary:
-      "Built this site in Next.js with a Wix-backed blog, structured resume data, deterministic focus-based ranking, and a zero-cost hosting path.",
+      "Built this site as a product surface with focused resume views, project search, ATS-safe PDF export, and a low-cost stack.",
     impact:
-      "Turns the portfolio into a recruiter path, manager deep-dive, and resume tailoring surface without depending on paid AI.",
+      "Turns one site into a sharp introduction, a deeper work sample, and a tailored resume tool.",
     detail:
-      "The portfolio is intentionally engineered like a product surface: free-first hosting, structured content, deterministic resume tailoring, ATS-safe PDF export, and clear separation between public content and admin-only tooling.",
-    skillIds: ["nextjs", "postgres", "fastapi", "python"],
+      "Built with Astro, Wix for blog content, deterministic focus ranking, private admin tooling, and room for future search and assistant features.",
+    skillIds: ["astro", "postgres", "fastapi", "python"],
     focusWeights: {
       general: 0.8,
       ai: 0.4,
@@ -477,11 +487,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "context-aware-rule-engine",
     title: "Context-aware rule engine",
     summary:
-      "Built a real-time decisioning platform that evaluated user activity and triggered downstream business rules with low latency.",
+      "Built a low-latency decision engine that evaluated user activity and triggered downstream actions in real time.",
     impact:
-      "Supported event-driven business decisions using streaming data instead of static reporting loops.",
+      "Moved business decisions closer to the event stream instead of waiting for offline reporting loops.",
     detail:
-      "The system consumed user behavior events, enriched them, evaluated context-aware conditions, and pushed decisions into downstream consumers. The key engineering problem was maintaining throughput while keeping the rule surface understandable for non-platform stakeholders.",
+      "The system consumed user events, enriched them, applied context-aware rules, and pushed results to downstream systems while keeping throughput high and the rule model understandable.",
     skillIds: ["flink", "kafka", "java", "airflow"],
     focusWeights: {
       general: 0.8,
@@ -500,11 +510,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "telecom-network-datalake",
     title: "Telecom network datalake",
     summary:
-      "Designed and implemented a data lake and warehouse for mobile network telemetry operating at petabyte scale and more than two trillion events per day.",
+      "Designed a petabyte-scale telemetry platform for mobile network data, handling more than two trillion events per day.",
     impact:
-      "Created a durable analytics foundation for network visibility, downstream data products, and operational reporting.",
+      "Created the analytics foundation used for network visibility, downstream data products, and operational reporting.",
     detail:
-      "The work covered ingestion, modeling, platform reliability, and downstream access patterns for highly voluminous network telemetry. The hard part was balancing scale, cost, and operability while keeping the platform useful for multiple consumers.",
+      "Balanced ingestion scale, storage cost, usability, and operational reliability across multiple downstream consumers.",
     skillIds: ["flink", "kafka", "java", "nifi", "airflow", "sql"],
     focusWeights: {
       general: 1,
@@ -523,11 +533,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "retail-cross-shopping",
     title: "Retail cross-shopping analysis",
     summary:
-      "Developed a solution for global retailers to analyze cross-shopping behavior across departments, categories, and products, enriched with customer segmentation.",
+      "Built analytics that showed how customers shopped across departments, categories, and products, with segmentation layered in.",
     impact:
-      "Helped retail teams identify patterns that informed merchandising and customer strategy decisions.",
+      "Helped retail teams turn customer behavior into merchandising and strategy decisions.",
     detail:
-      "This project combined analytical modeling with production data engineering. The work needed to be understandable to business teams while still being robust enough to run repeatedly at retail data scale.",
+      "Combined analytical modeling with production data engineering in a form that business teams could understand and use.",
     skillIds: ["spark", "python", "sql", "airflow"],
     focusWeights: {
       general: 0.7,
@@ -544,11 +554,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "retail-association-rule-engine",
     title: "Retail association engine",
     summary:
-      "Built a large-scale association engine to understand which products, categories, and departments were bought together using Apriori-based analysis.",
+      "Built a large-scale association engine to understand which products, categories, and departments were bought together.",
     impact:
-      "Translated large-scale basket behavior into useful retail intelligence and repeatable decision support.",
+      "Turned large-scale basket behavior into usable retail intelligence and repeatable decision support.",
     detail:
-      "The challenge was not only the algorithmic work; it was building a repeatable and consumable analytics product that fit the cadence of retail planning and reporting.",
+      "The hard part was not only the algorithmic work, but turning it into a repeatable analytics product that matched the cadence of retail planning.",
     skillIds: ["spark", "python", "sql", "airflow"],
     focusWeights: {
       general: 0.6,
@@ -565,11 +575,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "retail-category-uplift",
     title: "Retail uplift and cannibalization analysis",
     summary:
-      "Developed a solution to measure category uplift from new product launches, incremental contribution to sales, and cannibalization within the same category.",
+      "Built analytics to measure category uplift from new launches, incremental sales contribution, and cannibalization within the same category.",
     impact:
-      "Gave stakeholders a clearer view of how launches affected category performance beyond top-line sales.",
+      "Gave stakeholders a clearer view of how launches changed category performance beyond top-line sales.",
     detail:
-      "The value came from connecting analytical reasoning with reliable data preparation. It had to be trusted by business users, not just technically correct in isolation.",
+      "The value came from combining sound analysis with reliable data preparation that business users could trust.",
     skillIds: ["spark", "python", "sql", "airflow"],
     focusWeights: {
       general: 0.6,
@@ -591,7 +601,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     companyUrl: "https://careers.airtel.com",
     type: "employment",
     description:
-      "I work on large-scale data engineering systems with an emphasis on distributed platforms, dependable delivery, and reusable data products.",
+      "Building large-scale data platforms for network telemetry and product data, with a focus on scale, reliability, and reuse.",
     date: "2021 - present",
     icon: "/project_img/org-airtel.png",
     focusWeights: {
@@ -605,7 +615,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     bullets: [
       {
         id: "airtel-scale",
-        text: "Design petabyte-scale data pipelines and platform capabilities for network and product-facing data systems.",
+        text: "Designed petabyte-scale pipelines and platform capabilities for network and product-facing data systems.",
         skillIds: ["flink", "kafka", "sql", "airflow"],
         focusWeights: {
           general: 1,
@@ -618,7 +628,7 @@ export const experiences: readonly ExperienceDefinition[] = [
       },
       {
         id: "airtel-products",
-        text: "Build reusable data product interfaces that reduce repeated work for downstream consumers and internal teams.",
+        text: "Built reusable data products and access patterns that reduced repeated work for downstream teams.",
         skillIds: ["python", "sql", "postgres"],
         focusWeights: {
           general: 0.8,
@@ -630,7 +640,7 @@ export const experiences: readonly ExperienceDefinition[] = [
       },
       {
         id: "airtel-reliability",
-        text: "Improve operational reliability through design choices that reduce breakage, simplify ownership, and increase observability.",
+        text: "Improved reliability and observability so ownership stayed clearer and incidents were easier to manage.",
         skillIds: ["grafana", "kubernetes", "airflow"],
         focusWeights: {
           general: 0.8,
@@ -647,7 +657,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     companyUrl: "https://www.dunnhumby.com/careers/",
     type: "employment",
     description:
-      "Worked between data scientists and big data platforms to productize analytics, reporting, customer segmentation, and data marts for global retailers.",
+      "Worked between data science and big data platform teams to turn retail analytics into repeatable products and pipelines.",
     date: "2018 - 2021",
     icon: "/project_img/org-dh.jpg",
     focusWeights: {
@@ -671,7 +681,7 @@ export const experiences: readonly ExperienceDefinition[] = [
       },
       {
         id: "dh-retail",
-        text: "Built reporting, segmentation, and customer behavior solutions for large retailer datasets with an emphasis on trust and repeatability.",
+        text: "Built reporting, segmentation, and customer behavior solutions for large retail datasets with an emphasis on trust and repeatability.",
         skillIds: ["spark", "python", "sql", "airflow"],
         focusWeights: {
           general: 0.7,
@@ -690,7 +700,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     companyUrl: "https://careers.mphasis.com/home.html",
     type: "employment",
     description:
-      "Worked across mainframe and big data systems for insurance and telecom clients, including migration work and time-saving automation.",
+      "Worked across enterprise data and migration projects for insurance and telecom clients, including automation that removed substantial manual work.",
     date: "2014 - 2018",
     icon: "/project_img/org-mphasis.png",
     focusWeights: {
@@ -733,7 +743,7 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     label: "Experience",
     value: "10+ years",
     detail:
-      "Hands-on work across data engineering, analytics, streaming, and platform systems.",
+      "Hands-on work across telecom, retail, analytics, streaming, and platform systems.",
     focusWeights: {
       general: 1,
     },
@@ -743,7 +753,7 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     label: "Scale",
     value: "2T+ events/day",
     detail:
-      "Shipped systems that had to stay useful under very large network telemetry volumes.",
+      "Worked on network telemetry systems operating at very high event volume.",
     focusWeights: {
       general: 1,
       "platform-engineering": 0.8,
@@ -754,10 +764,10 @@ export const profileHighlights: readonly ProfileHighlight[] = [
   },
   {
     id: "systems",
-    label: "Strength",
-    value: "Streaming and platforms",
+    label: "Best at",
+    value: "Streaming, platforms, and data systems",
     detail:
-      "Strongest at reliable data products, event systems, and engineering foundations.",
+      "Strongest when scale, reliability, and clarity all matter at the same time.",
     focusWeights: {
       general: 1,
       "backend-engineering": 0.5,
@@ -773,23 +783,23 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
   {
     id: "general",
     focusIds: ["general"],
-    headline: "Data and Platform Engineer",
+    headline: "Data Platform and Backend Engineer",
     summary:
-      "I build reliable data and platform systems across streaming, analytics, backend services, and operational tooling. My strongest work combines system design, delivery discipline, and business context.",
+      "I build data and backend systems with a strong bias toward reliability, scale, and clear ownership. My best work spans streaming, platform foundations, analytics, and product-facing services.",
   },
   {
     id: "ai",
     focusIds: ["ai"],
-    headline: "AI and Data Platform Engineer",
+    headline: "AI Infrastructure and Backend Engineer",
     summary:
-      "I focus on the engineering side of AI work: Python, backend services, structured data, retrieval foundations, and the platform work needed to make AI features stable in production.",
+      "I focus on the engineering side of AI work: Python services, retrieval foundations, structured data, and the platform work needed to make AI features reliable in production.",
   },
   {
     id: "backend",
     focusIds: ["backend-engineering"],
-    headline: "Backend and Data Infrastructure Engineer",
+    headline: "Backend Engineer for Data-Heavy Systems",
     summary:
-      "I build backend services and data-facing APIs with a bias toward clear interfaces, operational reliability, and systems that hold up under production load.",
+      "I build backend services and data-facing APIs with a bias toward clean interfaces, reliable behavior, and systems that hold up under production load.",
   },
   {
     id: "platform",

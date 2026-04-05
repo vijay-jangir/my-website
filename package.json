@@ -25,7 +25,10 @@
     ]
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": "24.x"
+  },
+  "overrides": {
+    "vite": "^7.3.1"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.3",
@@ -34,6 +37,7 @@
     "arctic": "^3.7.0",
     "astro": "^6.1.3",
     "clsx": "^1.2.1",
+    "framer-motion": "^12.38.0",
     "jose": "^6.2.2",
     "pg": "^8.20.0",
     "react": "18.2.0",

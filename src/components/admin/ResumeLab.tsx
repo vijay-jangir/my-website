@@ -60,22 +60,22 @@ export default function ResumeLab({ focusOptions }: Props) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)]">
       <form
-        className="rounded-[2rem] border border-[var(--line)] bg-white/75 p-6 shadow-sm"
+        className="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-semibold text-[#0e1528]">
           Tailor a private resume variant
         </h2>
-        <p className="mt-2 text-sm leading-7 text-[var(--muted)]">
+        <p className="mt-2 text-sm leading-7 text-slate-600">
           Paste a job description, optionally pin a few focus areas, and
           generate a shareable resume variant without depending on a hosted LLM.
         </p>
 
-        <label className="mt-6 block text-sm font-medium text-[var(--ink)]">
+        <label className="mt-6 block text-sm font-medium text-[#0e1528]">
           Job description
         </label>
         <textarea
-          className="mt-2 h-64 w-full rounded-[1.5rem] border border-[var(--line)] bg-white p-4 text-sm outline-none focus:border-[var(--accent)]"
+          className="mt-2 h-64 w-full rounded-[1.5rem] border border-slate-200/80 bg-white p-4 text-sm text-[#0e1528] outline-none transition focus:border-slate-300"
           maxLength={10000}
           minLength={80}
           name="jobDescription"
@@ -84,7 +84,7 @@ export default function ResumeLab({ focusOptions }: Props) {
         />
 
         <fieldset className="mt-6">
-          <legend className="text-sm font-medium text-[var(--ink)]">
+          <legend className="text-sm font-medium text-[#0e1528]">
             Pin focus overrides
           </legend>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -97,8 +97,8 @@ export default function ResumeLab({ focusOptions }: Props) {
                   <button
                     className={
                       isSelected
-                        ? "rounded-full bg-[var(--ink)] px-4 py-2 text-sm font-semibold text-white"
-                        : "rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]"
+                        ? "rounded-full bg-[#11192c] px-4 py-2 text-sm font-semibold text-white"
+                        : "rounded-full border border-slate-200/80 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-[#0e1528]"
                     }
                     key={focus.id}
                     onClick={(event) => {
@@ -121,7 +121,7 @@ export default function ResumeLab({ focusOptions }: Props) {
         </fieldset>
 
         <button
-          className="mt-6 w-full rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 w-full rounded-full bg-[#11192c] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222] disabled:cursor-not-allowed disabled:opacity-60"
           disabled={loading}
           type="submit"
         >
@@ -135,18 +135,22 @@ export default function ResumeLab({ focusOptions }: Props) {
         ) : null}
       </form>
 
-      <section className="rounded-[2rem] border border-[var(--line)] bg-white/75 p-6 shadow-sm">
-        <h2 className="text-xl font-semibold">Analysis result</h2>
+      <section className="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+        <h2 className="text-xl font-semibold text-[#0e1528]">
+          Analysis result
+        </h2>
         {!result ? (
-          <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
+          <p className="mt-4 text-sm leading-7 text-slate-600">
             The parser will return weighted focus areas, skill matches, a
             preview headline and summary, plus shareable resume and PDF links.
           </p>
         ) : (
           <div className="mt-4 space-y-5 text-sm">
-            <div className="rounded-[1.5rem] bg-[var(--accent-soft)] p-4">
-              <p className="font-semibold">{result.variant?.headline}</p>
-              <p className="mt-2 leading-7 text-[var(--muted)]">
+            <div className="rounded-[1.5rem] bg-slate-100/80 p-4">
+              <p className="font-semibold text-[#0e1528]">
+                {result.variant?.headline}
+              </p>
+              <p className="mt-2 leading-7 text-slate-600">
                 {result.variant?.summary}
               </p>
             </div>
@@ -156,7 +160,7 @@ export default function ResumeLab({ focusOptions }: Props) {
               <div className="mt-2 flex flex-wrap gap-2">
                 {result.analysis?.focusScores.map((focus) => (
                   <span
-                    className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-semibold text-[var(--muted)]"
+                    className="rounded-full border border-slate-200/80 px-3 py-1 text-xs font-semibold text-slate-600"
                     key={focus.focusId}
                   >
                     {focus.label} {(focus.score * 100).toFixed(0)}%
@@ -170,7 +174,7 @@ export default function ResumeLab({ focusOptions }: Props) {
               <div className="mt-2 flex flex-wrap gap-2">
                 {result.variant?.primarySkills.map((skill) => (
                   <span
-                    className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-semibold text-[var(--muted)]"
+                    className="rounded-full border border-slate-200/80 px-3 py-1 text-xs font-semibold text-slate-600"
                     key={skill.id}
                   >
                     {skill.label}
@@ -181,7 +185,7 @@ export default function ResumeLab({ focusOptions }: Props) {
 
             <div>
               <h3 className="font-semibold">Highlights</h3>
-              <ul className="mt-2 space-y-2 text-[var(--muted)]">
+              <ul className="mt-2 space-y-2 text-slate-600">
                 {result.analysis?.extractedHighlights.map((highlight) => (
                   <li key={highlight}>{highlight}</li>
                 ))}
@@ -193,13 +197,13 @@ export default function ResumeLab({ focusOptions }: Props) {
               <ul className="mt-2 space-y-3">
                 {result.variant?.projects.map((project) => (
                   <li
-                    className="rounded-[1.5rem] border border-[var(--line)] p-3"
+                    className="rounded-[1.5rem] border border-slate-200/80 p-3"
                     key={project.id}
                   >
-                    <p className="font-medium">{project.title}</p>
-                    <p className="mt-1 text-[var(--muted)]">
-                      {project.summary}
+                    <p className="font-medium text-[#0e1528]">
+                      {project.title}
                     </p>
+                    <p className="mt-1 text-slate-600">{project.summary}</p>
                   </li>
                 ))}
               </ul>
@@ -208,7 +212,7 @@ export default function ResumeLab({ focusOptions }: Props) {
             <div className="flex flex-wrap gap-3">
               {result.resumeUrl ? (
                 <a
-                  className="rounded-full bg-[var(--ink)] px-4 py-2 font-semibold text-white hover:opacity-90"
+                  className="rounded-full bg-[#11192c] px-4 py-2 font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
                   href={result.resumeUrl}
                   rel="noreferrer"
                   target="_blank"
@@ -218,7 +222,7 @@ export default function ResumeLab({ focusOptions }: Props) {
               ) : null}
               {result.pdfUrl ? (
                 <a
-                  className="rounded-full border border-[var(--line)] px-4 py-2 font-semibold hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]"
+                  className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
                   href={result.pdfUrl}
                   rel="noreferrer"
                   target="_blank"
@@ -228,7 +232,7 @@ export default function ResumeLab({ focusOptions }: Props) {
               ) : null}
             </div>
 
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-xs text-slate-500">
               {result.saved
                 ? "This variant was saved in the database."
                 : "Database storage is not configured yet, so the public links use focus-based fallback only."}

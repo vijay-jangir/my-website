@@ -9,6 +9,8 @@ type Props = {
   siteProfile?: SiteProfile;
   showAdminNav?: boolean;
   showRouteHeader?: boolean;
+  socialImageAlt?: string;
+  socialImagePath?: string;
   title?: string;
 };
 
@@ -17,6 +19,8 @@ const {
   siteProfile: siteProfileOverride,
   showAdminNav = false,
   showRouteHeader = true,
+  socialImageAlt = "Profile photo of Vijay Jangir",
+  socialImagePath = "/og-preview.jpg",
   title: titleOverride,
 } = Astro.props;
 
@@ -24,6 +28,26 @@ const siteProfile =
   siteProfileOverride ?? (await getPortfolioContent()).siteProfile;
 const title = titleOverride ?? siteProfile.name;
 const typographyCssVariables = buildTypographyCssVariables();
+const siteBase = Astro.site ?? Astro.url;
+const canonicalUrl = new URL(Astro.url.pathname, siteBase).toString();
+const socialImageUrl = new URL(socialImagePath, siteBase).toString();
+const personJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  description,
+  email: siteProfile.email,
+  image: new URL(
+    siteProfile.profileImageUrl ?? socialImagePath,
+    siteBase,
+  ).toString(),
+  jobTitle: siteProfile.title,
+  knowsAbout: siteProfile.currentFocusLabels,
+  mainEntityOfPage: canonicalUrl,
+  name: siteProfile.name,
+  sameAs: [siteProfile.githubUrl, siteProfile.linkedinUrl].filter(Boolean),
+  url: new URL("/", siteBase).toString(),
+  worksFor: undefined,
+});
 
 const routeNavItems = [
   { href: "/", label: "Home", activeOn: ["/"] },
@@ -46,21 +70,25 @@ const pathname = Astro.url.pathname;
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content={description} name="description" />
+    <link href="/favico.ico" rel="icon" sizes="any" />
+    <link href="/favico.png" rel="icon" type="image/png" />
+    <link href="/favico.png" rel="apple-touch-icon" />
     <meta content={siteProfile.name} property="og:site_name" />
     <meta content={title} property="og:title" />
     <meta content={description} property="og:description" />
-    <meta
-      content={new URL(Astro.url.pathname, Astro.site).toString()}
-      property="og:url"
-    />
+    <meta content={canonicalUrl} property="og:url" />
     <meta content="website" property="og:type" />
+    <meta content={socialImageUrl} property="og:image" />
+    <meta content={socialImageAlt} property="og:image:alt" />
+    <meta content="1200" property="og:image:width" />
+    <meta content="630" property="og:image:height" />
     <meta content="summary_large_image" name="twitter:card" />
     <meta content={title} name="twitter:title" />
     <meta content={description} name="twitter:description" />
-    <link
-      href={new URL(Astro.url.pathname, Astro.site).toString()}
-      rel="canonical"
-    />
+    <meta content={socialImageUrl} name="twitter:image" />
+    <meta content={socialImageAlt} name="twitter:image:alt" />
+    <link href={canonicalUrl} rel="canonical" />
+    <script is:inline set:html={personJsonLd} type="application/ld+json" />
     <title>{title}</title>
   </head>
   <body

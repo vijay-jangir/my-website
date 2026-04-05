@@ -30,7 +30,25 @@ const content = await getPortfolioContent();
             Blog
           </h1>
           <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-            Posts are published on Wix and listed here.
+            Technical writing, architecture notes, and systems thinking that add
+            depth to the work featured on this site.
+          </p>
+          <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
+            Start with
+            <a
+              class="font-semibold text-[#1f3b73] hover:text-[#15284c]"
+              href="/"
+            >
+              home</a
+            > for the overview,
+            <a
+              class="font-semibold text-[#1f3b73] hover:text-[#15284c]"
+              href="/projects">projects</a
+            > for delivery proof, or the
+            <a
+              class="font-semibold text-[#1f3b73] hover:text-[#15284c]"
+              href="/resume">resume</a
+            > for a role-specific summary.
           </p>
         </div>
 
@@ -43,7 +61,8 @@ const content = await getPortfolioContent();
           <p class="mt-3 text-sm leading-7 text-slate-600">
             Profile content was refreshed {
               content.siteProfile.lastUpdatedLabel
-            }. Blog posts are fetched from Wix when credentials are configured.
+            }. Posts are authored in Wix and surfaced here when credentials are
+            configured.
           </p>
         </div>
       </div>

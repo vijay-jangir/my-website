@@ -8,9 +8,17 @@ const content = await getPortfolioContent();
 const featuredProjects = getPublicProjectsFromContent(content)
   .filter((project) => project.featured)
   .slice(0, 3);
+const homeTitle =
+  "Vijay Jangir | Data Engineer for Analytics & Platform Systems";
+const homeDescription =
+  "Data engineer building analytics platforms, backend systems, and streaming data products. Explore Vijay Jangir's projects, resume, and technical writing.";
 ---
 
-<BaseLayout siteProfile={content.siteProfile}>
+<BaseLayout
+  description={homeDescription}
+  siteProfile={content.siteProfile}
+  title={homeTitle}
+>
   <HomePage
     client:load
     experiences={content.experiences}

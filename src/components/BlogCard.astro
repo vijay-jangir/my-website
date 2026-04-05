@@ -1,26 +1,20 @@
 ---
-type BlogPost = {
-  id: string;
-  title: string;
-  excerpt: string;
-  url: {
-    base: string;
-    path: string;
-  };
-};
+import { getWixBlogHref, type WixBlogPost } from "@/src/lib/wix";
 
 type Props = {
-  post: BlogPost;
+  post: WixBlogPost;
 };
 
 const { post } = Astro.props;
+const href = getWixBlogHref(post);
+const isExternal = href.startsWith("http");
 ---
 
 <a
   class="block rounded-[1.75rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
-  href={`${post.url.base}${post.url.path}`}
-  rel="noreferrer"
-  target="_blank"
+  href={href}
+  rel={isExternal ? "noreferrer" : undefined}
+  target={isExternal ? "_blank" : undefined}
 >
   <p
     class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
@@ -33,5 +27,7 @@ const { post } = Astro.props;
     {post.title}
   </h3>
   <p class="mt-4 text-base leading-8 text-slate-600">{post.excerpt}</p>
-  <p class="mt-6 text-sm font-semibold text-[#1f3b73]">Read full post</p>
+  <p class="mt-6 text-sm font-semibold text-[#1f3b73]">
+    {isExternal ? "Read full post on Wix" : "Read full post"}
+  </p>
 </a>

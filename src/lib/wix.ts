@@ -1,9 +1,17 @@
 import { env } from "@/lib/env";
 
+const WIX_POSTS_API_URL = "https://www.wixapis.com/v3/posts";
+const WIX_BLOG_REVALIDATE_SECONDS = 60 * 30;
+
 export type WixBlogPost = {
   id: string;
   title: string;
   excerpt: string;
+  slug?: string;
+  contentText?: string;
+  firstPublishedDate?: string;
+  lastPublishedDate?: string;
+  minutesToRead?: number;
   url: {
     base: string;
     path: string;
@@ -14,31 +22,190 @@ type WixPostsResponse = {
   posts?: WixBlogPost[];
 };
 
-export async function getWixBlogs() {
-  if (!env.wixApiKey) {
-    return [];
+type WixPostResponse = {
+  post?: WixBlogPost;
+};
+
+type WixRequestInit = RequestInit & {
+  next?: {
+    revalidate?: number;
+  };
+};
+
+type WixFetchResult<T> =
+  | {
+      status: "ok";
+      data: T;
+    }
+  | {
+      status: "missing_credentials" | "not_found" | "error";
+    };
+
+export type WixBlogPostLookupResult =
+  | {
+      status: "ok";
+      post: WixBlogPost;
+    }
+  | {
+      status: "missing_credentials" | "not_found" | "error";
+    };
+
+export const WIX_BLOG_DETAIL_CACHE_CONTROL =
+  "public, s-maxage=1800, stale-while-revalidate=86400";
+
+function hasWixBlogCredentials() {
+  return Boolean(env.wixApiKey);
+}
+
+function buildWixRequestInit(init: WixRequestInit = {}): WixRequestInit {
+  const headers = new Headers(init.headers);
+
+  headers.set("Authorization", env.wixApiKey ?? "");
+  headers.set("wix-site-id", env.wixSiteId);
+  headers.set("Content-Type", "application/json");
+
+  return {
+    cache: "force-cache",
+    ...init,
+    headers,
+    next: {
+      revalidate: WIX_BLOG_REVALIDATE_SECONDS,
+      ...init.next,
+    },
+  };
+}
+
+async function wixFetch<T>(
+  path: string,
+  init?: WixRequestInit,
+): Promise<WixFetchResult<T>> {
+  if (!hasWixBlogCredentials()) {
+    return { status: "missing_credentials" };
   }
 
   try {
-    const response = await fetch("https://www.wixapis.com/v3/posts/query", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: env.wixApiKey,
-        "wix-site-id": env.wixSiteId,
-      },
-      body: JSON.stringify({
-        fieldsets: ["URL"],
-      }),
-    });
+    const response = await fetch(
+      `${WIX_POSTS_API_URL}${path}`,
+      buildWixRequestInit(init),
+    );
 
-    if (!response.ok) {
-      return [];
+    if (response.status === 404) {
+      return { status: "not_found" };
     }
 
-    const payload = (await response.json()) as WixPostsResponse;
-    return payload.posts ?? [];
+    if (!response.ok) {
+      return { status: "error" };
+    }
+
+    return {
+      status: "ok",
+      data: (await response.json()) as T,
+    };
   } catch {
+    return { status: "error" };
+  }
+}
+
+export async function getWixBlogs() {
+  const result = await wixFetch<WixPostsResponse>("/query", {
+    method: "POST",
+    body: JSON.stringify({
+      fieldsets: ["URL"],
+    }),
+  });
+
+  if (result.status !== "ok") {
     return [];
   }
+
+  return result.data.posts ?? [];
+}
+
+export async function getWixBlogPostBySlug(
+  slug: string,
+): Promise<WixBlogPostLookupResult> {
+  const result = await wixFetch<WixPostResponse>(
+    `/slugs/${encodeURIComponent(slug)}`,
+  );
+
+  if (result.status !== "ok") {
+    return result;
+  }
+
+  if (!result.data.post) {
+    return { status: "not_found" };
+  }
+
+  return {
+    status: "ok",
+    post: result.data.post,
+  };
+}
+
+export function getWixBlogParagraphs(contentText?: string) {
+  return (contentText ?? "")
+    .split(/\n{2,}/)
+    .map((paragraph) =>
+      paragraph
+        .replace(/\s*\n\s*/g, " ")
+        .replace(/\s+/g, " ")
+        .trim(),
+    )
+    .filter(Boolean);
+}
+
+export function getWixBlogDescription(
+  post?: Pick<WixBlogPost, "excerpt" | "contentText"> | null,
+) {
+  const excerpt = post?.excerpt?.trim();
+
+  if (excerpt) {
+    return excerpt;
+  }
+
+  return (
+    getWixBlogParagraphs(post?.contentText)[0] ??
+    "Read this Wix-authored post on Vijay Jangir's main site."
+  );
+}
+
+export function getWixBlogSlug(post: Pick<WixBlogPost, "slug" | "url">) {
+  const explicitSlug = post.slug?.trim();
+
+  if (explicitSlug) {
+    return explicitSlug;
+  }
+
+  const rawPath = post.url.path.split(/[?#]/, 1)[0]?.replace(/\/+$/, "");
+
+  if (!rawPath) {
+    return null;
+  }
+
+  const segments = rawPath.split("/").filter(Boolean);
+  const fallbackSlug = segments.at(-1);
+
+  if (!fallbackSlug || fallbackSlug === "blog" || fallbackSlug === "post") {
+    return null;
+  }
+
+  return decodeURIComponent(fallbackSlug);
+}
+
+export function getWixBlogLocalPath(post: Pick<WixBlogPost, "slug" | "url">) {
+  const slug = getWixBlogSlug(post);
+
+  if (!slug) {
+    return null;
+  }
+
+  return `/blog/${encodeURIComponent(slug)}`;
+}
+
+export function getWixBlogSourceUrl(post: Pick<WixBlogPost, "url">) {
+  return `${post.url.base}${post.url.path}`;
+}
+
+export function getWixBlogHref(post: Pick<WixBlogPost, "slug" | "url">) {
+  return getWixBlogLocalPath(post) ?? getWixBlogSourceUrl(post);
 }

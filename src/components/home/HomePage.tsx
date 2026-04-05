@@ -56,6 +56,35 @@ export default function HomePage({
 
   const [primaryProject, ...secondaryProjects] = featuredProjects;
   const topSkills = skillDefinitions.slice(0, 14);
+  const quickAnswers = [
+    {
+      answer:
+        "I build data platforms, ETL pipelines, streaming systems, and backend services for analytics-heavy products and internal platforms.",
+      links: [
+        { href: "/projects", label: "See projects" },
+        { href: "/resume", label: "Open resume" },
+      ],
+      question: "What do I build?",
+    },
+    {
+      answer:
+        "The strongest fit is data engineering, platform engineering, backend, and analytics-platform work where reliability matters as much as delivery speed.",
+      links: [
+        { href: "/resume", label: "Role-focused resume" },
+        { href: "/#experience", label: "Review experience" },
+      ],
+      question: "What roles fit best?",
+    },
+    {
+      answer:
+        "Use the projects page for proof, the resume for a focused summary, and the blog for systems thinking and technical writing.",
+      links: [
+        { href: "/blog", label: "Read the blog" },
+        { href: "/projects", label: "Browse proof" },
+      ],
+      question: "Where should you start?",
+    },
+  ] as const;
 
   function getSkillLabel(skillId: string) {
     return skillLabelById[skillId] ?? skillId;
@@ -93,7 +122,7 @@ export default function HomePage({
 
         <motion.h1
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 max-w-[13ch] font-display text-5xl font-semibold leading-[1.06] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
+          className="mt-6 max-w-[16ch] font-display text-5xl font-semibold leading-[1.06] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
           initial={prefersReducedMotion ? false : { opacity: 0, y: 32 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
@@ -234,6 +263,8 @@ export default function HomePage({
           {[
             { href: "#about", label: "About" },
             { href: "#projects", label: "Projects" },
+            { href: "/resume", label: "Resume" },
+            { href: "/blog", label: "Blog" },
             { href: "#skills", label: "Skills" },
             { href: "#experience", label: "Experience" },
             { href: "#contact", label: "Contact" },
@@ -248,6 +279,52 @@ export default function HomePage({
           ))}
         </motion.div>
       </section>
+
+      <Section
+        copy={[
+          "Short, direct answers for recruiters, search engines, and readers evaluating the work on this site.",
+        ]}
+        id="answers"
+        kicker="Quick answers"
+        medium={true}
+        prefersReducedMotion={prefersReducedMotion}
+        title="What I do and where to start"
+      >
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {quickAnswers.map((item, index) => (
+            <motion.article
+              className="rounded-[1.9rem] border border-white/70 bg-white/78 px-6 py-6 text-left shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl"
+              custom={0.1 + index * 0.04}
+              initial={initial}
+              key={item.question}
+              variants={fadeUp}
+              viewport={viewport}
+              whileInView={whileInView}
+            >
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Quick answer
+              </p>
+              <h3 className="mt-4 text-2xl font-semibold tracking-tight text-[#0e1528]">
+                {item.question}
+              </h3>
+              <p className="mt-4 text-sm leading-7 text-slate-600">
+                {item.answer}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {item.links.map((link) => (
+                  <a
+                    className="rounded-full border border-slate-200/80 bg-white/92 px-3 py-2 text-xs font-semibold text-[#1f3b73] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-[#15284c]"
+                    href={link.href}
+                    key={link.href}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </Section>
 
       <Section
         copy={siteProfile.overview}
@@ -499,7 +576,7 @@ export default function HomePage({
 
       <Section
         copy={[
-          "I also write about systems, engineering, and related ideas from time to time.",
+          "I write about systems, engineering decisions, and the kinds of platform problems that show up in the work on this site.",
         ]}
         id="blog-bridge"
         medium={true}
@@ -522,8 +599,9 @@ export default function HomePage({
             Open the blog
           </a>
           <p className="mt-4 text-sm leading-7 text-slate-500">
-            Posts are published on Wix and surfaced here so the writing stays
-            easy to find from this site.
+            The blog adds technical depth to the projects and resume, so readers
+            can move from a summary to longer-form engineering context without
+            leaving the site navigation.
           </p>
         </motion.div>
       </Section>

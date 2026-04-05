@@ -11,11 +11,12 @@ import type {
 
 export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
-  title: "Data Engineering · Analytics · Platforms · DevOps",
+  title: "Data engineering · analytics platforms · backend systems",
   location: "India",
   timezone: "Asia/Kolkata",
   lastUpdatedLabel: "April 2026",
-  contentPromise: "I keep this profile current as the work evolves.",
+  contentPromise:
+    "I keep this site current with focused resume views, project proof, and technical writing.",
   currentFocusLabels: [
     "Data engineering",
     "Distributed systems",
@@ -25,13 +26,13 @@ export const siteProfile: SiteProfile = {
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   profileImageUrl: "/profile-pic.jpeg",
-  heroLabel: "Data Engineer | Data Analyst | Platform Engineer | DevOps.",
+  heroLabel: "I build data platforms and distributed systems.",
   recruiterPitch:
-    "I am a data analytics evangelist and dedicated data engineer with a passion for transforming raw data into valuable insights.",
+    "I am a data engineer focused on ETL pipelines, analytics products, and backend systems that teams can rely on in production.",
   overview: [
-    "Hello! I am a data analytics evangelist and dedicated data engineer with a passion for transforming raw data into valuable insights. With expertise in data modeling, ETL processes, and data visualization, I enjoy streamlining complex workflows and uncovering hidden patterns.",
-    "As a constant learner, I stay updated with the latest trends and technologies in data and analytics. I believe collaboration is key to solving challenges, and I enjoy working with people who care about building useful systems.",
-    "If you are looking for someone who can work across data engineering, analytics, distributed systems, and platform thinking, I would be glad to connect.",
+    "I build data platforms, streaming pipelines, and backend services for teams that need reliable analytics and operational clarity.",
+    "My work spans telecom, retail, observability, and internal platform tooling, usually where distributed systems, ETL, and reusable data products all intersect.",
+    "If you want the fastest evaluation path, start with the projects page for proof, the focused resume for role fit, and the blog for technical writing.",
   ],
 };
 

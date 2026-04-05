@@ -10,7 +10,7 @@ const featuredProjects = getPublicProjectsFromContent(content)
   .slice(0, 3);
 ---
 
-<BaseLayout showRouteHeader={false} siteProfile={content.siteProfile}>
+<BaseLayout siteProfile={content.siteProfile}>
   <HomePage
     client:load
     experiences={content.experiences}

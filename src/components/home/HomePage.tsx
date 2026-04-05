@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
 import { FaGithubSquare } from "react-icons/fa";
@@ -15,17 +15,6 @@ import {
   type SkillDefinition,
 } from "@/lib/portfolio-types";
 import { resolveReducedMotionPreference } from "@/src/lib/motion";
-
-const sections = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "projects", label: "Projects" },
-  { id: "skills", label: "Skills" },
-  { id: "experience", label: "Experience" },
-  { id: "contact", label: "Contact" },
-] as const;
-
-const sectionIds = sections.map((section) => section.id);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -57,8 +46,6 @@ export default function HomePage({
 }: Props) {
   const prefersReducedMotion =
     resolveReducedMotionPreference(useReducedMotion());
-  const [activeSection, setActiveSection] =
-    useState<(typeof sectionIds)[number]>("home");
   const skillLabelById = useMemo(
     () =>
       Object.fromEntries(
@@ -74,53 +61,6 @@ export default function HomePage({
     return skillLabelById[skillId] ?? skillId;
   }
 
-  useEffect(() => {
-    const observedSections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((node): node is HTMLElement => node instanceof HTMLElement);
-
-    if (!observedSections.length) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (left, right) =>
-              Math.abs(left.boundingClientRect.top) -
-              Math.abs(right.boundingClientRect.top),
-          );
-
-        if (visible[0]?.target.id) {
-          setActiveSection(visible[0].target.id as (typeof sectionIds)[number]);
-        }
-      },
-      {
-        rootMargin: "-22% 0px -55% 0px",
-        threshold: [0.15, 0.4, 0.7],
-      },
-    );
-
-    observedSections.forEach((section) => observer.observe(section));
-
-    const onHashChange = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (sectionIds.includes(hash as (typeof sectionIds)[number])) {
-        setActiveSection(hash as (typeof sectionIds)[number]);
-      }
-    };
-
-    window.addEventListener("hashchange", onHashChange);
-    onHashChange();
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("hashchange", onHashChange);
-    };
-  }, []);
-
   const initial = prefersReducedMotion ? false : "hidden";
   const whileInView = prefersReducedMotion ? undefined : "visible";
   const viewport = prefersReducedMotion
@@ -129,50 +69,6 @@ export default function HomePage({
 
   return (
     <main className="pb-4 pt-4">
-      <header className="fixed inset-x-0 top-4 z-40 flex justify-center px-4">
-        <motion.nav
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: -24 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {sections.map((section) => {
-            const isActive = activeSection === section.id;
-            return (
-              <a
-                className={clsx(
-                  "relative shrink-0 rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:text-[#0e1528]",
-                  isActive && "text-[#0e1528]",
-                )}
-                href={`#${section.id}`}
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-              >
-                {isActive ? (
-                  <motion.span
-                    className="absolute inset-0 -z-10 rounded-full bg-white shadow-[0_6px_18px_rgba(31,44,75,0.08)]"
-                    layoutId="active-home-nav"
-                    transition={{
-                      type: "spring",
-                      stiffness: 420,
-                      damping: 32,
-                    }}
-                  />
-                ) : null}
-                {section.label}
-              </a>
-            );
-          })}
-
-          <a
-            className="shrink-0 rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:bg-white hover:text-[#0e1528]"
-            href="/blog"
-          >
-            Blog
-          </a>
-        </motion.nav>
-      </header>
-
       <section
         className="mx-auto flex min-h-[100svh] w-full max-w-[72rem] flex-col items-center justify-center px-4 pb-12 pt-24 text-center"
         id="home"
@@ -259,9 +155,9 @@ export default function HomePage({
 
           <a
             className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-7 py-4 text-base font-semibold text-[#0e1528] shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-            href="/work"
+            href="/projects"
           >
-            Explore work
+            View projects
           </a>
 
           <div className="flex gap-3">
@@ -292,7 +188,7 @@ export default function HomePage({
           initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
           transition={{ duration: 0.45, delay: 0.22 }}
         >
-          Jump straight to{" "}
+          Focused views:{" "}
           <a
             className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
             href="/resume?focus=flink"
@@ -320,7 +216,6 @@ export default function HomePage({
           >
             AI
           </a>
-          .
         </motion.p>
 
         <motion.div
@@ -329,6 +224,29 @@ export default function HomePage({
           initial={prefersReducedMotion ? false : { opacity: 0 }}
           transition={{ duration: 0.65, delay: 0.28 }}
         />
+
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-2"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
+          transition={{ duration: 0.45, delay: 0.24 }}
+        >
+          {[
+            { href: "#about", label: "About" },
+            { href: "#projects", label: "Projects" },
+            { href: "#skills", label: "Skills" },
+            { href: "#experience", label: "Experience" },
+            { href: "#contact", label: "Contact" },
+          ].map((item) => (
+            <a
+              className="rounded-full border border-slate-200/80 bg-white/85 px-4 py-2 text-sm font-semibold text-slate-600 shadow-[0_10px_24px_rgba(31,44,75,0.05)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-[#0e1528]"
+              href={item.href}
+              key={item.href}
+            >
+              {item.label}
+            </a>
+          ))}
+        </motion.div>
       </section>
 
       <Section
@@ -337,7 +255,7 @@ export default function HomePage({
         kicker="About me"
         narrow={true}
         prefersReducedMotion={prefersReducedMotion}
-        title="Calm systems thinking for high-scale problems"
+        title="About me"
       >
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {profileHighlights.slice(0, 3).map((highlight, index) => (
@@ -366,12 +284,12 @@ export default function HomePage({
 
       <Section
         copy={[
-          "These are the clearest examples of how I work through scale, reliability, product usefulness, and technical constraints.",
+          "A few of the projects I have worked on across telecom, retail, observability, and my own website.",
         ]}
         id="projects"
-        kicker="Selected work"
+        kicker="Projects"
         prefersReducedMotion={prefersReducedMotion}
-        title="A few projects that show the level of work"
+        title="Top projects"
         wide={true}
       >
         {primaryProject ? (
@@ -490,22 +408,20 @@ export default function HomePage({
         >
           <a
             className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-            href="/work"
+            href="/projects"
           >
-            Browse all selected work
+            Browse all projects
           </a>
         </motion.div>
       </Section>
 
       <Section
-        copy={[
-          "These move up or down depending on the role, but this is the technical surface I am strongest on.",
-        ]}
+        copy={["Some of the tools and platforms I work with most often."]}
         id="skills"
-        kicker="Skills in rotation"
+        kicker="Skills"
         narrow={true}
         prefersReducedMotion={prefersReducedMotion}
-        title="The tools and systems I reach for most often"
+        title="My skills"
       >
         <motion.div
           className="mt-10 flex flex-wrap justify-center gap-3"
@@ -528,13 +444,13 @@ export default function HomePage({
 
       <Section
         copy={[
-          "The common thread is building systems that multiple teams rely on and can keep trusting over time.",
+          "I have worked across telecom, retail, analytics, and platform engineering, with most of the work centered on data systems and products.",
         ]}
         id="experience"
         medium={true}
         kicker="Experience"
         prefersReducedMotion={prefersReducedMotion}
-        title="Built across telecom, retail, analytics, and platform work"
+        title="My experience"
       >
         <div className="mt-12 grid gap-4">
           {experiences.map((experience, index) => (
@@ -583,13 +499,13 @@ export default function HomePage({
 
       <Section
         copy={[
-          "The homepage is the short introduction. The blog is where I unpack systems, decisions, and ideas in more detail.",
+          "I also write about systems, engineering, and related ideas from time to time.",
         ]}
         id="blog-bridge"
         medium={true}
-        kicker="Writing"
+        kicker="Blog"
         prefersReducedMotion={prefersReducedMotion}
-        title="Architecture notes and technical writing live here too"
+        title="Blog"
       >
         <motion.div
           className="mt-10 rounded-[2.2rem] border border-white/70 bg-[radial-gradient(circle_at_12%_12%,rgba(176,177,255,0.18),transparent_22%),radial-gradient(circle_at_96%_0%,rgba(255,214,223,0.22),transparent_28%),rgba(255,255,255,0.82)] px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-10"
@@ -614,13 +530,13 @@ export default function HomePage({
 
       <Section
         copy={[
-          "Email is still the simplest path. If you want the shorter version first, open the focused resume and use the work page when you want more detail.",
+          `Please contact me directly at ${siteProfile.email} or through LinkedIn.`,
         ]}
         id="contact"
         kicker="Contact"
         narrow={true}
         prefersReducedMotion={prefersReducedMotion}
-        title="If the work looks relevant, reach out"
+        title="Contact me"
       >
         <motion.div
           className="mt-10 rounded-[2.35rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(245,247,255,0.88))] px-6 py-8 shadow-[0_26px_70px_rgba(31,44,75,0.08)] backdrop-blur-xl sm:px-10 sm:py-10"
@@ -646,9 +562,9 @@ export default function HomePage({
             </a>
             <a
               className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-4 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-              href="/work"
+              href="/projects"
             >
-              See work
+              See projects
             </a>
           </div>
         </motion.div>

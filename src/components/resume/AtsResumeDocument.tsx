@@ -112,7 +112,7 @@ export default function AtsResumeDocument({ siteProfile, variant }: Props) {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Selected Work</Text>
+          <Text style={styles.sectionTitle}>Projects</Text>
           {variant.projects.map((project) => (
             <View key={project.id} style={styles.listItem}>
               <Text style={styles.projectTitle}>{project.title}</Text>

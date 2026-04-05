@@ -27,10 +27,19 @@ describe("portfolio focus utilities", () => {
     );
   });
 
+  it("prefers the portfolio project for portfolio-specific search terms", () => {
+    const projects = searchProjects({
+      focusIds: ["backend-engineering"],
+      query: "portfolio nextjs wix",
+    });
+
+    expect(projects[0]?.id).toBe("portfolio-website");
+  });
+
   it("searches projects using both focus alignment and lexical matches", () => {
     const projects = searchProjects({
       focusIds: ["backend-engineering"],
-      query: "FastAPI portfolio",
+      query: "portfolio website",
     });
 
     expect(projects[0]?.id).toBe("portfolio-website");

@@ -47,7 +47,9 @@ export async function saveResumeVariant(options: {
   }
 }
 
-export async function getResumeVariantByToken(token: string): Promise<StoredResumeVariant | null> {
+export async function getResumeVariantByToken(
+  token: string,
+): Promise<StoredResumeVariant | null> {
   try {
     const result = await dbQuery<StoredVariantRow>(
       `

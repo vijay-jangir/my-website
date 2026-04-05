@@ -1,4 +1,9 @@
-import { experiences, portfolioLinks, projects, skillDefinitions } from "@/content/portfolio";
+import {
+  experiences,
+  portfolioLinks,
+  projects,
+  skillDefinitions,
+} from "@/content/portfolio";
 
 export const links = portfolioLinks;
 
@@ -18,7 +23,10 @@ export const experiencesData = experiences.map((experience) => ({
 export const projectsData = projects.map((project) => ({
   title: project.title,
   description: project.summary,
-  tags: project.skillIds.map((skillId) => skillDefinitions.find((skill) => skill.id === skillId)?.label ?? skillId),
+  tags: project.skillIds.map(
+    (skillId) =>
+      skillDefinitions.find((skill) => skill.id === skillId)?.label ?? skillId,
+  ),
 }));
 
 export const skillsData = skillDefinitions.map((skill) => skill.label);

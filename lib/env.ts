@@ -1,16 +1,21 @@
 export const env = {
   databaseUrl: process.env.DATABASE_URL,
   wixApiKey: process.env.WIX_API_KEY,
-  wixSiteId:
-    process.env.WIX_SITE_ID ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
+  wixSiteId: process.env.WIX_SITE_ID ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
   resendApiKey: process.env.RESEND_API_KEY,
   resendFrom:
-    process.env.RESEND_FROM ?? "My Website Contact Form <onboarding@resend.dev>",
+    process.env.RESEND_FROM ??
+    "My Website Contact Form <onboarding@resend.dev>",
   contactToEmail: process.env.CONTACT_TO_EMAIL ?? "contact@vijayjangir.com",
+  sessionSecret: process.env.SESSION_SECRET ?? process.env.NEXTAUTH_SECRET,
   nextAuthSecret: process.env.NEXTAUTH_SECRET,
   githubId: process.env.GITHUB_ID,
   githubSecret: process.env.GITHUB_SECRET,
   adminGithubLogins: (process.env.ADMIN_GITHUB_LOGINS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean),
+  editorGithubLogins: (process.env.EDITOR_GITHUB_LOGINS ?? "")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean),
@@ -32,10 +37,10 @@ export function isTurnstileConfigured() {
 
 export function isAuthConfigured() {
   return Boolean(
-    env.nextAuthSecret &&
-      env.githubId &&
-      env.githubSecret &&
-      env.adminGithubLogins.length > 0,
+    env.sessionSecret &&
+    env.githubId &&
+    env.githubSecret &&
+    env.adminGithubLogins.length > 0,
   );
 }
 

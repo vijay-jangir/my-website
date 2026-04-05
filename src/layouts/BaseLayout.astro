@@ -1,0 +1,126 @@
+---
+import { siteProfile } from "@/content/portfolio";
+import "@/src/styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = siteProfile.name,
+  description = "Data and platform engineer focused on streaming systems, backend services, and recruiter-friendly proof of work.",
+} = Astro.props;
+
+const navItems = [
+  { href: "/", label: "Home" },
+  { href: "/resume", label: "Resume" },
+  { href: "/work", label: "Work" },
+  { href: "/blog", label: "Blog" },
+  { href: "/admin", label: "Admin" },
+];
+
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content={description} name="description" />
+    <meta content={siteProfile.name} property="og:site_name" />
+    <meta content={title} property="og:title" />
+    <meta content={description} property="og:description" />
+    <meta
+      content={new URL(Astro.url.pathname, Astro.site).toString()}
+      property="og:url"
+    />
+    <meta content="website" property="og:type" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content={title} name="twitter:title" />
+    <meta content={description} name="twitter:description" />
+    <link
+      href={new URL(Astro.url.pathname, Astro.site).toString()}
+      rel="canonical"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="shell pb-20 pt-6 sm:pt-8">
+      <header
+        class="glass-panel sticky top-4 z-20 rounded-[2rem] px-4 py-4 sm:px-6"
+      >
+        <div
+          class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+        >
+          <div>
+            <a class="text-lg font-semibold tracking-tight" href="/">
+              {siteProfile.name}
+            </a>
+            <p class="mt-1 text-sm text-[var(--muted)]">{siteProfile.title}</p>
+          </div>
+
+          <nav class="flex flex-wrap gap-2">
+            {
+              navItems.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <a
+                    class:list={[
+                      "rounded-full px-4 py-2 text-sm font-semibold",
+                      active
+                        ? "bg-[var(--ink)] text-white"
+                        : "border border-[var(--line)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]",
+                    ]}
+                    href={item.href}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })
+            }
+          </nav>
+        </div>
+      </header>
+
+      <slot />
+
+      <footer
+        class="mt-16 border-t border-[var(--line)] py-8 text-sm text-[var(--muted)]"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>
+            Built for recruiter clarity, manager depth, and low-debt extension.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a
+              class="hover:text-[var(--ink)]"
+              href={siteProfile.githubUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              GitHub
+            </a>
+            <a
+              class="hover:text-[var(--ink)]"
+              href={siteProfile.linkedinUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              LinkedIn
+            </a>
+            <a
+              class="hover:text-[var(--ink)]"
+              href={`mailto:${siteProfile.email}`}
+            >
+              {siteProfile.email}
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

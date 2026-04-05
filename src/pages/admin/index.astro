@@ -1,0 +1,87 @@
+---
+import { focusDefinitions } from "@/content/portfolio";
+import { isAuthConfigured } from "@/lib/env";
+import ResumeLab from "@/src/components/admin/ResumeLab";
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { getSessionUser } from "@/src/lib/auth";
+
+const session = await getSessionUser(Astro.cookies);
+const error = Astro.url.searchParams.get("error");
+---
+
+<BaseLayout
+  description="Private resume tailoring and JD analysis tools."
+  title="Admin | Vijay Jangir"
+>
+  <main class="mt-10 space-y-8 sm:mt-14">
+    <section class="glass-panel rounded-[2.5rem] p-8 sm:p-10">
+      <p class="eyebrow text-xs text-[var(--muted)]">Private admin</p>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight">
+        Resume tailoring lab
+      </h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-[var(--muted)]">
+        This surface stays private. Public visitors should never have direct
+        access to JD parsing or assistant tooling.
+      </p>
+
+      {
+        !isAuthConfigured() ? (
+          <div class="mt-8 rounded-[1.75rem] border border-[var(--line)] bg-white/70 p-6">
+            <p class="text-sm leading-7 text-[var(--muted)]">
+              Add <code>NEXTAUTH_SECRET</code> or <code>SESSION_SECRET</code>,{" "}
+              <code>GITHUB_ID</code>, <code>GITHUB_SECRET</code>, and{" "}
+              <code>ADMIN_GITHUB_LOGINS</code> to enable private access in the
+              next wave.
+            </p>
+          </div>
+        ) : !session ? (
+          <div class="mt-8 rounded-[1.75rem] border border-[var(--line)] bg-white/70 p-6">
+            <p class="text-sm leading-7 text-[var(--muted)]">
+              This route is restricted to manually allowlisted GitHub accounts.
+            </p>
+            {error ? (
+              <p class="mt-4 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Sign-in failed: {error}.
+              </p>
+            ) : null}
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a
+                class="rounded-full bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+                href="/api/auth/github"
+              >
+                Sign in with GitHub
+              </a>
+            </div>
+          </div>
+        ) : null
+      }
+    </section>
+
+    {
+      session ? (
+        <>
+          <section class="glass-panel rounded-[2rem] p-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold text-[var(--ink)]">
+                  Signed in as {session.login}
+                </p>
+                <p class="mt-1 text-sm text-[var(--muted)]">
+                  Role: {session.role}
+                </p>
+              </div>
+              <a
+                class="rounded-full border border-[var(--line)] px-4 py-2 text-sm font-semibold hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]"
+                href="/api/auth/logout"
+              >
+                Sign out
+              </a>
+            </div>
+          </section>
+
+          <ResumeLab client:load focusOptions={focusDefinitions} />
+        </>
+      ) : null
+    }
+  </main>
+</BaseLayout>

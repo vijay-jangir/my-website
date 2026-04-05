@@ -1,5 +1,3 @@
-import type { StaticImageData } from "next/image";
-
 export type FocusId =
   | "general"
   | "ai"
@@ -75,7 +73,7 @@ export type ExperienceDefinition = {
   type: "employment";
   description: string;
   date: string;
-  icon: StaticImageData;
+  icon: string;
   focusWeights: FocusWeights;
   bullets: readonly ExperienceBullet[];
 };

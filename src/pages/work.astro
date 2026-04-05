@@ -1,0 +1,64 @@
+---
+import { focusDefinitions } from "@/content/portfolio";
+import { parseFocusIds, searchProjects } from "@/lib/portfolio";
+import type { FocusId } from "@/lib/portfolio-types";
+import FocusPills from "@/src/components/FocusPills.astro";
+import ProjectCard from "@/src/components/ProjectCard.astro";
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+
+const focusIds = parseFocusIds(Astro.url.searchParams.get("focus"));
+const query = Astro.url.searchParams.get("q") ?? "";
+const activeFocusIds: FocusId[] =
+  focusIds.length > 0 ? [...focusIds] : ["general"];
+const projects = searchProjects({
+  query,
+  focusIds: activeFocusIds,
+});
+---
+
+<BaseLayout
+  description="Selected work across data platforms, streaming systems, backend engineering, and platform foundations."
+  title="Work | Vijay Jangir"
+>
+  <main class="mt-10 space-y-8 sm:mt-14">
+    <section class="glass-panel rounded-[2.5rem] p-8 sm:p-10">
+      <p class="eyebrow text-xs text-[var(--muted)]">Manager deep dive</p>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+        Selected work
+      </h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-[var(--muted)]">
+        Filter by focus, search for specific systems or skills, and use the
+        resume page when you need a concise recruiter-facing variant.
+      </p>
+
+      <form class="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <input
+          class="rounded-full border border-[var(--line)] bg-white/80 px-5 py-3 text-sm outline-none focus:border-[var(--accent)]"
+          name="q"
+          placeholder="Search for Flink, Kafka, backend, AI, observability..."
+          type="search"
+          value={query}
+        />
+        <button
+          class="rounded-full bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+          type="submit"
+        >
+          Search
+        </button>
+      </form>
+
+      <div class="mt-6">
+        <FocusPills
+          activeFocusIds={activeFocusIds}
+          basePath="/work"
+          focusOptions={focusDefinitions}
+          query={{ q: query || undefined }}
+        />
+      </div>
+    </section>
+
+    <section class="section-grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </section>
+  </main>
+</BaseLayout>

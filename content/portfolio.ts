@@ -1,7 +1,3 @@
-import airtel from "@/public/project_img/org-airtel.png";
-import dh from "@/public/project_img/org-dh.jpg";
-import mphasis from "@/public/project_img/org-mphasis.png";
-
 import type {
   ExperienceDefinition,
   FocusDefinition,
@@ -103,7 +99,13 @@ export const focusDefinitions: readonly FocusDefinition[] = [
       "genai",
       "artificial intelligence",
     ],
-    relatedSkillIds: ["python", "fastapi", "vector-search", "postgres", "kafka"],
+    relatedSkillIds: [
+      "python",
+      "fastapi",
+      "vector-search",
+      "postgres",
+      "kafka",
+    ],
   },
   {
     id: "agentic-development",
@@ -122,7 +124,13 @@ export const focusDefinitions: readonly FocusDefinition[] = [
       "workflow automation",
       "llm workflow",
     ],
-    relatedSkillIds: ["python", "fastapi", "nextjs", "vector-search", "postgres"],
+    relatedSkillIds: [
+      "python",
+      "fastapi",
+      "nextjs",
+      "vector-search",
+      "postgres",
+    ],
   },
   {
     id: "backend-engineering",
@@ -194,7 +202,12 @@ export const focusDefinitions: readonly FocusDefinition[] = [
       "I use Flink where low-latency processing, event-driven decisioning, and operational control matter. The value is not the framework itself, but the systems and products it enables.",
     description:
       "For real-time streaming systems, event pipelines, and Flink-heavy roles.",
-    aliases: ["flink", "apache flink", "stream processing", "real time streaming"],
+    aliases: [
+      "flink",
+      "apache flink",
+      "stream processing",
+      "real time streaming",
+    ],
     relatedSkillIds: ["flink", "kafka", "java", "python"],
   },
   {
@@ -218,8 +231,7 @@ export const focusDefinitions: readonly FocusDefinition[] = [
     headline: "Python Engineer for Data, APIs, and Automation",
     summary:
       "I use Python to build data products, automation, API layers, and AI-adjacent workflows. The strength is applying Python where it accelerates delivery without compromising operational clarity.",
-    description:
-      "For Python-first backend, data, and automation roles.",
+    description: "For Python-first backend, data, and automation roles.",
     aliases: ["python", "python3", "pandas", "fastapi"],
     relatedSkillIds: ["python", "fastapi", "postgres", "airflow", "spark"],
   },
@@ -581,7 +593,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     description:
       "I work on large-scale data engineering systems with an emphasis on distributed platforms, dependable delivery, and reusable data products.",
     date: "2021 - present",
-    icon: airtel,
+    icon: "/project_img/org-airtel.png",
     focusWeights: {
       general: 1,
       "backend-engineering": 0.5,
@@ -637,7 +649,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     description:
       "Worked between data scientists and big data platforms to productize analytics, reporting, customer segmentation, and data marts for global retailers.",
     date: "2018 - 2021",
-    icon: dh,
+    icon: "/project_img/org-dh.jpg",
     focusWeights: {
       general: 0.8,
       ai: 0.4,
@@ -680,7 +692,7 @@ export const experiences: readonly ExperienceDefinition[] = [
     description:
       "Worked across mainframe and big data systems for insurance and telecom clients, including migration work and time-saving automation.",
     date: "2014 - 2018",
-    icon: mphasis,
+    icon: "/project_img/org-mphasis.png",
     focusWeights: {
       general: 0.7,
       "backend-engineering": 0.7,
@@ -720,7 +732,8 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     id: "experience-years",
     label: "Experience",
     value: "10+ years",
-    detail: "Hands-on work across data engineering, analytics, streaming, and platform systems.",
+    detail:
+      "Hands-on work across data engineering, analytics, streaming, and platform systems.",
     focusWeights: {
       general: 1,
     },
@@ -729,7 +742,8 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     id: "scale",
     label: "Scale",
     value: "2T+ events/day",
-    detail: "Shipped systems that had to stay useful under very large network telemetry volumes.",
+    detail:
+      "Shipped systems that had to stay useful under very large network telemetry volumes.",
     focusWeights: {
       general: 1,
       "platform-engineering": 0.8,
@@ -742,7 +756,8 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     id: "systems",
     label: "Strength",
     value: "Streaming and platforms",
-    detail: "Strongest at reliable data products, event systems, and engineering foundations.",
+    detail:
+      "Strongest at reliable data products, event systems, and engineering foundations.",
     focusWeights: {
       general: 1,
       "backend-engineering": 0.5,

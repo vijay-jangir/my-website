@@ -1,0 +1,21 @@
+---
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  description="Private assistant surface reserved for future OpenClaw integration."
+  title="Assistant | Vijay Jangir"
+>
+  <main class="mt-10 sm:mt-14">
+    <section class="glass-panel rounded-[2.5rem] p-8 sm:p-10">
+      <p class="eyebrow text-xs text-[var(--muted)]">Future private surface</p>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight">Assistant</h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-[var(--muted)]">
+        This route is reserved for a private assistant experience. OpenClaw
+        itself should stay off Vercel and behind a dedicated homelab or VPS
+        surface, with the website talking only to a restricted HTTP bridge
+        later.
+      </p>
+    </section>
+  </main>
+</BaseLayout>

@@ -8,8 +8,10 @@
 # testing
 /coverage
 
-# next.js
+# build outputs
+/.astro
 /.next/
+/dist
 /out/
 
 # production

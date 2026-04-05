@@ -1,4 +1,12 @@
-import { focusDefinitions, profileHighlights, projects, siteProfile, skillDefinitions, summaryTemplates, experiences } from "@/content/portfolio";
+import {
+  focusDefinitions,
+  profileHighlights,
+  projects,
+  siteProfile,
+  skillDefinitions,
+  summaryTemplates,
+  experiences,
+} from "@/content/portfolio";
 import type {
   ExperienceDefinition,
   FocusDefinition,
@@ -23,7 +31,7 @@ export const skillDefinitionMap = Object.fromEntries(
 ) as Record<string, (typeof skillDefinitions)[number]>;
 
 export function parseFocusIds(rawValue?: string | string[] | null): FocusId[] {
-  const value = Array.isArray(rawValue) ? rawValue.join(",") : rawValue ?? "";
+  const value = Array.isArray(rawValue) ? rawValue.join(",") : (rawValue ?? "");
 
   const parsed = value
     .split(",")
@@ -52,7 +60,9 @@ export function buildQueryFocusVector(
   return normalizeScores(weights);
 }
 
-function normalizeScores<T extends string>(scores: Record<T, number>): Record<T, number> {
+function normalizeScores<T extends string>(
+  scores: Record<T, number>,
+): Record<T, number> {
   const total = (Object.values(scores) as number[]).reduce(
     (sum, value) => sum + value,
     0,
@@ -95,7 +105,10 @@ function buildSkillScoreMap(skillScores?: readonly SkillScore[]) {
   return new Map((skillScores ?? []).map((item) => [item.skillId, item.score]));
 }
 
-function enrichProjectScore(project: ProjectDefinition, focusVector: Record<FocusId, number>) {
+function enrichProjectScore(
+  project: ProjectDefinition,
+  focusVector: Record<FocusId, number>,
+) {
   const base = scoreFromWeights(project.focusWeights, focusVector);
   const featuredBonus = project.featured ? 0.08 : 0;
   return base + featuredBonus;
@@ -141,15 +154,9 @@ function rankSkills(
     .sort((left, right) => right.score - left.score);
 
   return {
-    primarySkills: scored
-      .slice(0, 8)
-      .map(({ skill }) => skill),
-    secondarySkills: scored
-      .slice(8, 14)
-      .map(({ skill }) => skill),
-    supportingSkills: scored
-      .slice(14, 20)
-      .map(({ skill }) => skill),
+    primarySkills: scored.slice(0, 8).map(({ skill }) => skill),
+    secondarySkills: scored.slice(8, 14).map(({ skill }) => skill),
+    supportingSkills: scored.slice(14, 20).map(({ skill }) => skill),
   };
 }
 
@@ -180,7 +187,9 @@ function pickSummary(
   const exactTemplate = summaryTemplates.find(
     (template) =>
       template.focusIds.length === normalizedSelection.length &&
-      template.focusIds.every((focusId) => normalizedSelection.includes(focusId)),
+      template.focusIds.every((focusId) =>
+        normalizedSelection.includes(focusId),
+      ),
   );
 
   if (exactTemplate) {
@@ -235,7 +244,10 @@ export function buildResumeVariant(options: {
     options.analysis && options.analysis.focusScores.length > 0
       ? normalizeScores(
           Object.fromEntries(
-            options.analysis.focusScores.map((focus) => [focus.focusId, focus.score]),
+            options.analysis.focusScores.map((focus) => [
+              focus.focusId,
+              focus.score,
+            ]),
           ) as Record<FocusId, number>,
         )
       : buildQueryFocusVector(selectedFocusIds);
@@ -317,7 +329,10 @@ export function getHighlightedFocuses(): FocusDefinition[] {
   return focusDefinitions.filter((focus) => focus.id !== "general");
 }
 
-export function getTopRelatedSkills(focusId: FocusId, limit = 5): SkillDefinition[] {
+export function getTopRelatedSkills(
+  focusId: FocusId,
+  limit = 5,
+): SkillDefinition[] {
   return [...skillDefinitions]
     .filter((skill) => (skill.focusWeights[focusId] ?? 0) > 0)
     .sort(

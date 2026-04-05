@@ -159,8 +159,12 @@ function buildDirectFocusScores(sections: JdSection[]): FocusScore[] {
           continue;
         }
 
-        const repetitionBoost = 1 + Math.min(Math.log1p(matches - 1) * 0.2, 0.6);
-        score += section.weight * 1.25 * matches * repetitionBoost;
+        const repetitionBoost =
+          1 + Math.min(Math.log1p(matches - 1) * 0.2, 0.6);
+        const sectionBoost =
+          section.id === "title" ? 1.8 : section.id === "required" ? 1.1 : 1;
+        score +=
+          section.weight * 1.25 * sectionBoost * matches * repetitionBoost;
         matchedAliases.push(alias);
         evidence.push(...collectEvidence(section.content, alias));
       }
@@ -192,7 +196,8 @@ function buildSkillScores(sections: JdSection[]): SkillScore[] {
           continue;
         }
 
-        const repetitionBoost = 1 + Math.min(Math.log1p(matches - 1) * 0.2, 0.6);
+        const repetitionBoost =
+          1 + Math.min(Math.log1p(matches - 1) * 0.2, 0.6);
         score += section.weight * matches * repetitionBoost;
         matchedAliases.push(alias);
         evidence.push(...collectEvidence(section.content, alias));
@@ -217,7 +222,9 @@ function normalizeFocusScores(
 ): FocusScore[] {
   const propagatedScores = directFocusScores.map((focus) => {
     const skillContribution = skillScores.reduce((sum, skillScore) => {
-      const skill = skillDefinitions.find((item) => item.id === skillScore.skillId);
+      const skill = skillDefinitions.find(
+        (item) => item.id === skillScore.skillId,
+      );
       return sum + skillScore.score * (skill?.focusWeights[focus.focusId] ?? 0);
     }, 0);
 
@@ -283,7 +290,10 @@ function buildExtractedHighlights(
 export function analyzeJobDescription(rawText: string): JobDescriptionAnalysis {
   const sections = parseSections(rawText);
   const skillScores = buildSkillScores(sections);
-  const focusScores = normalizeFocusScores(buildDirectFocusScores(sections), skillScores);
+  const focusScores = normalizeFocusScores(
+    buildDirectFocusScores(sections),
+    skillScores,
+  );
 
   return {
     rawText,
@@ -304,7 +314,9 @@ export function buildResumeVariantFromJobDescription(options: {
 
   const mergedFocusIds =
     overrideFocusIds.length > 0
-      ? Array.from(new Set([...overrideFocusIds, ...analysis.topFocusIds])).slice(0, 3)
+      ? Array.from(
+          new Set([...overrideFocusIds, ...analysis.topFocusIds]),
+        ).slice(0, 3)
       : analysis.topFocusIds;
 
   return {

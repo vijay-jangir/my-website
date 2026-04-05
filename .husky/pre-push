@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+if [ -d /opt/homebrew/opt/node@22/bin ]; then
+  export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+fi
+
+npm run check

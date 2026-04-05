@@ -1,5 +1,5 @@
 ---
-import { focusDefinitions } from "@/content/portfolio";
+import { focusDefinitions, siteProfile } from "@/content/portfolio";
 import { parseFocusIds, searchProjects } from "@/lib/portfolio";
 import type { FocusId } from "@/lib/portfolio-types";
 import FocusPills from "@/src/components/FocusPills.astro";
@@ -46,11 +46,12 @@ const projects = searchProjects({
           <p
             class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
           >
-            How to use this page
+            Current content
           </p>
           <p class="mt-3 text-sm leading-7 text-slate-600">
-            Search by technology, architecture, or problem space. Then use the
-            focus filters to move the most relevant projects to the top.
+            Last updated {siteProfile.lastUpdatedLabel}. Search by technology,
+            architecture, or problem space, then use the focus filters to move
+            the most relevant projects to the top.
           </p>
         </div>
       </div>
@@ -79,6 +80,19 @@ const projects = searchProjects({
           query={{ q: query || undefined }}
         />
       </div>
+
+      {
+        query || !activeFocusIds.includes("general") ? (
+          <div class="mt-4">
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-[#0e1528]"
+              href="/work"
+            >
+              Clear search and filters
+            </a>
+          </div>
+        ) : null
+      }
     </section>
 
     <section class="space-y-6">

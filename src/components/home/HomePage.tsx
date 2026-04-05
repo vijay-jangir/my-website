@@ -115,7 +115,7 @@ export default function HomePage() {
       <header className="fixed inset-x-0 top-4 z-40 flex justify-center px-4">
         <motion.nav
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl"
+          className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl"
           initial={prefersReducedMotion ? false : { opacity: 0, y: -24 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -124,7 +124,7 @@ export default function HomePage() {
             return (
               <a
                 className={clsx(
-                  "relative rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:text-[#0e1528]",
+                  "relative shrink-0 rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:text-[#0e1528]",
                   isActive && "text-[#0e1528]",
                 )}
                 href={`#${section.id}`}
@@ -148,7 +148,7 @@ export default function HomePage() {
           })}
 
           <a
-            className="rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:bg-white hover:text-[#0e1528]"
+            className="shrink-0 rounded-full px-4 py-3 text-[0.95rem] font-semibold text-slate-500 transition hover:bg-white hover:text-[#0e1528]"
             href="/blog"
           >
             Blog
@@ -198,6 +198,28 @@ export default function HomePage() {
 
         <motion.div
           animate={{ opacity: 1, y: 0 }}
+          className="mt-6 flex flex-wrap items-center justify-center gap-2"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+          transition={{ duration: 0.45, delay: 0.16 }}
+        >
+          <span className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Updated {siteProfile.lastUpdatedLabel}
+          </span>
+          <span className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Based in {siteProfile.location}
+          </span>
+          {siteProfile.currentFocusLabels.map((label) => (
+            <span
+              className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold text-slate-600"
+              key={label}
+            >
+              {label}
+            </span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
           initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
           transition={{ duration: 0.55, delay: 0.18 }}
@@ -214,8 +236,15 @@ export default function HomePage() {
             className="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-7 py-4 text-base font-semibold text-[#0e1528] shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
             href="/resume"
           >
-            Open focused resume
+            View resume
             <HiDownload className="opacity-70 transition group-hover:translate-y-0.5" />
+          </a>
+
+          <a
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-7 py-4 text-base font-semibold text-[#0e1528] shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+            href="/work"
+          >
+            Explore work
           </a>
 
           <div className="flex gap-3">
@@ -246,7 +275,7 @@ export default function HomePage() {
           initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
           transition={{ duration: 0.45, delay: 0.22 }}
         >
-          Start with{" "}
+          Jump straight to{" "}
           <a
             className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
             href="/resume?focus=flink"
@@ -559,6 +588,10 @@ export default function HomePage() {
           >
             Open the blog
           </a>
+          <p className="mt-4 text-sm leading-7 text-slate-500">
+            Posts are published on Wix and surfaced here so the writing stays
+            easy to find from this site.
+          </p>
         </motion.div>
       </Section>
 

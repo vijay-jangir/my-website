@@ -98,6 +98,9 @@ export type SiteProfile = {
   title: string;
   location: string;
   timezone: string;
+  lastUpdatedLabel: string;
+  contentPromise: string;
+  currentFocusLabels: readonly string[];
   email: string;
   githubUrl: string;
   linkedinUrl: string;

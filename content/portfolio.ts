@@ -14,17 +14,20 @@ export const siteProfile: SiteProfile = {
   title: "Data Platform and Backend Engineer",
   location: "India",
   timezone: "Asia/Kolkata",
+  lastUpdatedLabel: "April 2026",
+  contentPromise: "I keep this site current as the work evolves.",
+  currentFocusLabels: ["Streaming systems", "Backend platforms", "AI tooling"],
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   heroLabel:
     "I build data platforms, streaming systems, and backend tools that stay reliable in production.",
   recruiterPitch:
-    "Over the last decade I have worked across telecom, retail, analytics, streaming, and platform engineering, usually on systems that multiple teams depend on. Start with the homepage for the short story, then open the resume or selected work when you want the deeper version.",
+    "Over the last decade I have worked across telecom, retail, analytics, streaming, and platform engineering, usually on systems that multiple teams depend on. Use the resume for the short version and selected work when you want proof, detail, and technical depth.",
   overview: [
     "Most of my work has been on systems that move a lot of data, serve multiple teams, and cannot afford to be fragile.",
     "I am strongest where platform thinking meets product reality: streaming pipelines, reusable data products, backend services, and engineering foundations that hold up over time.",
-    "This site is designed to be easy to scan first and rewarding to read more closely when you want the detail.",
+    "This site is designed to be quick to scan first and still rewarding to read more closely when you want the detail.",
   ],
 };
 

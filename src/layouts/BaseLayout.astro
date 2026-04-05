@@ -62,12 +62,18 @@ const pathname = Astro.url.pathname;
   <body
     class="min-h-screen bg-[radial-gradient(circle_at_18%_10%,rgba(176,177,255,0.34),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(255,214,223,0.42),transparent_24%),radial-gradient(circle_at_50%_72%,rgba(255,255,255,0.82),transparent_38%),linear-gradient(180deg,#fbfbff_0%,#f6f7fe_48%,#ffffff_100%)] font-[Manrope] text-[#0e1528] antialiased"
   >
+    <a
+      class="absolute left-4 top-4 z-50 -translate-y-20 rounded-full bg-[#11192c] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.2)] transition focus:translate-y-0"
+      href="#main-content"
+    >
+      Skip to content
+    </a>
     {
       showRouteHeader ? (
         <header class="fixed inset-x-0 top-4 z-40 flex justify-center px-4">
-          <div class="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl">
+          <div class="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/70 bg-white/80 p-2 shadow-[0_18px_46px_rgba(31,44,75,0.08)] backdrop-blur-xl">
             <a
-              class="px-3 py-2 text-sm font-bold tracking-tight text-[#0e1528]"
+              class="shrink-0 px-3 py-2 text-sm font-bold tracking-tight text-[#0e1528]"
               href="/"
             >
               {siteProfile.name}
@@ -78,7 +84,7 @@ const pathname = Astro.url.pathname;
                 <a
                   aria-current={active ? "page" : undefined}
                   class:list={[
-                    "rounded-full px-4 py-2 text-sm font-semibold transition",
+                    "shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition",
                     active
                       ? "bg-white text-[#0e1528] shadow-[0_6px_18px_rgba(31,44,75,0.08)]"
                       : "text-slate-500 hover:bg-white/80 hover:text-[#0e1528]",
@@ -95,6 +101,7 @@ const pathname = Astro.url.pathname;
     }
 
     <div
+      id="main-content"
       class:list={[
         "mx-auto w-full max-w-[84rem] px-4",
         showRouteHeader ? "pt-28" : "pt-0",
@@ -116,8 +123,12 @@ const pathname = Astro.url.pathname;
                 About this site
               </p>
               <p class="mt-3 text-base leading-7 text-slate-600">
-                Built to make a strong first impression and still hold up under
-                a closer read.
+                Built to make a strong first impression, hold up under a closer
+                read, and stay current over time.
+              </p>
+              <p class="mt-3 text-sm leading-7 text-slate-500">
+                Last updated {siteProfile.lastUpdatedLabel}.{" "}
+                {siteProfile.contentPromise}
               </p>
             </div>
             <div class="flex flex-wrap gap-5">

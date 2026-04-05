@@ -53,6 +53,9 @@ const pdfParams = storedVariant?.token
           Pick a focus to shift the emphasis without changing the underlying
           facts.
         </p>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-white/60">
+          Current profile content refreshed {siteProfile.lastUpdatedLabel}.
+        </p>
 
         <div class="mt-8 flex flex-wrap gap-3">
           <a
@@ -128,6 +131,18 @@ const pdfParams = storedVariant?.token
           focusOptions={focusDefinitions}
         />
       </div>
+      {
+        !selectedFocusIds.includes("general") ? (
+          <div class="mt-4">
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-[#0e1528]"
+              href="/resume"
+            >
+              Back to overall profile
+            </a>
+          </div>
+        ) : null
+      }
     </section>
 
     <section

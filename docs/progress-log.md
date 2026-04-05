@@ -55,6 +55,12 @@
 - Replaced the brittle custom transition script with a smaller, community-backed motion stack: `framer-motion` for homepage interaction and native browser view transitions for page navigation.
 - Rebuilt the public Astro pages and shared cards around reusable Tailwind patterns so the UI no longer feels like an afterthought layered on top of the migration.
 
+### Wave 2.4
+
+- Polished the UX around clarity and maintainability instead of adding new visual noise.
+- Improved the homepage copy, simplified CTA labels, and added visible freshness signals so the site reads as current rather than static.
+- Made the floating navigation safer on smaller screens, added a skip link, and added clear reset actions on filtered resume/work views.
+
 ### Failure Log
 
 - Hit an Astro/Tailwind integration incompatibility while trying `@astrojs/tailwind` with Astro 6.
@@ -71,6 +77,8 @@
   Resolution: confirmed the app-side build is valid and logged the actual environment blockers below.
 - Hit an Astro preview limitation while validating the built server.
   Resolution: used `astro dev` for route-level runtime verification because the Vercel adapter does not support `astro preview`.
+- Hit a recurring stale local `astro dev` process that stayed bound to port `4321` and served `500` responses after previous sessions.
+  Resolution: killed the stale listener and restarted the dev server cleanly before route validation.
 
 ### Verification
 
@@ -85,6 +93,7 @@
 - `npm run format && npm run check` passed under Node 24 after the homepage reset toward the live-site interaction model.
 - `npm run format` passed under Node 24 after the Tailwind-first refactor and transition cleanup.
 - `npm run check` passed under Node 24 after the `framer-motion` homepage transition pass.
+- `npm run format && npm run check` passed under Node 24 after the UX polish and freshness pass.
 - Local dev server responded successfully on the main public routes and the PDF endpoint.
 
 ### Deployment Check

@@ -84,7 +84,7 @@ export default function HomePage({
 
         <motion.p
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8 font-['IBM_Plex_Mono'] text-[0.76rem] font-medium uppercase tracking-[0.24em] text-slate-500 sm:text-[0.82rem]"
+          className="mt-8 font-mono text-[0.76rem] font-medium uppercase tracking-[0.24em] text-slate-500 sm:text-[0.82rem]"
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           transition={{ duration: 0.45, delay: 0.05 }}
         >
@@ -93,7 +93,7 @@ export default function HomePage({
 
         <motion.h1
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 max-w-[13ch] font-['Sora'] text-5xl font-semibold leading-[1.06] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
+          className="mt-6 max-w-[13ch] font-display text-5xl font-semibold leading-[1.06] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
           initial={prefersReducedMotion ? false : { opacity: 0, y: 32 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
@@ -268,7 +268,7 @@ export default function HomePage({
               viewport={viewport}
               whileInView={whileInView}
             >
-              <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                 {highlight.label}
               </p>
               <p className="mt-4 text-3xl font-semibold tracking-tight text-[#0e1528]">
@@ -302,10 +302,10 @@ export default function HomePage({
               viewport={viewport}
               whileInView={whileInView}
             >
-              <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                 Featured project
               </p>
-              <h3 className="mt-4 max-w-[16ch] font-['Sora'] text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
+              <h3 className="mt-4 max-w-[16ch] font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
                 {primaryProject.title}
               </h3>
               <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
@@ -325,7 +325,7 @@ export default function HomePage({
 
               <div className="mt-8 grid gap-6 lg:grid-cols-2">
                 <div>
-                  <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                     Why it mattered
                   </p>
                   <p className="mt-3 text-base leading-8 text-slate-600">
@@ -333,7 +333,7 @@ export default function HomePage({
                   </p>
                 </div>
                 <div>
-                  <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                     What I built
                   </p>
                   <p className="mt-3 text-base leading-8 text-slate-600">
@@ -370,10 +370,10 @@ export default function HomePage({
                   viewport={viewport}
                   whileInView={whileInView}
                 >
-                  <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                     Project
                   </p>
-                  <h3 className="mt-4 font-['Sora'] text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
+                  <h3 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
                     {project.title}
                   </h3>
                   <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -617,10 +617,10 @@ function Section({
       viewport={viewport}
       whileInView={whileInView}
     >
-      <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+      <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
         {kicker}
       </p>
-      <h2 className="mx-auto mt-4 max-w-[18ch] font-['Sora'] text-4xl font-semibold leading-[1.08] tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
+      <h2 className="mx-auto mt-4 max-w-[18ch] font-display text-4xl font-semibold leading-[1.08] tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
         {title}
       </h2>
       <div className="mx-auto mt-5 max-w-[50rem] space-y-4 text-base leading-8 text-slate-600 sm:text-[1.04rem] sm:leading-9">

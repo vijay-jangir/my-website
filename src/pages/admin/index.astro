@@ -1,13 +1,16 @@
 ---
 import { isAuthConfigured } from "@/lib/env";
+import { getContentPlatformStatus } from "@/lib/content-platform";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import ResumeLab from "@/src/components/admin/ResumeLab";
+import { typographyConfig } from "@/src/config/typography";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import { getSessionUser } from "@/src/lib/auth";
 
 const content = await getPortfolioContent();
 const session = await getSessionUser(Astro.cookies);
 const error = Astro.url.searchParams.get("error");
+const platformStatus = getContentPlatformStatus();
 ---
 
 <BaseLayout
@@ -21,12 +24,12 @@ const error = Astro.url.searchParams.get("error");
       class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
     >
       <p
-        class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
       >
         Private admin
       </p>
       <h1
-        class="mt-4 font-['Sora'] text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
+        class="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
       >
         Resume tailoring lab
       </h1>
@@ -93,10 +96,10 @@ const error = Astro.url.searchParams.get("error");
               class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
               href="/admin/content"
             >
-              <p class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                 Content
               </p>
-              <h2 class="mt-4 font-['Sora'] text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+              <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
                 Manage portfolio data
               </h2>
               <p class="mt-4 text-sm leading-7 text-slate-600">
@@ -106,7 +109,7 @@ const error = Astro.url.searchParams.get("error");
             </a>
 
             <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
-              <p class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
                 Current snapshot
               </p>
               <div class="mt-4 grid gap-4 sm:grid-cols-3">
@@ -128,6 +131,57 @@ const error = Astro.url.searchParams.get("error");
                   </p>
                   <p class="text-sm text-slate-500">Experiences</p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid gap-4 lg:grid-cols-2">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Content platform
+              </p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.contentDbLabel}
+                  </p>
+                  <p class="text-sm text-slate-500">Content database</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.backupConfigured ? "Configured" : "Missing"}
+                  </p>
+                  <p class="text-sm text-slate-500">Backup repo</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.authConfigured ? "Configured" : "Missing"}
+                  </p>
+                  <p class="text-sm text-slate-500">GitHub auth</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Typography
+              </p>
+              <p class="mt-4 text-sm leading-7 text-slate-600">
+                Font roles are now centralized and configurable.
+              </p>
+              <div class="mt-4 space-y-2 text-sm text-slate-600">
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Preset:</span>{" "}
+                  {typographyConfig.preset}
+                </p>
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Body/UI:</span>{" "}
+                  Inter Variable
+                </p>
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Mono:</span> IBM
+                  Plex Mono
+                </p>
               </div>
             </div>
           </section>

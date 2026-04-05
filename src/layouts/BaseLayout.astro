@@ -1,6 +1,7 @@
 ---
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import type { SiteProfile } from "@/lib/portfolio-types";
+import { buildTypographyCssVariables } from "@/src/config/typography";
 import "@/src/styles/global.css";
 
 type Props = {
@@ -22,6 +23,7 @@ const {
 const siteProfile =
   siteProfileOverride ?? (await getPortfolioContent()).siteProfile;
 const title = titleOverride ?? siteProfile.name;
+const typographyCssVariables = buildTypographyCssVariables();
 
 const routeNavItems = [
   { href: "/", label: "Home", activeOn: ["/"] },
@@ -59,16 +61,11 @@ const pathname = Astro.url.pathname;
       href={new URL(Astro.url.pathname, Astro.site).toString()}
       rel="canonical"
     />
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
     <title>{title}</title>
   </head>
   <body
-    class="min-h-screen bg-[radial-gradient(circle_at_18%_10%,rgba(176,177,255,0.34),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(255,214,223,0.42),transparent_24%),radial-gradient(circle_at_50%_72%,rgba(255,255,255,0.82),transparent_38%),linear-gradient(180deg,#fbfbff_0%,#f6f7fe_48%,#ffffff_100%)] font-[Manrope] text-[#0e1528] antialiased"
+    class="min-h-screen bg-[radial-gradient(circle_at_18%_10%,rgba(176,177,255,0.34),transparent_28%),radial-gradient(circle_at_85%_8%,rgba(255,214,223,0.42),transparent_24%),radial-gradient(circle_at_50%_72%,rgba(255,255,255,0.82),transparent_38%),linear-gradient(180deg,#fbfbff_0%,#f6f7fe_48%,#ffffff_100%)] font-body text-[#0e1528] antialiased"
+    style={typographyCssVariables}
   >
     <a
       class="absolute left-4 top-4 z-50 -translate-y-20 rounded-full bg-[#11192c] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.2)] transition focus:translate-y-0"
@@ -126,7 +123,7 @@ const pathname = Astro.url.pathname;
           >
             <div class="max-w-2xl">
               <p
-                class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+                class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
               >
                 {siteProfile.name}
               </p>

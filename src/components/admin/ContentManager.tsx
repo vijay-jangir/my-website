@@ -91,10 +91,10 @@ function parseJsonValue<T>(value: string, label: string): T {
 function SectionTitle(props: { body: string; eyebrow: string; title: string }) {
   return (
     <div>
-      <p className="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+      <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
         {props.eyebrow}
       </p>
-      <h2 className="mt-4 font-['Sora'] text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+      <h2 className="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
         {props.title}
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
@@ -744,7 +744,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Skill JSON
             <textarea
-              className="mt-2 h-[30rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[30rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) => setSkillDraft(event.target.value)}
               spellCheck={false}
               value={skillDraft}
@@ -803,7 +803,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Project JSON
             <textarea
-              className="mt-2 h-[34rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[34rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) => setProjectDraft(event.target.value)}
               spellCheck={false}
               value={projectDraft}
@@ -864,7 +864,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Experience JSON
             <textarea
-              className="mt-2 h-[34rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[34rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) => setExperienceDraft(event.target.value)}
               spellCheck={false}
               value={experienceDraft}
@@ -907,7 +907,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Focus definitions JSON
             <textarea
-              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) => setFocusDefinitionsDraft(event.target.value)}
               spellCheck={false}
               value={focusDefinitionsDraft}
@@ -916,7 +916,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Profile highlights JSON
             <textarea
-              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) =>
                 setProfileHighlightsDraft(event.target.value)
               }
@@ -927,7 +927,7 @@ export default function ContentManager({
           <label className="text-sm font-medium text-[#0e1528]">
             Summary templates JSON
             <textarea
-              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-['IBM_Plex_Mono'] text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+              className="mt-2 h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
               onChange={(event) => setSummaryTemplatesDraft(event.target.value)}
               spellCheck={false}
               value={summaryTemplatesDraft}

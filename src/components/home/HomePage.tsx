@@ -8,12 +8,12 @@ import { HiDownload } from "react-icons/hi";
 import clsx from "clsx";
 
 import {
-  experiences,
-  profileHighlights,
-  siteProfile,
-  skillDefinitions,
-} from "@/content/portfolio";
-import { getPublicProjects, getSkillLabel } from "@/lib/portfolio";
+  type ExperienceDefinition,
+  type ProfileHighlight,
+  type ProjectDefinition,
+  type SiteProfile,
+  type SkillDefinition,
+} from "@/lib/portfolio-types";
 import { resolveReducedMotionPreference } from "@/src/lib/motion";
 
 const sections = [
@@ -40,22 +40,39 @@ const fadeUp = {
   }),
 };
 
-export default function HomePage() {
+type Props = {
+  experiences: readonly ExperienceDefinition[];
+  featuredProjects: readonly ProjectDefinition[];
+  profileHighlights: readonly ProfileHighlight[];
+  siteProfile: SiteProfile;
+  skillDefinitions: readonly SkillDefinition[];
+};
+
+export default function HomePage({
+  experiences,
+  featuredProjects,
+  profileHighlights,
+  siteProfile,
+  skillDefinitions,
+}: Props) {
   const prefersReducedMotion =
     resolveReducedMotionPreference(useReducedMotion());
   const [activeSection, setActiveSection] =
     useState<(typeof sectionIds)[number]>("home");
-
-  const featuredProjects = useMemo(
+  const skillLabelById = useMemo(
     () =>
-      getPublicProjects()
-        .filter((project) => project.featured)
-        .slice(0, 3),
-    [],
+      Object.fromEntries(
+        skillDefinitions.map((skill) => [skill.id, skill.label]),
+      ) as Record<string, string>,
+    [skillDefinitions],
   );
 
   const [primaryProject, ...secondaryProjects] = featuredProjects;
   const topSkills = skillDefinitions.slice(0, 14);
+
+  function getSkillLabel(skillId: string) {
+    return skillLabelById[skillId] ?? skillId;
+  }
 
   useEffect(() => {
     const observedSections = sectionIds
@@ -165,7 +182,7 @@ export default function HomePage() {
           animate={{ opacity: 1, scale: 1 }}
           className="h-40 w-40 rounded-full border-[6px] border-white/95 object-cover shadow-[0_24px_70px_rgba(31,44,75,0.14)] sm:h-52 sm:w-52"
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
-          src="/profile-pic.jpeg"
+          src={siteProfile.profileImageUrl ?? "/profile-pic.jpeg"}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         />
 

@@ -61,6 +61,18 @@
 - Improved the homepage copy, simplified CTA labels, and added visible freshness signals so the site reads as current rather than static.
 - Made the floating navigation safer on smaller screens, added a skip link, and added clear reset actions on filtered resume/work views.
 
+### Wave 3.1
+
+- Added Astro DB-backed portfolio content storage with normalized tables in `db/config.ts` and local seed support in `db/seed.ts`.
+- Added DB-first content loading with fallback order: Astro DB, GitHub backup snapshot, bundled file snapshot.
+- Added GitHub snapshot publishing and media upload plumbing so content is not stored only in the database.
+
+### Wave 3.2
+
+- Switched the public pages, PDF endpoint, and JD analysis endpoint to read through the new content loader instead of importing the bundled portfolio file directly.
+- Added a private `/admin/content` surface with direct publishing for profile, skills, projects, experience, advanced collections, media, and revision history.
+- Reworked `/admin` into an actual hub that links resume tooling and content management together.
+
 ### Failure Log
 
 - Hit an Astro/Tailwind integration incompatibility while trying `@astrojs/tailwind` with Astro 6.
@@ -79,6 +91,10 @@
   Resolution: used `astro dev` for route-level runtime verification because the Vercel adapter does not support `astro preview`.
 - Hit a recurring stale local `astro dev` process that stayed bound to port `4321` and served `500` responses after previous sessions.
   Resolution: killed the stale listener and restarted the dev server cleanly before route validation.
+- Hit an Astro DB production-build blocker because `astro build` requires either a local database file or the `--remote` flag.
+  Resolution: added a small build wrapper that automatically selects local file mode for local builds and `--remote` when remote libSQL credentials are configured.
+- Hit a type mismatch between readonly portfolio model types and Astro Action input types.
+  Resolution: kept the public domain types readonly, then added explicit conversion points at the action boundaries instead of weakening the domain model.
 
 ### Verification
 
@@ -94,6 +110,10 @@
 - `npm run format` passed under Node 24 after the Tailwind-first refactor and transition cleanup.
 - `npm run check` passed under Node 24 after the `framer-motion` homepage transition pass.
 - `npm run format && npm run check` passed under Node 24 after the UX polish and freshness pass.
+- `npm run lint` passed after the Astro DB/content-management implementation wave.
+- `npm run typecheck` passed after the Astro DB/content-management implementation wave.
+- `npm run test:run` passed after the Astro DB/content-management implementation wave.
+- `npm run build` passed after the Astro DB/content-management implementation wave.
 - Local dev server responded successfully on the main public routes and the PDF endpoint.
 
 ### Deployment Check

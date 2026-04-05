@@ -4,9 +4,10 @@ import type { ProjectDefinition } from "@/lib/portfolio-types";
 
 type Props = {
   project: ProjectDefinition;
+  skillLabels?: Record<string, string>;
 };
 
-const { project } = Astro.props;
+const { project, skillLabels = {} } = Astro.props;
 ---
 
 <article
@@ -36,7 +37,7 @@ const { project } = Astro.props;
           .slice(0, 6)
           .map((skillId) => (
             <span class="rounded-full border border-slate-200/80 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600">
-              {getSkillLabel(skillId)}
+              {skillLabels[skillId] ?? getSkillLabel(skillId)}
             </span>
           ))
       }

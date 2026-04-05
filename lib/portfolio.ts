@@ -1,18 +1,11 @@
-import {
-  focusDefinitions,
-  profileHighlights,
-  projects,
-  siteProfile,
-  skillDefinitions,
-  summaryTemplates,
-  experiences,
-} from "@/content/portfolio";
+import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import type {
   ExperienceDefinition,
   FocusDefinition,
   FocusId,
   FocusWeights,
   JobDescriptionAnalysis,
+  PortfolioSnapshot,
   ProfileHighlight,
   ProjectDefinition,
   ResumeVariant,
@@ -20,15 +13,29 @@ import type {
   SkillScore,
 } from "@/lib/portfolio-types";
 
-const focusIds = new Set<FocusId>(focusDefinitions.map((focus) => focus.id));
+type PortfolioContentInput = Pick<
+  PortfolioSnapshot,
+  | "experiences"
+  | "focusDefinitions"
+  | "profileHighlights"
+  | "projects"
+  | "siteProfile"
+  | "skillDefinitions"
+  | "summaryTemplates"
+>;
+
+const fallbackContent = fallbackPortfolioSnapshot;
+const fallbackFocusIds = new Set<FocusId>(
+  fallbackContent.focusDefinitions.map((focus) => focus.id),
+);
 
 export const focusDefinitionMap = Object.fromEntries(
-  focusDefinitions.map((focus) => [focus.id, focus]),
-) as Record<FocusId, (typeof focusDefinitions)[number]>;
+  fallbackContent.focusDefinitions.map((focus) => [focus.id, focus]),
+) as Record<FocusId, (typeof fallbackContent.focusDefinitions)[number]>;
 
 export const skillDefinitionMap = Object.fromEntries(
-  skillDefinitions.map((skill) => [skill.id, skill]),
-) as Record<string, (typeof skillDefinitions)[number]>;
+  fallbackContent.skillDefinitions.map((skill) => [skill.id, skill]),
+) as Record<string, (typeof fallbackContent.skillDefinitions)[number]>;
 
 export function parseFocusIds(rawValue?: string | string[] | null): FocusId[] {
   const value = Array.isArray(rawValue) ? rawValue.join(",") : (rawValue ?? "");
@@ -36,7 +43,7 @@ export function parseFocusIds(rawValue?: string | string[] | null): FocusId[] {
   const parsed = value
     .split(",")
     .map((item) => item.trim().toLowerCase())
-    .filter((item): item is FocusId => focusIds.has(item as FocusId));
+    .filter((item): item is FocusId => fallbackFocusIds.has(item as FocusId));
 
   return Array.from(new Set(parsed)).slice(0, 3);
 }
@@ -115,10 +122,11 @@ function enrichProjectScore(
 }
 
 function rankProjects(
+  content: PortfolioContentInput,
   focusVector: Record<FocusId, number>,
-  limit = projects.length,
+  limit = content.projects.length,
 ) {
-  return [...projects]
+  return [...content.projects]
     .filter((project) => project.visibility === "public")
     .map((project) => ({
       item: project,
@@ -130,21 +138,23 @@ function rankProjects(
 }
 
 function rankHighlights(
+  content: PortfolioContentInput,
   focusVector: Record<FocusId, number>,
-  limit = profileHighlights.length,
+  limit = content.profileHighlights.length,
 ) {
-  return rankItems(profileHighlights, focusVector)
+  return rankItems(content.profileHighlights, focusVector)
     .slice(0, limit)
     .map(({ item }) => item);
 }
 
 function rankSkills(
+  content: PortfolioContentInput,
   focusVector: Record<FocusId, number>,
   analysis?: JobDescriptionAnalysis,
 ) {
   const jdSkillMap = buildSkillScoreMap(analysis?.skillScores);
 
-  const scored = [...skillDefinitions]
+  const scored = [...content.skillDefinitions]
     .map((skill) => {
       const focusScore = scoreFromWeights(skill.focusWeights, focusVector);
       const jdBoost = jdSkillMap.get(skill.id) ?? 0;
@@ -161,9 +171,10 @@ function rankSkills(
 }
 
 function rankExperience(
+  content: PortfolioContentInput,
   focusVector: Record<FocusId, number>,
 ): ExperienceDefinition[] {
-  return rankItems(experiences, focusVector)
+  return rankItems(content.experiences, focusVector)
     .map(({ item }) => ({
       ...item,
       bullets: [...item.bullets]
@@ -179,12 +190,13 @@ function rankExperience(
 }
 
 function pickSummary(
+  content: PortfolioContentInput,
   focusSelection: readonly FocusId[],
   analysis?: JobDescriptionAnalysis,
 ) {
   const normalizedSelection: readonly FocusId[] =
     focusSelection.length > 0 ? focusSelection : ["general"];
-  const exactTemplate = summaryTemplates.find(
+  const exactTemplate = content.summaryTemplates.find(
     (template) =>
       template.focusIds.length === normalizedSelection.length &&
       template.focusIds.every((focusId) =>
@@ -196,12 +208,15 @@ function pickSummary(
     return exactTemplate;
   }
 
+  const contentFocusMap = Object.fromEntries(
+    content.focusDefinitions.map((focus) => [focus.id, focus]),
+  ) as Record<FocusId, FocusDefinition>;
   const primaryFocus = normalizedSelection[0];
-  const primaryDefinition = focusDefinitionMap[primaryFocus];
+  const primaryDefinition = contentFocusMap[primaryFocus];
 
   if (analysis && normalizedSelection.length > 1) {
     const focusLabels = normalizedSelection
-      .map((focusId) => focusDefinitionMap[focusId].shortLabel)
+      .map((focusId) => contentFocusMap[focusId].shortLabel)
       .join(" + ");
 
     return {
@@ -228,11 +243,24 @@ export function getSkillLabel(skillId: string) {
   return skillDefinitionMap[skillId]?.label ?? skillId;
 }
 
-export function buildResumeVariant(options: {
-  source?: ResumeVariant["source"];
-  focusIds?: readonly FocusId[];
-  analysis?: JobDescriptionAnalysis;
-}): ResumeVariant {
+export function getSkillLabelFromContent(
+  content: Pick<PortfolioSnapshot, "skillDefinitions">,
+  skillId: string,
+) {
+  return (
+    content.skillDefinitions.find((skill) => skill.id === skillId)?.label ??
+    skillId
+  );
+}
+
+export function buildResumeVariantFromContent(
+  content: PortfolioContentInput,
+  options: {
+    source?: ResumeVariant["source"];
+    focusIds?: readonly FocusId[];
+    analysis?: JobDescriptionAnalysis;
+  },
+): ResumeVariant {
   const focusIdsFromAnalysis = options.analysis?.topFocusIds ?? [];
   const selectedFocusIds: readonly FocusId[] =
     options.focusIds && options.focusIds.length > 0
@@ -251,11 +279,11 @@ export function buildResumeVariant(options: {
           ) as Record<FocusId, number>,
         )
       : buildQueryFocusVector(selectedFocusIds);
-  const summary = pickSummary(selectedFocusIds, options.analysis);
-  const rankedProjects = rankProjects(focusVector, 4);
-  const rankedExperience = rankExperience(focusVector);
-  const rankedHighlights = rankHighlights(focusVector, 3);
-  const rankedSkills = rankSkills(focusVector, options.analysis);
+  const summary = pickSummary(content, selectedFocusIds, options.analysis);
+  const rankedProjects = rankProjects(content, focusVector, 4);
+  const rankedExperience = rankExperience(content, focusVector);
+  const rankedHighlights = rankHighlights(content, focusVector, 3);
+  const rankedSkills = rankSkills(content, focusVector, options.analysis);
 
   return {
     id: selectedFocusIds.join("-"),
@@ -263,7 +291,7 @@ export function buildResumeVariant(options: {
     focusIds: selectedFocusIds,
     headline: summary.headline,
     summary: summary.summary,
-    recruiterPitch: siteProfile.recruiterPitch,
+    recruiterPitch: content.siteProfile.recruiterPitch,
     highlights: rankedHighlights,
     primarySkills: rankedSkills.primarySkills,
     secondarySkills: rankedSkills.secondarySkills,
@@ -274,14 +302,28 @@ export function buildResumeVariant(options: {
   };
 }
 
-export function searchProjects(options: {
-  query?: string;
-  focusIds?: FocusId[];
-}) {
+export function buildResumeVariant(options: {
+  source?: ResumeVariant["source"];
+  focusIds?: readonly FocusId[];
+  analysis?: JobDescriptionAnalysis;
+}): ResumeVariant {
+  return buildResumeVariantFromContent(fallbackContent, options);
+}
+
+export function searchProjectsInContent(
+  content: PortfolioContentInput,
+  options: {
+    query?: string;
+    focusIds?: FocusId[];
+  },
+) {
   const focusVector = buildQueryFocusVector(options.focusIds ?? ["general"]);
   const query = options.query?.trim().toLowerCase() ?? "";
+  const labelBySkill = Object.fromEntries(
+    content.skillDefinitions.map((skill) => [skill.id, skill.label]),
+  ) as Record<string, string>;
 
-  return [...projects]
+  return [...content.projects]
     .filter((project) => project.visibility === "public")
     .map((project) => {
       const baseScore = enrichProjectScore(project, focusVector);
@@ -294,7 +336,7 @@ export function searchProjects(options: {
         project.summary,
         project.detail,
         project.impact,
-        ...project.skillIds.map(getSkillLabel),
+        ...project.skillIds.map((skillId) => labelBySkill[skillId] ?? skillId),
       ]
         .join(" ")
         .toLowerCase();
@@ -317,23 +359,45 @@ export function searchProjects(options: {
     .map(({ item }) => item);
 }
 
+export function searchProjects(options: {
+  query?: string;
+  focusIds?: FocusId[];
+}) {
+  return searchProjectsInContent(fallbackContent, options);
+}
+
+export function getPublicProjectsFromContent(content: PortfolioContentInput) {
+  return content.projects.filter((project) => project.visibility === "public");
+}
+
 export function getPublicProjects() {
-  return projects.filter((project) => project.visibility === "public");
+  return getPublicProjectsFromContent(fallbackContent);
+}
+
+export function getFocusOptionsFromContent(content: PortfolioContentInput) {
+  return content.focusDefinitions;
 }
 
 export function getFocusOptions() {
-  return focusDefinitions;
+  return getFocusOptionsFromContent(fallbackContent);
+}
+
+export function getHighlightedFocusesFromContent(
+  content: PortfolioContentInput,
+): FocusDefinition[] {
+  return content.focusDefinitions.filter((focus) => focus.id !== "general");
 }
 
 export function getHighlightedFocuses(): FocusDefinition[] {
-  return focusDefinitions.filter((focus) => focus.id !== "general");
+  return getHighlightedFocusesFromContent(fallbackContent);
 }
 
-export function getTopRelatedSkills(
+export function getTopRelatedSkillsFromContent(
+  content: PortfolioContentInput,
   focusId: FocusId,
   limit = 5,
 ): SkillDefinition[] {
-  return [...skillDefinitions]
+  return [...content.skillDefinitions]
     .filter((skill) => (skill.focusWeights[focusId] ?? 0) > 0)
     .sort(
       (left, right) =>
@@ -342,7 +406,21 @@ export function getTopRelatedSkills(
     .slice(0, limit);
 }
 
-export function getHighlightByFocus(focusId: FocusId): ProfileHighlight[] {
+export function getTopRelatedSkills(
+  focusId: FocusId,
+  limit = 5,
+): SkillDefinition[] {
+  return getTopRelatedSkillsFromContent(fallbackContent, focusId, limit);
+}
+
+export function getHighlightByFocusFromContent(
+  content: PortfolioContentInput,
+  focusId: FocusId,
+): ProfileHighlight[] {
   const vector = buildQueryFocusVector([focusId]);
-  return rankHighlights(vector, 3);
+  return rankHighlights(content, vector, 3);
+}
+
+export function getHighlightByFocus(focusId: FocusId): ProfileHighlight[] {
+  return getHighlightByFocusFromContent(fallbackContent, focusId);
 }

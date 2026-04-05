@@ -1,20 +1,27 @@
 ---
-import { siteProfile } from "@/content/portfolio";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import type { SiteProfile } from "@/lib/portfolio-types";
 import "@/src/styles/global.css";
 
 type Props = {
-  title?: string;
   description?: string;
+  siteProfile?: SiteProfile;
   showAdminNav?: boolean;
   showRouteHeader?: boolean;
+  title?: string;
 };
 
 const {
-  title = siteProfile.name,
   description = "Portfolio, resume, and selected work for Vijay Jangir across data platforms, backend systems, and streaming infrastructure.",
+  siteProfile: siteProfileOverride,
   showAdminNav = false,
   showRouteHeader = true,
+  title: titleOverride,
 } = Astro.props;
+
+const siteProfile =
+  siteProfileOverride ?? (await getPortfolioContent()).siteProfile;
+const title = titleOverride ?? siteProfile.name;
 
 const routeNavItems = [
   { href: "/", label: "Home" },

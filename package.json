@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node ./scripts/astro-build.mjs",
     "preview": "astro preview",
     "lint": "eslint .",
     "test": "vitest",
@@ -31,6 +31,7 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@astrojs/db": "^0.20.1",
     "@react-pdf/renderer": "^4.3.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

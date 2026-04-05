@@ -1,8 +1,22 @@
 ---
 import HomePage from "@/src/components/home/HomePage";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { getPublicProjectsFromContent } from "@/lib/portfolio";
+
+const content = await getPortfolioContent();
+const featuredProjects = getPublicProjectsFromContent(content)
+  .filter((project) => project.featured)
+  .slice(0, 3);
 ---
 
-<BaseLayout showRouteHeader={false}>
-  <HomePage client:load />
+<BaseLayout showRouteHeader={false} siteProfile={content.siteProfile}>
+  <HomePage
+    client:load
+    experiences={content.experiences}
+    featuredProjects={featuredProjects}
+    profileHighlights={content.profileHighlights}
+    siteProfile={content.siteProfile}
+    skillDefinitions={content.skillDefinitions}
+  />
 </BaseLayout>

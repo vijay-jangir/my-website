@@ -1,9 +1,10 @@
-import { focusDefinitions, skillDefinitions } from "@/content/portfolio";
-import { buildResumeVariant, parseFocusIds } from "@/lib/portfolio";
+import { fallbackPortfolioSnapshot } from "@/content/portfolio";
+import { buildResumeVariantFromContent, parseFocusIds } from "@/lib/portfolio";
 import type {
   FocusScore,
   JobDescriptionAnalysis,
   JdSection,
+  PortfolioSnapshot,
   ResumeVariant,
   SkillScore,
 } from "@/lib/portfolio-types";
@@ -62,6 +63,11 @@ const DEFAULT_SECTION: JdSection = {
   weight: 1,
   content: "",
 };
+
+type TaxonomyContent = Pick<
+  PortfolioSnapshot,
+  "focusDefinitions" | "skillDefinitions"
+>;
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -143,8 +149,11 @@ function collectEvidence(content: string, alias: string, limit = 2) {
   return snippets;
 }
 
-function buildDirectFocusScores(sections: JdSection[]): FocusScore[] {
-  return focusDefinitions.map((focus) => {
+function buildDirectFocusScores(
+  content: TaxonomyContent,
+  sections: JdSection[],
+): FocusScore[] {
+  return content.focusDefinitions.map((focus) => {
     let score = 0;
     const matchedAliases: string[] = [];
     const evidence: string[] = [];
@@ -180,8 +189,11 @@ function buildDirectFocusScores(sections: JdSection[]): FocusScore[] {
   });
 }
 
-function buildSkillScores(sections: JdSection[]): SkillScore[] {
-  const scoredSkills = skillDefinitions.map((skill) => {
+function buildSkillScores(
+  content: TaxonomyContent,
+  sections: JdSection[],
+): SkillScore[] {
+  const scoredSkills = content.skillDefinitions.map((skill) => {
     let score = 0;
     const matchedAliases: string[] = [];
     const evidence: string[] = [];
@@ -212,17 +224,17 @@ function buildSkillScores(sections: JdSection[]): SkillScore[] {
       evidence: evidence.slice(0, 3),
     };
   });
-
   return normalizeSkillScores(scoredSkills);
 }
 
 function normalizeFocusScores(
+  content: TaxonomyContent,
   directFocusScores: FocusScore[],
   skillScores: SkillScore[],
 ): FocusScore[] {
   const propagatedScores = directFocusScores.map((focus) => {
     const skillContribution = skillScores.reduce((sum, skillScore) => {
-      const skill = skillDefinitions.find(
+      const skill = content.skillDefinitions.find(
         (item) => item.id === skillScore.skillId,
       );
       return sum + skillScore.score * (skill?.focusWeights[focus.focusId] ?? 0);
@@ -288,10 +300,18 @@ function buildExtractedHighlights(
 }
 
 export function analyzeJobDescription(rawText: string): JobDescriptionAnalysis {
+  return analyzeJobDescriptionWithContent(fallbackPortfolioSnapshot, rawText);
+}
+
+export function analyzeJobDescriptionWithContent(
+  content: TaxonomyContent,
+  rawText: string,
+): JobDescriptionAnalysis {
   const sections = parseSections(rawText);
-  const skillScores = buildSkillScores(sections);
+  const skillScores = buildSkillScores(content, sections);
   const focusScores = normalizeFocusScores(
-    buildDirectFocusScores(sections),
+    content,
+    buildDirectFocusScores(content, sections),
     skillScores,
   );
 
@@ -309,7 +329,29 @@ export function buildResumeVariantFromJobDescription(options: {
   rawText: string;
   focusOverride?: string;
 }): { analysis: JobDescriptionAnalysis; variant: ResumeVariant } {
-  const analysis = analyzeJobDescription(options.rawText);
+  return buildResumeVariantFromJobDescriptionWithContent(
+    fallbackPortfolioSnapshot,
+    options,
+  );
+}
+
+export function buildResumeVariantFromJobDescriptionWithContent(
+  content: Pick<
+    PortfolioSnapshot,
+    | "experiences"
+    | "focusDefinitions"
+    | "profileHighlights"
+    | "projects"
+    | "siteProfile"
+    | "skillDefinitions"
+    | "summaryTemplates"
+  >,
+  options: {
+    rawText: string;
+    focusOverride?: string;
+  },
+): { analysis: JobDescriptionAnalysis; variant: ResumeVariant } {
+  const analysis = analyzeJobDescriptionWithContent(content, options.rawText);
   const overrideFocusIds = parseFocusIds(options.focusOverride ?? "");
 
   const mergedFocusIds =
@@ -321,7 +363,7 @@ export function buildResumeVariantFromJobDescription(options: {
 
   return {
     analysis,
-    variant: buildResumeVariant({
+    variant: buildResumeVariantFromContent(content, {
       source: "jd",
       focusIds: mergedFocusIds.length > 0 ? mergedFocusIds : ["general"],
       analysis,

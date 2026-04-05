@@ -2,7 +2,8 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 
 import { dbQuery } from "@/lib/db";
-import { buildResumeVariantFromJobDescription } from "@/lib/jd";
+import { buildResumeVariantFromJobDescriptionWithContent } from "@/lib/jd";
+import { getPortfolioContent } from "@/lib/portfolio-content";
 import { isAuthConfigured } from "@/lib/env";
 import { saveResumeVariant } from "@/lib/resume-store";
 import { getSessionUser } from "@/src/lib/auth";
@@ -53,10 +54,14 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     );
   }
 
-  const { analysis, variant } = buildResumeVariantFromJobDescription({
-    focusOverride: parsed.data.focusOverride,
-    rawText: parsed.data.jobDescription,
-  });
+  const content = await getPortfolioContent();
+  const { analysis, variant } = buildResumeVariantFromJobDescriptionWithContent(
+    content,
+    {
+      focusOverride: parsed.data.focusOverride,
+      rawText: parsed.data.jobDescription,
+    },
+  );
 
   try {
     await dbQuery(

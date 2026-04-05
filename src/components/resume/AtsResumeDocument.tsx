@@ -1,7 +1,6 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
-import { siteProfile } from "@/content/portfolio";
-import type { ResumeVariant } from "@/lib/portfolio-types";
+import type { ResumeVariant, SiteProfile } from "@/lib/portfolio-types";
 
 const styles = StyleSheet.create({
   page: {
@@ -65,10 +64,11 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
+  siteProfile: SiteProfile;
   variant: ResumeVariant;
 };
 
-export default function AtsResumeDocument({ variant }: Props) {
+export default function AtsResumeDocument({ siteProfile, variant }: Props) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>

@@ -20,6 +20,7 @@ export const siteProfile: SiteProfile = {
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
+  profileImageUrl: "/profile-pic.jpeg",
   heroLabel:
     "I build data platforms, streaming systems, and backend tools that stay reliable in production.",
   recruiterPitch:
@@ -826,3 +827,16 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
       "I build AI-adjacent backend systems with structured data, deterministic fallbacks, and pragmatic engineering constraints in mind. The focus is dependable product behavior, not demos that only work in ideal conditions.",
   },
 ] as const;
+
+export const fallbackPortfolioSnapshot = {
+  siteProfile,
+  portfolioLinks,
+  focusDefinitions,
+  skillDefinitions,
+  projects,
+  experiences,
+  profileHighlights,
+  summaryTemplates,
+  mediaAssets: [],
+  revisions: [],
+} as const;

@@ -6,11 +6,13 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+import db from "@astrojs/db";
+
 export default defineConfig({
   site: "https://www.vijayjangir.com",
   output: "server",
   adapter: vercel(),
-  integrations: [react()],
+  integrations: [react(), db()],
   vite: {
     plugins: [tailwindcss(), tsconfigPaths()],
     resolve: {

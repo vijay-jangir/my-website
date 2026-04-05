@@ -1,16 +1,18 @@
 ---
-import { focusDefinitions } from "@/content/portfolio";
 import { isAuthConfigured } from "@/lib/env";
+import { getPortfolioContent } from "@/lib/portfolio-content";
 import ResumeLab from "@/src/components/admin/ResumeLab";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import { getSessionUser } from "@/src/lib/auth";
 
+const content = await getPortfolioContent();
 const session = await getSessionUser(Astro.cookies);
 const error = Astro.url.searchParams.get("error");
 ---
 
 <BaseLayout
   description="Private resume tailoring and JD analysis tools."
+  siteProfile={content.siteProfile}
   showAdminNav={true}
   title="Admin | Vijay Jangir"
 >
@@ -86,7 +88,51 @@ const error = Astro.url.searchParams.get("error");
             </div>
           </section>
 
-          <ResumeLab client:load focusOptions={focusDefinitions} />
+          <section class="grid gap-4 lg:grid-cols-2">
+            <a
+              class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
+              href="/admin/content"
+            >
+              <p class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Content
+              </p>
+              <h2 class="mt-4 font-['Sora'] text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+                Manage portfolio data
+              </h2>
+              <p class="mt-4 text-sm leading-7 text-slate-600">
+                Edit profile, skills, projects, experience, uploads, and
+                revision history from one place.
+              </p>
+            </a>
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-['IBM_Plex_Mono'] text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Current snapshot
+              </p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.projects.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Projects</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.skillDefinitions.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Skills</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.experiences.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Experiences</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <ResumeLab client:load focusOptions={content.focusDefinitions} />
         </>
       ) : null
     }

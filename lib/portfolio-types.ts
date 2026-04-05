@@ -104,9 +104,50 @@ export type SiteProfile = {
   email: string;
   githubUrl: string;
   linkedinUrl: string;
+  profileImageUrl?: string;
   heroLabel: string;
   recruiterPitch: string;
   overview: string[];
+};
+
+export type MediaAsset = {
+  id: string;
+  label: string;
+  kind: "image" | "pdf" | "document" | "other";
+  mimeType: string;
+  fileName: string;
+  url: string;
+  path: string;
+  entityType?: "site-profile" | "project" | "experience" | "general";
+  entityId?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ContentRevision = {
+  id: string;
+  snapshotPath: string;
+  currentPath: string;
+  commitSha?: string;
+  backupRepo: string;
+  branch: string;
+  publishedBy: string;
+  status: "published" | "db-apply-failed";
+  summary?: string;
+  publishedAt: string;
+};
+
+export type PortfolioSnapshot = {
+  siteProfile: SiteProfile;
+  portfolioLinks: readonly PortfolioLink[];
+  focusDefinitions: readonly FocusDefinition[];
+  skillDefinitions: readonly SkillDefinition[];
+  projects: readonly ProjectDefinition[];
+  experiences: readonly ExperienceDefinition[];
+  profileHighlights: readonly ProfileHighlight[];
+  summaryTemplates: readonly SummaryTemplate[];
+  mediaAssets: readonly MediaAsset[];
+  revisions?: readonly ContentRevision[];
 };
 
 export type RankedItem<T> = {

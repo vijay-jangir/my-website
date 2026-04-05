@@ -1,4 +1,6 @@
 export const env = {
+  astroDbRemoteUrl: process.env.ASTRO_DB_REMOTE_URL,
+  astroDbAppToken: process.env.ASTRO_DB_APP_TOKEN,
   databaseUrl: process.env.DATABASE_URL,
   wixApiKey: process.env.WIX_API_KEY,
   wixSiteId: process.env.WIX_SITE_ID ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
@@ -22,6 +24,13 @@ export const env = {
   turnstileSiteKey: process.env.TURNSTILE_SITE_KEY,
   turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY,
   cronSecret: process.env.CRON_SECRET,
+  contentBackupRepo: process.env.CONTENT_BACKUP_REPO,
+  contentBackupBranch: process.env.CONTENT_BACKUP_BRANCH ?? "content-backup",
+  contentBackupPat: process.env.CONTENT_BACKUP_PAT,
+  contentHistoryLimit: Number.parseInt(
+    process.env.CONTENT_HISTORY_LIMIT ?? "10",
+    10,
+  ),
   openAiApiKey: process.env.OPENAI_API_KEY,
   openClawBaseUrl: process.env.OPENCLAW_BASE_URL,
   openClawToken: process.env.OPENCLAW_TOKEN,
@@ -29,6 +38,20 @@ export const env = {
 
 export function isDatabaseConfigured() {
   return Boolean(env.databaseUrl);
+}
+
+export function isAstroContentDbConfigured() {
+  return Boolean(env.astroDbRemoteUrl && env.astroDbAppToken);
+}
+
+export function isContentBackupConfigured() {
+  return Boolean(env.contentBackupRepo && env.contentBackupPat);
+}
+
+export function getContentHistoryLimit() {
+  return Number.isFinite(env.contentHistoryLimit) && env.contentHistoryLimit > 0
+    ? env.contentHistoryLimit
+    : 10;
 }
 
 export function isTurnstileConfigured() {

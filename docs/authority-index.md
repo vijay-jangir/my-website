@@ -16,6 +16,10 @@
   Migration phases, waves, and exit criteria.
 - [`docs/progress-log.md`](/Users/b0228188/projects/github_repos/vijayjangir/my-website/docs/progress-log.md)
   Execution log and deployment-check history.
+- [`docs/seo-aeo-geo-strategy.md`](/Users/b0228188/projects/github_repos/vijayjangir/my-website/docs/seo-aeo-geo-strategy.md)
+  Canonical SEO, AEO, and GEO roadmap; target queries table; phases and optional Cursor audit checklist.
+- [`docs/seo-audit-log.md`](/Users/b0228188/projects/github_repos/vijayjangir/my-website/docs/seo-audit-log.md)
+  Dated audit trail for periodic GSC, Lighthouse, and manual checks.
 - [`src/lib/auth.ts`](/Users/b0228188/projects/github_repos/vijayjangir/my-website/src/lib/auth.ts)
   Authority for private-session behavior and GitHub allowlist auth.
 - [`src/pages/api/jd/analyze.ts`](/Users/b0228188/projects/github_repos/vijayjangir/my-website/src/pages/api/jd/analyze.ts)
@@ -25,6 +29,14 @@
 
 ## External Platform Authorities
 
+- Google Search Console:
+  https://search.google.com/search-console
+- Google Search Essentials (overview for site owners):
+  https://developers.google.com/search/docs/essentials
+- Schema.org Person (structured data reference):
+  https://schema.org/Person
+- llms.txt convention (machine-readable site summary for LLMs):
+  https://llmstxt.org/
 - Astro endpoints:
   https://docs.astro.build/en/guides/endpoints/
 - Astro authentication guidance:

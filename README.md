@@ -20,6 +20,8 @@ Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backe
 - [`docs/implementation-plan.md`](./docs/implementation-plan.md)
 - [`docs/progress-log.md`](./docs/progress-log.md)
 - [`docs/authority-index.md`](./docs/authority-index.md)
+- [`docs/seo-aeo-geo-strategy.md`](./docs/seo-aeo-geo-strategy.md)
+- [`docs/seo-audit-log.md`](./docs/seo-audit-log.md)
 - [`docs/infra.md`](./docs/infra.md)
 
 ## Runtime

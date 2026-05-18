@@ -41,7 +41,9 @@ import type {
   PortfolioLink,
   PortfolioSnapshot,
   ProfileHighlight,
+  ProjectCaseStudy,
   ProjectDefinition,
+  ProjectPublicProof,
   SiteProfile,
   SkillDefinition,
   SummaryTemplate,
@@ -319,6 +321,8 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
       ),
       projects: projects.map(
         (row): ProjectDefinition => ({
+          caseStudy: ((row.caseStudy as ProjectCaseStudy | null) ??
+            undefined) as ProjectCaseStudy | undefined,
           detail: row.detail,
           featured: row.featured,
           focusWeights: buildWeightRecord(projectWeightMap.get(row.id) ?? []),
@@ -331,6 +335,8 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
               label: link.label,
             }),
           ),
+          publicProof: ((row.publicProof as ProjectPublicProof | null) ??
+            undefined) as ProjectPublicProof | undefined,
           skillIds: sortByOrder(projectSkillMap.get(row.id) ?? []).map(
             (link) => link.skillId,
           ),
@@ -551,10 +557,12 @@ async function applyPortfolioContentSnapshot(
   await insertMany(
     ProjectTable,
     sanitized.projects.map((project, index) => ({
+      caseStudy: project.caseStudy ?? null,
       detail: project.detail,
       featured: project.featured,
       id: project.id,
       impact: project.impact,
+      publicProof: project.publicProof ?? null,
       slug: project.slug,
       sortOrder: index,
       summary: project.summary,

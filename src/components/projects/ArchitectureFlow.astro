@@ -1,0 +1,43 @@
+---
+type Props = {
+  items: readonly string[];
+};
+
+const { items } = Astro.props;
+---
+
+<section
+  class="rounded-[2rem] border border-slate-200/80 bg-white/78 px-6 py-8 shadow-[0_20px_56px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-8"
+>
+  <div class="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
+    <div>
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        System trace
+      </p>
+      <h2
+        class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]"
+      >
+        How the work moved through the system
+      </h2>
+      <p class="mt-4 text-sm leading-7 text-slate-600">
+        A high-level operating path: where the request starts, how the system
+        shapes it, and how other teams consume the result.
+      </p>
+    </div>
+
+    <ol class="relative grid gap-4 md:grid-cols-3">
+      {
+        items.slice(0, 3).map((item, index) => (
+          <li class="relative rounded-[1.4rem] border border-slate-200/80 bg-white px-5 py-5 shadow-[0_14px_34px_rgba(31,44,75,0.05)]">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#101827] text-sm font-semibold text-white">
+              {index + 1}
+            </span>
+            <p class="mt-4 text-sm leading-7 text-slate-600">{item}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

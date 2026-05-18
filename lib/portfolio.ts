@@ -223,7 +223,7 @@ function pickSummary(
       id: "generated",
       focusIds: normalizedSelection,
       headline: `${focusLabels} Engineer`,
-      summary: `This resume highlights my strongest fit across ${focusLabels.toLowerCase()} work using only validated project, skill, and experience data from the portfolio.`,
+      summary: `This resume highlights my strongest fit across ${focusLabels.toLowerCase()} work using the same project, skill, and experience data shown on this site.`,
     };
   }
 
@@ -310,6 +310,70 @@ export function buildResumeVariant(options: {
   return buildResumeVariantFromContent(fallbackContent, options);
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function buildSearchTerms(query: string) {
+  const normalizedQuery = normalizeSearchText(query);
+
+  return Array.from(new Set(normalizedQuery.split(/\s+/).filter(Boolean)));
+}
+
+function buildProjectSearchIndex(
+  project: ProjectDefinition,
+  skillSearchFragments: Record<string, readonly string[]>,
+) {
+  const fragments = [
+    project.id,
+    project.slug,
+    project.title,
+    project.summary,
+    project.detail,
+    project.impact,
+    ...project.skillIds.flatMap(
+      (skillId) => skillSearchFragments[skillId] ?? [skillId],
+    ),
+  ];
+  const normalizedFragments = fragments.flatMap((fragment) => {
+    const normalized = normalizeSearchText(fragment);
+
+    if (!normalized) {
+      return [];
+    }
+
+    const compact = normalized.replace(/\s+/g, "");
+
+    return compact && compact !== normalized
+      ? [normalized, compact]
+      : [normalized];
+  });
+
+  return {
+    text: ` ${normalizedFragments.join(" ")} `,
+    tokens: new Set(
+      normalizedFragments.flatMap((fragment) =>
+        fragment.split(/\s+/).filter(Boolean),
+      ),
+    ),
+  };
+}
+
+function matchesSearchTerm(
+  searchIndex: ReturnType<typeof buildProjectSearchIndex>,
+  term: string,
+) {
+  return (
+    searchIndex.tokens.has(term) ||
+    (term.length > 2 && searchIndex.text.includes(term))
+  );
+}
+
 export function searchProjectsInContent(
   content: PortfolioContentInput,
   options: {
@@ -318,43 +382,44 @@ export function searchProjectsInContent(
   },
 ) {
   const focusVector = buildQueryFocusVector(options.focusIds ?? ["general"]);
-  const query = options.query?.trim().toLowerCase() ?? "";
-  const labelBySkill = Object.fromEntries(
-    content.skillDefinitions.map((skill) => [skill.id, skill.label]),
-  ) as Record<string, string>;
+  const query = options.query?.trim() ?? "";
+  const queryTerms = buildSearchTerms(query);
+  const skillSearchFragments = Object.fromEntries(
+    content.skillDefinitions.map((skill) => [
+      skill.id,
+      [skill.id, skill.label, ...skill.aliases],
+    ]),
+  ) as Record<string, readonly string[]>;
 
   return [...content.projects]
     .filter((project) => project.visibility === "public")
     .map((project) => {
       const baseScore = enrichProjectScore(project, focusVector);
-      if (!query) {
+      if (queryTerms.length === 0) {
         return { item: project, score: baseScore };
       }
 
-      const haystack = [
-        project.title,
-        project.summary,
-        project.detail,
-        project.impact,
-        ...project.skillIds.map((skillId) => labelBySkill[skillId] ?? skillId),
-      ]
-        .join(" ")
-        .toLowerCase();
+      const searchIndex = buildProjectSearchIndex(
+        project,
+        skillSearchFragments,
+      );
 
-      const queryTerms = query.split(/\s+/).filter(Boolean);
-      const queryScore = queryTerms.reduce((sum, term) => {
-        if (haystack.includes(term)) {
-          return sum + 0.18;
-        }
+      if (!queryTerms.every((term) => matchesSearchTerm(searchIndex, term))) {
+        return null;
+      }
 
-        return sum;
-      }, 0);
+      const normalizedQuery = normalizeSearchText(query);
+      const phraseBonus = searchIndex.text.includes(normalizedQuery) ? 0.24 : 0;
+      const queryScore = queryTerms.length * 0.18 + phraseBonus;
 
       return {
         item: project,
         score: baseScore + queryScore,
       };
     })
+    .filter((project): project is { item: ProjectDefinition; score: number } =>
+      Boolean(project),
+    )
     .sort((left, right) => right.score - left.score)
     .map(({ item }) => item);
 }

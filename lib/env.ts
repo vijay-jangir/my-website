@@ -1,39 +1,45 @@
+const metaEnv = import.meta.env as Record<string, string | undefined>;
+const shouldReadMetaEnv = !process.env.VITEST;
+
+function readEnv(key: string) {
+  return process.env[key] ?? (shouldReadMetaEnv ? metaEnv[key] : undefined);
+}
+
 export const env = {
-  astroDbRemoteUrl: process.env.ASTRO_DB_REMOTE_URL,
-  astroDbAppToken: process.env.ASTRO_DB_APP_TOKEN,
-  databaseUrl: process.env.DATABASE_URL,
-  wixApiKey: process.env.WIX_API_KEY,
-  wixSiteId: process.env.WIX_SITE_ID ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
-  resendApiKey: process.env.RESEND_API_KEY,
+  astroDbRemoteUrl: readEnv("ASTRO_DB_REMOTE_URL"),
+  astroDbAppToken: readEnv("ASTRO_DB_APP_TOKEN"),
+  databaseUrl: readEnv("DATABASE_URL"),
+  wixApiKey: readEnv("WIX_API_KEY"),
+  wixSiteId: readEnv("WIX_SITE_ID") ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
+  resendApiKey: readEnv("RESEND_API_KEY"),
   resendFrom:
-    process.env.RESEND_FROM ??
-    "My Website Contact Form <onboarding@resend.dev>",
-  contactToEmail: process.env.CONTACT_TO_EMAIL ?? "contact@vijayjangir.com",
-  sessionSecret: process.env.SESSION_SECRET ?? process.env.NEXTAUTH_SECRET,
-  nextAuthSecret: process.env.NEXTAUTH_SECRET,
-  githubId: process.env.GITHUB_ID,
-  githubSecret: process.env.GITHUB_SECRET,
-  adminGithubLogins: (process.env.ADMIN_GITHUB_LOGINS ?? "")
+    readEnv("RESEND_FROM") ?? "My Website Contact Form <onboarding@resend.dev>",
+  contactToEmail: readEnv("CONTACT_TO_EMAIL") ?? "contact@vijayjangir.com",
+  sessionSecret: readEnv("SESSION_SECRET") ?? readEnv("NEXTAUTH_SECRET"),
+  nextAuthSecret: readEnv("NEXTAUTH_SECRET"),
+  githubId: readEnv("GITHUB_ID"),
+  githubSecret: readEnv("GITHUB_SECRET"),
+  adminGithubLogins: (readEnv("ADMIN_GITHUB_LOGINS") ?? "")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean),
-  editorGithubLogins: (process.env.EDITOR_GITHUB_LOGINS ?? "")
+  editorGithubLogins: (readEnv("EDITOR_GITHUB_LOGINS") ?? "")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean),
-  turnstileSiteKey: process.env.TURNSTILE_SITE_KEY,
-  turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY,
-  cronSecret: process.env.CRON_SECRET,
-  contentBackupRepo: process.env.CONTENT_BACKUP_REPO,
-  contentBackupBranch: process.env.CONTENT_BACKUP_BRANCH ?? "content-backup",
-  contentBackupPat: process.env.CONTENT_BACKUP_PAT,
+  turnstileSiteKey: readEnv("TURNSTILE_SITE_KEY"),
+  turnstileSecretKey: readEnv("TURNSTILE_SECRET_KEY"),
+  cronSecret: readEnv("CRON_SECRET"),
+  contentBackupRepo: readEnv("CONTENT_BACKUP_REPO"),
+  contentBackupBranch: readEnv("CONTENT_BACKUP_BRANCH") ?? "content-backup",
+  contentBackupPat: readEnv("CONTENT_BACKUP_PAT"),
   contentHistoryLimit: Number.parseInt(
-    process.env.CONTENT_HISTORY_LIMIT ?? "10",
+    readEnv("CONTENT_HISTORY_LIMIT") ?? "10",
     10,
   ),
-  openAiApiKey: process.env.OPENAI_API_KEY,
-  openClawBaseUrl: process.env.OPENCLAW_BASE_URL,
-  openClawToken: process.env.OPENCLAW_TOKEN,
+  openAiApiKey: readEnv("OPENAI_API_KEY"),
+  openClawBaseUrl: readEnv("OPENCLAW_BASE_URL"),
+  openClawToken: readEnv("OPENCLAW_TOKEN"),
 };
 
 export function isDatabaseConfigured() {

@@ -1,0 +1,50 @@
+---
+import type { ProjectDefinition } from "@/lib/portfolio-types";
+
+type Props = {
+  nextProject?: ProjectDefinition;
+  previousProject?: ProjectDefinition;
+};
+
+const { nextProject, previousProject } = Astro.props;
+---
+
+<nav aria-label="Project navigation" class="grid gap-4 md:grid-cols-2">
+  <a
+    class="rounded-[1.8rem] border border-white/70 bg-white/80 px-5 py-5 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white"
+    href={previousProject ? `/projects/${previousProject.slug}` : "/projects"}
+  >
+    <span
+      class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+    >
+      Previous project
+    </span>
+    <span
+      class="mt-3 block font-display text-2xl font-semibold leading-tight tracking-[-0.04em] text-[#0e1528]"
+    >
+      {previousProject?.title ?? "Start of list"}
+    </span>
+    <span class="mt-3 block text-sm leading-7 text-slate-600">
+      {previousProject?.summary ?? "Return to the full project index."}
+    </span>
+  </a>
+
+  <a
+    class="rounded-[1.8rem] border border-white/70 bg-white/80 px-5 py-5 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white md:text-right"
+    href={nextProject ? `/projects/${nextProject.slug}` : "/projects"}
+  >
+    <span
+      class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+    >
+      Next project
+    </span>
+    <span
+      class="mt-3 block font-display text-2xl font-semibold leading-tight tracking-[-0.04em] text-[#0e1528]"
+    >
+      {nextProject?.title ?? "End of list"}
+    </span>
+    <span class="mt-3 block text-sm leading-7 text-slate-600">
+      {nextProject?.summary ?? "Return to the full project index."}
+    </span>
+  </a>
+</nav>

@@ -9,9 +9,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import db from "@astrojs/db";
 
 export default defineConfig({
-  site: "https://www.vijayjangir.com",
+  site: "https://vijayjangir.com",
   output: "server",
   adapter: vercel(),
+  devToolbar: {
+    enabled: false,
+  },
   integrations: [react(), db()],
   vite: {
     plugins: [tailwindcss(), tsconfigPaths()],

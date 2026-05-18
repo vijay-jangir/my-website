@@ -1,11 +1,9 @@
 "use client";
 
 import { type ReactNode, useMemo } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
 import { FaGithubSquare } from "react-icons/fa";
 import { HiDownload } from "react-icons/hi";
-import clsx from "clsx";
 
 import {
   type ExperienceDefinition,
@@ -14,20 +12,7 @@ import {
   type SiteProfile,
   type SkillDefinition,
 } from "@/lib/portfolio-types";
-import { resolveReducedMotionPreference } from "@/src/lib/motion";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.7,
-      delay,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  }),
-};
+import SystemsBackdrop from "@/src/components/home/SystemsBackdrop";
 
 type Props = {
   experiences: readonly ExperienceDefinition[];
@@ -44,8 +29,6 @@ export default function HomePage({
   siteProfile,
   skillDefinitions,
 }: Props) {
-  const prefersReducedMotion =
-    resolveReducedMotionPreference(useReducedMotion());
   const skillLabelById = useMemo(
     () =>
       Object.fromEntries(
@@ -53,660 +36,241 @@ export default function HomePage({
       ) as Record<string, string>,
     [skillDefinitions],
   );
-
-  const [primaryProject, ...secondaryProjects] = featuredProjects;
-  const topSkills = skillDefinitions.slice(0, 14);
-  const quickAnswers = [
-    {
-      answer:
-        "I build data platforms, ETL pipelines, streaming systems, and backend services for analytics-heavy products and internal platforms.",
-      links: [
-        { href: "/projects", label: "See projects" },
-        { href: "/resume", label: "Open resume" },
-      ],
-      question: "What do I build?",
-    },
-    {
-      answer:
-        "The strongest fit is data engineering, platform engineering, backend, and analytics-platform work where reliability matters as much as delivery speed.",
-      links: [
-        { href: "/resume", label: "Role-focused resume" },
-        { href: "/#experience", label: "Review experience" },
-      ],
-      question: "What roles fit best?",
-    },
-    {
-      answer:
-        "Use the projects page for proof, the resume for a focused summary, and the blog for systems thinking and technical writing.",
-      links: [
-        { href: "/blog", label: "Read the blog" },
-        { href: "/projects", label: "Browse proof" },
-      ],
-      question: "Where should you start?",
-    },
-  ] as const;
+  const featured = featuredProjects.slice(0, 3);
+  const experienceSummary = experiences.slice(0, 3);
 
   function getSkillLabel(skillId: string) {
     return skillLabelById[skillId] ?? skillId;
   }
 
-  const initial = prefersReducedMotion ? false : "hidden";
-  const whileInView = prefersReducedMotion ? undefined : "visible";
-  const viewport = prefersReducedMotion
-    ? undefined
-    : { once: true, amount: 0.3 };
+  function getProjectHref(project: ProjectDefinition) {
+    return project.slug ? `/projects/${project.slug}` : "/projects";
+  }
 
   return (
-    <main className="pb-4 pt-4">
+    <main className="pb-8">
       <section
-        className="mx-auto flex min-h-[100svh] w-full max-w-[72rem] flex-col items-center justify-center px-4 pb-12 pt-24 text-center"
+        className="relative mx-auto flex min-h-[calc(100svh-7.5rem)] w-full max-w-[82rem] items-center justify-center overflow-hidden px-4 pb-16 pt-6 text-center"
         id="home"
       >
-        <motion.img
-          alt={`${siteProfile.name} profile`}
-          animate={{ opacity: 1, scale: 1 }}
-          className="h-40 w-40 rounded-full border-[6px] border-white/95 object-cover shadow-[0_24px_70px_rgba(31,44,75,0.14)] sm:h-52 sm:w-52"
-          initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
-          src={siteProfile.profileImageUrl ?? "/profile-pic.jpeg"}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        />
+        <SystemsBackdrop />
+        <div className="relative z-10 max-w-5xl">
+          <div className="flex flex-col items-center gap-5">
+            <img
+              alt={`${siteProfile.name} profile`}
+              className="h-24 w-24 rounded-full border-[5px] border-white object-cover shadow-[0_20px_52px_rgba(31,44,75,0.16)] sm:h-32 sm:w-32"
+              src={siteProfile.profileImageUrl ?? "/profile-pic.jpeg"}
+            />
+            <div>
+              <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[#1f3b73]">
+                {siteProfile.title}
+              </p>
+              <p className="mt-3 text-sm font-semibold text-slate-500">
+                {siteProfile.location} / updated {siteProfile.lastUpdatedLabel}
+              </p>
+            </div>
+          </div>
 
-        <motion.p
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 font-mono text-[0.76rem] font-medium uppercase tracking-[0.24em] text-slate-500 sm:text-[0.82rem]"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
-          transition={{ duration: 0.45, delay: 0.05 }}
-        >
-          {siteProfile.title}
-        </motion.p>
+          <h1 className="mx-auto mt-8 max-w-[14ch] font-display text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-[#0e1528] sm:mt-10 sm:text-6xl lg:text-7xl">
+            {siteProfile.heroLabel}
+          </h1>
+          <p className="mx-auto mt-6 max-w-[21rem] text-center text-lg leading-8 text-slate-600 sm:hidden">
+            10+ years building governed data platforms, enterprise AI,
+            orchestration, access governance, and network analytics systems.
+          </p>
+          <p className="mx-auto mt-8 hidden max-w-3xl text-xl leading-9 text-slate-600 sm:block">
+            {siteProfile.recruiterPitch}
+          </p>
 
-        <motion.h1
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 max-w-[16ch] font-display text-5xl font-semibold leading-[1.06] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 32 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {siteProfile.heroLabel}
-        </motion.h1>
-
-        <motion.p
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 max-w-[50rem] text-base leading-8 text-slate-600 sm:text-lg sm:leading-9"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 36 }}
-          transition={{ duration: 0.5, delay: 0.14 }}
-        >
-          {siteProfile.recruiterPitch}
-        </motion.p>
-
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-2"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
-          transition={{ duration: 0.45, delay: 0.16 }}
-        >
-          <span className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            Updated {siteProfile.lastUpdatedLabel}
-          </span>
-          <span className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            Based in {siteProfile.location}
-          </span>
-          {siteProfile.currentFocusLabels.map((label) => (
-            <span
-              className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-xs font-semibold text-slate-600"
-              key={label}
+          <div className="mt-8 flex flex-wrap justify-center gap-3 sm:mt-10">
+            <a
+              className="group inline-flex items-center gap-2 rounded-full bg-[#101827] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(16,24,39,0.22)] transition hover:-translate-y-0.5 hover:bg-[#0b1220] sm:text-base"
+              href="/projects"
             >
-              {label}
-            </span>
-          ))}
-        </motion.div>
-
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-3"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.55, delay: 0.18 }}
-        >
-          <a
-            className="group inline-flex items-center gap-2 rounded-full bg-[#11192c] px-7 py-4 text-base font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
-            href="#contact"
-          >
-            Connect with me
-            <BsArrowRight className="transition group-hover:translate-x-1" />
-          </a>
-
-          <a
-            className="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-7 py-4 text-base font-semibold text-[#0e1528] shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-            href="/resume"
-          >
-            View resume
-            <HiDownload className="opacity-70 transition group-hover:translate-y-0.5" />
-          </a>
-
-          <a
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-7 py-4 text-base font-semibold text-[#0e1528] shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-            href="/projects"
-          >
-            View projects
-          </a>
-
-          <div className="flex gap-3">
+              View selected work
+              <BsArrowRight className="transition group-hover:translate-x-1" />
+            </a>
+            <a
+              className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_14px_30px_rgba(31,44,75,0.09)] transition hover:-translate-y-0.5 hover:bg-white sm:text-base"
+              href="/resume"
+            >
+              Resume
+              <HiDownload className="opacity-70 transition group-hover:translate-y-0.5" />
+            </a>
             <a
               aria-label="LinkedIn"
-              className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-500 shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
               href={siteProfile.linkedinUrl}
               rel="noreferrer"
               target="_blank"
             >
-              <BsLinkedin className="text-xl" />
+              <BsLinkedin className="text-lg" />
             </a>
             <a
               aria-label="GitHub"
-              className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-500 shadow-[0_12px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
               href={siteProfile.githubUrl}
               rel="noreferrer"
               target="_blank"
             >
-              <FaGithubSquare className="text-[1.35rem]" />
+              <FaGithubSquare className="text-xl" />
             </a>
           </div>
-        </motion.div>
 
-        <motion.p
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 text-sm leading-7 text-slate-500"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
-          transition={{ duration: 0.45, delay: 0.22 }}
-        >
-          Focused views:{" "}
-          <a
-            className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
-            href="/resume?focus=flink"
-          >
-            Flink
-          </a>
-          ,{" "}
-          <a
-            className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
-            href="/resume?focus=backend-engineering"
-          >
-            Backend
-          </a>
-          ,{" "}
-          <a
-            className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
-            href="/resume?focus=platform-engineering"
-          >
-            Platform
-          </a>{" "}
-          or{" "}
-          <a
-            className="font-semibold text-[#1f3b73] hover:text-[#15284c]"
-            href="/resume?focus=ai"
-          >
-            AI
-          </a>
-        </motion.p>
-
-        <motion.div
-          animate={{ opacity: 1 }}
-          className="mt-16 h-20 w-px rounded-full bg-gradient-to-b from-slate-200 via-slate-400/70 to-transparent"
-          initial={prefersReducedMotion ? false : { opacity: 0 }}
-          transition={{ duration: 0.65, delay: 0.28 }}
-        />
-
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-2"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
-          transition={{ duration: 0.45, delay: 0.24 }}
-        >
-          {[
-            { href: "#about", label: "About" },
-            { href: "#projects", label: "Projects" },
-            { href: "/resume", label: "Resume" },
-            { href: "/blog", label: "Blog" },
-            { href: "#skills", label: "Skills" },
-            { href: "#experience", label: "Experience" },
-            { href: "#contact", label: "Contact" },
-          ].map((item) => (
-            <a
-              className="rounded-full border border-slate-200/80 bg-white/85 px-4 py-2 text-sm font-semibold text-slate-600 shadow-[0_10px_24px_rgba(31,44,75,0.05)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-[#0e1528]"
-              href={item.href}
-              key={item.href}
-            >
-              {item.label}
-            </a>
-          ))}
-        </motion.div>
+          <div className="mx-auto mt-8 hidden max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-200/80 shadow-[0_20px_56px_rgba(31,44,75,0.08)] sm:grid">
+            {profileHighlights.slice(0, 2).map((item) => (
+              <div className="bg-white/76 px-6 py-5" key={item.id}>
+                <p className="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                  {item.value}
+                </p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <Section
-        copy={[
-          "Short, direct answers for recruiters, search engines, and readers evaluating the work on this site.",
-        ]}
-        id="answers"
-        kicker="Quick answers"
-        medium={true}
-        prefersReducedMotion={prefersReducedMotion}
-        title="What I do and where to start"
-      >
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {quickAnswers.map((item, index) => (
-            <motion.article
-              className="rounded-[1.9rem] border border-white/70 bg-white/78 px-6 py-6 text-left shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl"
-              custom={0.1 + index * 0.04}
-              initial={initial}
-              key={item.question}
-              variants={fadeUp}
-              viewport={viewport}
-              whileInView={whileInView}
-            >
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                Quick answer
-              </p>
-              <h3 className="mt-4 text-2xl font-semibold tracking-tight text-[#0e1528]">
-                {item.question}
-              </h3>
-              <p className="mt-4 text-sm leading-7 text-slate-600">
-                {item.answer}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {item.links.map((link) => (
-                  <a
-                    className="rounded-full border border-slate-200/80 bg-white/92 px-3 py-2 text-xs font-semibold text-[#1f3b73] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-[#15284c]"
-                    href={link.href}
-                    key={link.href}
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </motion.article>
-          ))}
-        </div>
-      </Section>
-
-      <Section
-        copy={siteProfile.overview}
-        id="about"
-        kicker="About me"
-        narrow={true}
-        prefersReducedMotion={prefersReducedMotion}
-        title="About me"
-      >
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {profileHighlights.slice(0, 3).map((highlight, index) => (
-            <motion.article
-              className="rounded-[1.9rem] border border-white/70 bg-white/75 px-6 py-6 text-left shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl"
-              custom={0.12 + index * 0.04}
-              initial={initial}
-              key={highlight.id}
-              variants={fadeUp}
-              viewport={viewport}
-              whileInView={whileInView}
-            >
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                {highlight.label}
-              </p>
-              <p className="mt-4 text-3xl font-semibold tracking-tight text-[#0e1528]">
-                {highlight.value}
-              </p>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                {highlight.detail}
-              </p>
-            </motion.article>
-          ))}
-        </div>
-      </Section>
-
-      <Section
-        copy={[
-          "A few of the projects I have worked on across telecom, retail, observability, and my own website.",
-        ]}
+        copy="Internal names stay private. Each writeup focuses on the problem, my ownership, the architecture, the tradeoffs, and what can be shared publicly."
+        eyebrow="Selected work"
         id="projects"
-        kicker="Projects"
-        prefersReducedMotion={prefersReducedMotion}
-        title="Top projects"
-        wide={true}
+        title="Systems I have actually built."
       >
-        {primaryProject ? (
-          <div className="mt-12 grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-            <motion.article
-              className="rounded-[2.3rem] border border-white/70 bg-white/82 px-6 py-8 shadow-[0_22px_70px_rgba(31,44,75,0.08)] backdrop-blur-xl sm:px-8"
-              custom={0.08}
-              initial={initial}
-              variants={fadeUp}
-              viewport={viewport}
-              whileInView={whileInView}
+        <div className="mt-12 grid gap-px overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-slate-200/80 shadow-[0_24px_70px_rgba(31,44,75,0.08)] lg:grid-cols-3">
+          {featured.map((project) => (
+            <a
+              className="group flex min-h-[24rem] flex-col bg-white/88 p-7 transition hover:bg-white"
+              href={getProjectHref(project)}
+              key={project.id}
             >
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                Featured project
+              <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#1f3b73]">
+                Selected system
               </p>
-              <h3 className="mt-4 max-w-[16ch] font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
-                {primaryProject.title}
+              <h3 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
+                {project.title}
               </h3>
-              <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
-                {primaryProject.summary}
+              <p className="mt-5 text-sm leading-7 text-slate-600">
+                {project.caseStudy?.headline ?? project.summary}
               </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                {primaryProject.skillIds.map((skillId) => (
+              <div className="mt-6 grid grid-cols-3 gap-2">
+                {project.skillIds.slice(0, 3).map((skillId) => (
                   <span
-                    className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600"
+                    className="min-h-14 rounded-[1rem] border border-slate-200 bg-white px-3 py-3 text-xs font-semibold leading-tight text-slate-500"
                     key={skillId}
                   >
                     {getSkillLabel(skillId)}
                   </span>
                 ))}
               </div>
-
-              <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                <div>
-                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                    Why it mattered
-                  </p>
-                  <p className="mt-3 text-base leading-8 text-slate-600">
-                    {primaryProject.impact}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                    What I built
-                  </p>
-                  <p className="mt-3 text-base leading-8 text-slate-600">
-                    {primaryProject.detail}
-                  </p>
-                </div>
-              </div>
-
-              {primaryProject.proofLinks.length > 0 ? (
-                <div className="mt-8 flex flex-wrap gap-3">
-                  {primaryProject.proofLinks.map((link) => (
-                    <a
-                      className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-                      href={link.href}
-                      key={link.href}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              ) : null}
-            </motion.article>
-
-            <div className="grid gap-4">
-              {secondaryProjects.map((project, index) => (
-                <motion.article
-                  className="rounded-[2rem] border border-white/70 bg-white/75 px-6 py-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl"
-                  custom={0.12 + index * 0.05}
-                  initial={initial}
-                  key={project.id}
-                  variants={fadeUp}
-                  viewport={viewport}
-                  whileInView={whileInView}
-                >
-                  <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                    Project
-                  </p>
-                  <h3 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
-                    {project.title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-slate-600">
-                    {project.summary}
-                  </p>
-                  <p className="mt-4 text-sm leading-7 text-slate-600">
-                    {project.impact}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {project.skillIds.slice(0, 5).map((skillId) => (
-                      <span
-                        className="rounded-full border border-slate-200/80 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600"
-                        key={skillId}
-                      >
-                        {getSkillLabel(skillId)}
-                      </span>
-                    ))}
-                  </div>
-                </motion.article>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        <motion.div
-          className="mt-8 text-center"
-          custom={0.18}
-          initial={initial}
-          variants={fadeUp}
-          viewport={viewport}
-          whileInView={whileInView}
-        >
+              <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[#1f3b73]">
+                Open case study
+                <BsArrowRight className="transition group-hover:translate-x-1" />
+              </span>
+            </a>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
           <a
-            className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
             href="/projects"
           >
             Browse all projects
+            <BsArrowRight />
           </a>
-        </motion.div>
-      </Section>
-
-      <Section
-        copy={["Some of the tools and platforms I work with most often."]}
-        id="skills"
-        kicker="Skills"
-        narrow={true}
-        prefersReducedMotion={prefersReducedMotion}
-        title="My skills"
-      >
-        <motion.div
-          className="mt-10 flex flex-wrap justify-center gap-3"
-          custom={0.1}
-          initial={initial}
-          variants={fadeUp}
-          viewport={viewport}
-          whileInView={whileInView}
-        >
-          {topSkills.map((skill) => (
-            <span
-              className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 shadow-[0_10px_24px_rgba(31,44,75,0.05)]"
-              key={skill.id}
-            >
-              {skill.label}
-            </span>
-          ))}
-        </motion.div>
-      </Section>
-
-      <Section
-        copy={[
-          "I have worked across telecom, retail, analytics, and platform engineering, with most of the work centered on data systems and products.",
-        ]}
-        id="experience"
-        medium={true}
-        kicker="Experience"
-        prefersReducedMotion={prefersReducedMotion}
-        title="My experience"
-      >
-        <div className="mt-12 grid gap-4">
-          {experiences.map((experience, index) => (
-            <motion.article
-              className="grid gap-5 rounded-[2rem] border border-white/70 bg-white/75 px-6 py-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:px-7"
-              custom={0.08 + index * 0.04}
-              initial={initial}
-              key={experience.id}
-              variants={fadeUp}
-              viewport={viewport}
-              whileInView={whileInView}
-            >
-              <img
-                alt={experience.company}
-                className="h-16 w-16 rounded-[1.25rem] object-cover shadow-[0_12px_28px_rgba(31,44,75,0.08)]"
-                src={experience.icon}
-              />
-              <div>
-                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <h3 className="text-2xl font-semibold tracking-tight text-[#0e1528]">
-                      {experience.company}
-                    </h3>
-                    <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">
-                      {experience.title}
-                    </p>
-                  </div>
-                  <p className="text-sm text-slate-500">{experience.date}</p>
-                </div>
-                <p className="mt-4 text-base leading-8 text-slate-600">
-                  {experience.description}
-                </p>
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600">
-                  {experience.bullets.slice(0, 2).map((bullet) => (
-                    <li className="flex gap-3" key={bullet.id}>
-                      <span className="mt-[0.6rem] h-2 w-2 rounded-full bg-[#1f3b73]" />
-                      <span>{bullet.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.article>
-          ))}
         </div>
       </Section>
 
       <Section
-        copy={[
-          "I write about systems, engineering decisions, and the kinds of platform problems that show up in the work on this site.",
-        ]}
-        id="blog-bridge"
-        medium={true}
-        kicker="Blog"
-        prefersReducedMotion={prefersReducedMotion}
-        title="Blog"
+        copy="I usually work on systems that already matter in production: heavy data movement, unclear ownership, fragile access paths, and platform work that has to become easier to operate."
+        eyebrow="Experience"
+        id="experience"
+        title="Built across telecom, retail, and platform teams."
       >
-        <motion.div
-          className="mt-10 rounded-[2.2rem] border border-white/70 bg-[radial-gradient(circle_at_12%_12%,rgba(176,177,255,0.18),transparent_22%),radial-gradient(circle_at_96%_0%,rgba(255,214,223,0.22),transparent_28%),rgba(255,255,255,0.82)] px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-10"
-          custom={0.08}
-          initial={initial}
-          variants={fadeUp}
-          viewport={viewport}
-          whileInView={whileInView}
-        >
-          <a
-            className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-            href="/blog"
-          >
-            Open the blog
-          </a>
-          <p className="mt-4 text-sm leading-7 text-slate-500">
-            The blog adds technical depth to the projects and resume, so readers
-            can move from a summary to longer-form engineering context without
-            leaving the site navigation.
-          </p>
-        </motion.div>
+        <div className="mt-12 divide-y divide-slate-200/80 rounded-[1.8rem] border border-slate-200/80 bg-white/82 shadow-[0_24px_70px_rgba(31,44,75,0.08)]">
+          {experienceSummary.map((experience) => (
+            <article
+              className="grid gap-6 p-6 text-left md:grid-cols-[12rem_minmax(0,1fr)] md:p-8"
+              key={experience.id}
+            >
+              <div>
+                <p className="text-sm font-semibold text-[#0e1528]">
+                  {experience.company}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">{experience.date}</p>
+              </div>
+              <div>
+                <h3 className="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                  {experience.title}
+                </h3>
+                <p className="mt-3 text-base leading-8 text-slate-600">
+                  {experience.description}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
       </Section>
 
-      <Section
-        copy={[
-          `Please contact me directly at ${siteProfile.email} or through LinkedIn.`,
-        ]}
+      <section
+        className="mx-auto mt-24 max-w-[76rem] rounded-[2rem] bg-[#101827] px-6 py-12 text-center text-white shadow-[0_28px_80px_rgba(16,24,39,0.22)] sm:px-10"
         id="contact"
-        kicker="Contact"
-        narrow={true}
-        prefersReducedMotion={prefersReducedMotion}
-        title="Contact me"
       >
-        <motion.div
-          className="mt-10 rounded-[2.35rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(245,247,255,0.88))] px-6 py-8 shadow-[0_26px_70px_rgba(31,44,75,0.08)] backdrop-blur-xl sm:px-10 sm:py-10"
-          custom={0.08}
-          initial={initial}
-          variants={fadeUp}
-          viewport={viewport}
-          whileInView={whileInView}
-        >
-          <div className="flex flex-wrap justify-center gap-3">
-            <a
-              className="inline-flex items-center gap-2 rounded-full bg-[#11192c] px-7 py-4 text-base font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
-              href={`mailto:${siteProfile.email}`}
-            >
-              Email {siteProfile.name}
-              <BsArrowRight className="transition group-hover:translate-x-1" />
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-4 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-              href="/resume"
-            >
-              Open resume
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-4 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-              href="/projects"
-            >
-              See projects
-            </a>
-          </div>
-        </motion.div>
-      </Section>
+        <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/55">
+          Contact
+        </p>
+        <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
+          I am most useful where data systems need clearer ownership, safer
+          access, and better day-to-day operation.
+        </h2>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#101827] transition hover:-translate-y-0.5"
+            href={`mailto:${siteProfile.email}`}
+          >
+            Email {siteProfile.name}
+            <BsArrowRight />
+          </a>
+          <a
+            className="inline-flex items-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+            href="/resume"
+          >
+            Open resume
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
 
-type SectionProps = {
-  id: string;
-  kicker: string;
-  title: string;
-  copy: readonly string[];
-  children?: ReactNode;
-  narrow?: boolean;
-  medium?: boolean;
-  wide?: boolean;
-  prefersReducedMotion: boolean;
-};
-
 function Section({
-  id,
-  kicker,
-  title,
   copy,
+  eyebrow,
+  id,
+  title,
   children,
-  narrow = false,
-  medium = false,
-  wide = false,
-  prefersReducedMotion,
-}: SectionProps) {
-  const initial = prefersReducedMotion ? false : "hidden";
-  const whileInView = prefersReducedMotion ? undefined : "visible";
-  const viewport = prefersReducedMotion
-    ? undefined
-    : { once: true, amount: 0.24 };
-
+}: {
+  copy: string;
+  eyebrow: string;
+  id: string;
+  title: string;
+  children: ReactNode;
+}) {
   return (
-    <motion.section
-      className={clsx(
-        "scroll-mt-28 px-4 text-center",
-        narrow && "mx-auto w-full max-w-[52rem]",
-        medium && "mx-auto w-full max-w-[64rem]",
-        wide && "mx-auto w-full max-w-[74rem]",
-      )}
-      custom={0.04}
-      id={id}
-      initial={initial}
-      variants={fadeUp}
-      viewport={viewport}
-      whileInView={whileInView}
-    >
-      <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-        {kicker}
-      </p>
-      <h2 className="mx-auto mt-4 max-w-[18ch] font-display text-4xl font-semibold leading-[1.08] tracking-[-0.05em] text-[#0e1528] sm:text-5xl">
-        {title}
-      </h2>
-      <div className="mx-auto mt-5 max-w-[50rem] space-y-4 text-base leading-8 text-slate-600 sm:text-[1.04rem] sm:leading-9">
-        {copy.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+    <section className="mx-auto max-w-[76rem] px-4 py-20" id={id}>
+      <div className="mx-auto max-w-4xl text-center">
+        <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#1f3b73]">
+          {eyebrow}
+        </p>
+        <h2 className="mx-auto mt-4 max-w-[15ch] text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-[#0e1528] sm:text-6xl">
+          {title}
+        </h2>
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+          {copy}
+        </p>
       </div>
       {children}
-    </motion.section>
+    </section>
   );
 }

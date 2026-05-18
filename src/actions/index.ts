@@ -20,7 +20,10 @@ import {
   listContentRevisions,
   publishPortfolioSnapshot,
 } from "@/lib/portfolio-content";
-import { isContentBackupConfigured } from "@/lib/env";
+import {
+  isAstroContentDbConfigured,
+  isContentBackupConfigured,
+} from "@/lib/env";
 import type {
   FocusDefinition,
   PortfolioSnapshot,
@@ -87,13 +90,67 @@ const proofLinkSchema = z.object({
   label: z.string().min(1),
 });
 
+const projectProofTypeSchema = z.enum([
+  "sanitized-diagram",
+  "metric",
+  "open-source-reference",
+  "public-repo",
+  "article",
+  "private-enterprise",
+]);
+
+const projectMetricSchema = z.object({
+  detail: z.string().min(1),
+  label: z.string().min(1),
+  value: z.string().min(1),
+});
+
+const projectDecisionSchema = z.object({
+  detail: z.string().min(1),
+  label: z.string().min(1),
+});
+
+const projectCaseStudySchema = z.object({
+  architecture: z.array(z.string().min(1)).default([]),
+  confidentiality: z.string().min(1),
+  context: z.string().min(1),
+  decisions: z.array(projectDecisionSchema).default([]),
+  headline: z.string().min(1),
+  lessons: z.array(z.string().min(1)).default([]),
+  metrics: z.array(projectMetricSchema).default([]),
+  organization: z.string().min(1),
+  responsibilities: z.array(z.string().min(1)).default([]),
+  role: z.string().min(1),
+  team: z.string().min(1),
+  timeframe: z.string().min(1),
+});
+
+const projectProofArtifactSchema = z.object({
+  detail: z.string().min(1),
+  href: z.url().optional(),
+  label: z.string().min(1),
+  type: projectProofTypeSchema,
+});
+
+const projectPublicProofSchema = z.object({
+  architectureShape: z.array(z.string().min(1)).default([]),
+  artifacts: z.array(projectProofArtifactSchema).default([]),
+  confidentialityNotes: z.array(z.string().min(1)).default([]),
+  constraints: z.array(z.string().min(1)).default([]),
+  proofTypes: z.array(projectProofTypeSchema).default([]),
+  responsibilities: z.array(z.string().min(1)).default([]),
+  scaleSignals: z.array(projectMetricSchema).default([]),
+});
+
 const projectSchema = z.object({
+  caseStudy: projectCaseStudySchema.optional(),
   detail: z.string().min(1),
   featured: z.boolean().default(false),
   focusWeights: focusWeightsSchema,
   id: z.string().min(1),
   impact: z.string().min(1),
   proofLinks: z.array(proofLinkSchema).default([]),
+  publicProof: projectPublicProofSchema.optional(),
   skillIds: z.array(z.string()).default([]),
   slug: z.string().min(1),
   summary: z.string().min(1),
@@ -190,6 +247,14 @@ async function requireAdmin(cookies: Parameters<typeof getSessionUser>[0]) {
       code: "PRECONDITION_FAILED",
       message:
         "CONTENT_BACKUP_REPO and CONTENT_BACKUP_PAT must be configured before content publishing is enabled.",
+    });
+  }
+
+  if (process.env.NODE_ENV === "production" && !isAstroContentDbConfigured()) {
+    throw new ActionError({
+      code: "PRECONDITION_FAILED",
+      message:
+        "Remote Astro DB must be configured before production content publishing is enabled.",
     });
   }
 

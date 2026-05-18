@@ -41,6 +41,16 @@ type WixFetchResult<T> =
       status: "missing_credentials" | "not_found" | "error";
     };
 
+export type WixBlogListResult =
+  | {
+      status: "ok";
+      posts: WixBlogPost[];
+    }
+  | {
+      status: "missing_credentials" | "error";
+      posts: [];
+    };
+
 export type WixBlogPostLookupResult =
   | {
       status: "ok";
@@ -52,6 +62,10 @@ export type WixBlogPostLookupResult =
 
 export const WIX_BLOG_DETAIL_CACHE_CONTROL =
   "public, s-maxage=1800, stale-while-revalidate=86400";
+const WIX_BLOG_DETAIL_FIELDSETS = new URLSearchParams([
+  ["fieldsets", "URL"],
+  ["fieldsets", "CONTENT_TEXT"],
+]);
 
 function hasWixBlogCredentials() {
   return Boolean(env.wixApiKey);
@@ -106,26 +120,51 @@ async function wixFetch<T>(
   }
 }
 
-export async function getWixBlogs() {
+export async function getWixBlogsResult(): Promise<WixBlogListResult> {
   const result = await wixFetch<WixPostsResponse>("/query", {
     method: "POST",
     body: JSON.stringify({
       fieldsets: ["URL"],
+      query: {
+        paging: {
+          limit: 20,
+        },
+        sort: [
+          {
+            fieldName: "firstPublishedDate",
+            order: "DESC",
+          },
+        ],
+      },
     }),
   });
 
   if (result.status !== "ok") {
-    return [];
+    return {
+      status: result.status === "missing_credentials" ? result.status : "error",
+      posts: [],
+    };
   }
 
-  return result.data.posts ?? [];
+  return {
+    status: "ok",
+    posts: [...(result.data.posts ?? [])].sort((left, right) => {
+      const rightDate = new Date(right.firstPublishedDate ?? 0).getTime();
+      const leftDate = new Date(left.firstPublishedDate ?? 0).getTime();
+      return rightDate - leftDate;
+    }),
+  };
+}
+
+export async function getWixBlogs() {
+  return (await getWixBlogsResult()).posts;
 }
 
 export async function getWixBlogPostBySlug(
   slug: string,
 ): Promise<WixBlogPostLookupResult> {
   const result = await wixFetch<WixPostResponse>(
-    `/slugs/${encodeURIComponent(slug)}`,
+    `/slugs/${encodeURIComponent(slug)}?${WIX_BLOG_DETAIL_FIELDSETS.toString()}`,
   );
 
   if (result.status !== "ok") {
@@ -165,7 +204,7 @@ export function getWixBlogDescription(
 
   return (
     getWixBlogParagraphs(post?.contentText)[0] ??
-    "Read this Wix-authored post on Vijay Jangir's main site."
+    "Read this post on Vijay Jangir's main site."
   );
 }
 

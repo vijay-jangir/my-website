@@ -6,9 +6,9 @@ import {
   type WixBlogPost,
 } from "@/src/lib/wix";
 
-export const prerender = true;
+export const prerender = false;
 
-const publicRoutes = ["/", "/projects", "/resume", "/blog", "/work"];
+const publicRoutes = ["/", "/projects", "/resume", "/blog"];
 
 const escapeXml = (value: string) =>
   value
@@ -20,18 +20,25 @@ const escapeXml = (value: string) =>
 
 export function buildSitemapRoutes(
   posts: readonly Pick<WixBlogPost, "slug" | "url">[] = [],
+  projectSlugs: readonly string[] = [],
 ) {
   const blogRoutes = posts
     .map((post) => getWixBlogLocalPath(post))
     .filter((route): route is string => Boolean(route));
+  const projectRoutes = projectSlugs.map((slug) => `/projects/${slug}`);
 
-  return [...new Set([...publicRoutes, ...blogRoutes])];
+  return [...new Set([...publicRoutes, ...projectRoutes, ...blogRoutes])];
 }
 
 export const GET: APIRoute = async ({ site }) => {
   const baseUrl = site ?? new URL("https://www.vijayjangir.com");
+  const { getPortfolioContent } = await import("@/lib/portfolio-content");
+  const content = await getPortfolioContent();
   const posts = await getWixBlogs();
-  const urlEntries = buildSitemapRoutes(posts)
+  const publicProjectSlugs = content.projects
+    .filter((project) => project.visibility === "public")
+    .map((project) => project.slug);
+  const urlEntries = buildSitemapRoutes(posts, publicProjectSlugs)
     .map((route) => {
       const loc = escapeXml(new URL(route, baseUrl).toString());
 
@@ -46,6 +53,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   return new Response(body, {
     headers: {
+      "Cache-Control": "public, max-age=0, s-maxage=3600",
       "Content-Type": "application/xml; charset=utf-8",
     },
   });

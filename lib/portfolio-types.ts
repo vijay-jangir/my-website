@@ -43,6 +43,57 @@ export type ProofLink = {
   kind: "repo" | "demo" | "article" | "case-study";
 };
 
+export type ProjectProofType =
+  | "sanitized-diagram"
+  | "metric"
+  | "open-source-reference"
+  | "public-repo"
+  | "article"
+  | "private-enterprise";
+
+export type ProjectMetric = {
+  label: string;
+  value: string;
+  detail: string;
+};
+
+export type ProjectDecision = {
+  label: string;
+  detail: string;
+};
+
+export type ProjectCaseStudy = {
+  headline: string;
+  context: string;
+  role: string;
+  timeframe: string;
+  organization: string;
+  team: string;
+  confidentiality: string;
+  metrics: readonly ProjectMetric[];
+  architecture: readonly string[];
+  responsibilities: readonly string[];
+  decisions: readonly ProjectDecision[];
+  lessons: readonly string[];
+};
+
+export type ProjectProofArtifact = {
+  label: string;
+  type: ProjectProofType;
+  detail: string;
+  href?: string;
+};
+
+export type ProjectPublicProof = {
+  proofTypes: readonly ProjectProofType[];
+  architectureShape: readonly string[];
+  scaleSignals: readonly ProjectMetric[];
+  responsibilities: readonly string[];
+  constraints: readonly string[];
+  artifacts: readonly ProjectProofArtifact[];
+  confidentialityNotes: readonly string[];
+};
+
 export type ProjectDefinition = {
   id: string;
   slug: string;
@@ -55,6 +106,8 @@ export type ProjectDefinition = {
   featured: boolean;
   visibility: "public" | "limited";
   proofLinks: readonly ProofLink[];
+  caseStudy?: ProjectCaseStudy;
+  publicProof?: ProjectPublicProof;
 };
 
 export type ExperienceBullet = {

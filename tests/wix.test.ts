@@ -28,9 +28,14 @@ describe("wix blog helpers", () => {
 
     vi.stubGlobal("fetch", fetchMock);
 
-    const { getWixBlogPostBySlug } = await import("@/src/lib/wix");
+    const { getWixBlogPostBySlug, getWixBlogsResult } =
+      await import("@/src/lib/wix");
 
     await expect(getWixBlogPostBySlug("astro-routing")).resolves.toEqual({
+      status: "missing_credentials",
+    });
+    await expect(getWixBlogsResult()).resolves.toEqual({
+      posts: [],
       status: "missing_credentials",
     });
     expect(fetchMock).not.toHaveBeenCalled();
@@ -60,9 +65,11 @@ describe("wix blog helpers", () => {
       },
     ];
 
-    expect(requestUrl).toBe(
-      "https://www.wixapis.com/v3/posts/slugs/missing%20post",
+    expect(requestUrl).toContain(
+      "https://www.wixapis.com/v3/posts/slugs/missing%20post?",
     );
+    const requestParams = new URL(requestUrl).searchParams;
+    expect(requestParams.getAll("fieldsets")).toEqual(["URL", "CONTENT_TEXT"]);
     expect(requestInit.cache).toBe("force-cache");
     expect(requestInit.next?.revalidate).toBe(1800);
     expect((requestInit.headers as Headers).get("Authorization")).toBe(
@@ -71,6 +78,57 @@ describe("wix blog helpers", () => {
     expect((requestInit.headers as Headers).get("wix-site-id")).toBe(
       "test-site-id",
     );
+  });
+
+  it("returns the Wix post list payload with local slugs", async () => {
+    process.env.WIX_API_KEY = "test-key";
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          posts: [
+            {
+              id: "post-older",
+              title: "Older note",
+              excerpt: "Older excerpt.",
+              firstPublishedDate: "2023-01-01T00:00:00.000Z",
+              slug: "older-note",
+              url: {
+                base: "https://example.com",
+                path: "/post/older-note",
+              },
+            },
+            {
+              id: "post-newer",
+              title: "Newer note",
+              excerpt: "Newer excerpt.",
+              firstPublishedDate: "2024-01-01T00:00:00.000Z",
+              slug: "newer-note",
+              url: {
+                base: "https://example.com",
+                path: "/post/newer-note",
+              },
+            },
+          ],
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { getWixBlogHref, getWixBlogsResult } = await import("@/src/lib/wix");
+
+    const result = await getWixBlogsResult();
+
+    expect(result.status).toBe("ok");
+    expect(result.posts.map((post) => post.id)).toEqual([
+      "post-newer",
+      "post-older",
+    ]);
+    expect(getWixBlogHref(result.posts[0])).toBe("/blog/newer-note");
   });
 
   it("returns the Wix post payload when the slug exists", async () => {

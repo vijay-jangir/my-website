@@ -1,0 +1,58 @@
+---
+import type { ProjectDefinition } from "@/lib/portfolio-types";
+
+type RelatedProject = {
+  project: ProjectDefinition;
+  reasons: readonly string[];
+};
+
+type Props = {
+  projects: readonly RelatedProject[];
+};
+
+const { projects } = Astro.props;
+---
+
+{
+  projects.length > 0 ? (
+    <section class="rounded-[2.2rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-8">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+            Related projects
+          </p>
+          <h2 class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
+            Continue in the same area
+          </h2>
+        </div>
+        <a
+          class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+          href="/projects"
+        >
+          Project index
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-4 lg:grid-cols-3">
+        {projects.map(({ project, reasons }) => (
+          <article class="rounded-[1.6rem] border border-slate-200/80 bg-white/80 px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1f3b73]">
+              {reasons.join(" + ")}
+            </p>
+            <h3 class="mt-3 text-xl font-semibold tracking-tight text-[#0e1528]">
+              <a
+                class="transition hover:text-[#1f3b73]"
+                href={`/projects/${project.slug}`}
+              >
+                {project.title}
+              </a>
+            </h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {project.summary}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  ) : null
+}

@@ -26,10 +26,19 @@ describe("buildSitemapRoutes", () => {
         "/projects",
         "/resume",
         "/blog",
-        "/work",
         "/blog/astro-caching-notes",
         "/blog/platform-review",
       ]),
+    );
+  });
+
+  it("excludes redirected public routes", () => {
+    expect(buildSitemapRoutes()).not.toContain("/work");
+  });
+
+  it("includes public project detail routes", () => {
+    expect(buildSitemapRoutes([], ["portfolio-website"])).toEqual(
+      expect.arrayContaining(["/projects/portfolio-website"]),
     );
   });
 

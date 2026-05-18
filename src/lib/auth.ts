@@ -109,11 +109,13 @@ export async function getSessionUser(
     const verified = await jwtVerify(token, getSecret());
     const payload = verified.payload as Partial<SessionUser>;
 
-    if (!payload.login || !payload.role) {
+    if (!payload.login) {
       return null;
     }
 
-    if (!isAllowedGitHubLogin(payload.login)) {
+    const role = getRoleForLogin(payload.login);
+
+    if (!role) {
       return null;
     }
 
@@ -121,7 +123,7 @@ export async function getSessionUser(
       avatarUrl: payload.avatarUrl,
       login: payload.login,
       name: payload.name,
-      role: payload.role,
+      role,
     };
   } catch {
     return null;

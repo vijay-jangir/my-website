@@ -4,17 +4,20 @@ import { getContentPlatformStatus } from "@/lib/content-platform";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import ResumeLab from "@/src/components/admin/ResumeLab";
 import { typographyConfig } from "@/src/config/typography";
-import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import BaseLayout, { setRobotsHeader } from "@/src/layouts/BaseLayout.astro";
 import { getSessionUser } from "@/src/lib/auth";
 
 const content = await getPortfolioContent();
 const session = await getSessionUser(Astro.cookies);
 const error = Astro.url.searchParams.get("error");
 const platformStatus = getContentPlatformStatus();
+
+setRobotsHeader(Astro.response.headers);
 ---
 
 <BaseLayout
   description="Private resume tailoring and JD analysis tools."
+  nonPublic={true}
   siteProfile={content.siteProfile}
   showAdminNav={true}
   title="Admin | Vijay Jangir"
@@ -42,10 +45,7 @@ const platformStatus = getContentPlatformStatus();
         !isAuthConfigured() ? (
           <div class="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/90 p-6">
             <p class="text-sm leading-7 text-slate-600">
-              Add <code>NEXTAUTH_SECRET</code> or <code>SESSION_SECRET</code>,{" "}
-              <code>GITHUB_ID</code>, <code>GITHUB_SECRET</code>, and{" "}
-              <code>ADMIN_GITHUB_LOGINS</code> to enable private access in the
-              next wave.
+              Private access is not enabled for this deployment.
             </p>
           </div>
         ) : !session ? (

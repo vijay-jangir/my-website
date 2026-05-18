@@ -1,9 +1,12 @@
 ---
-import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import BaseLayout, { setRobotsHeader } from "@/src/layouts/BaseLayout.astro";
+
+setRobotsHeader(Astro.response.headers);
 ---
 
 <BaseLayout
-  description="Private assistant surface reserved for future OpenClaw integration."
+  description="Private assistant surface reserved for future use."
+  nonPublic={true}
   title="Assistant | Vijay Jangir"
 >
   <main class="pb-4">
@@ -13,7 +16,7 @@ import BaseLayout from "@/src/layouts/BaseLayout.astro";
       <p
         class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
       >
-        Future private surface
+        Private surface
       </p>
       <h1
         class="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
@@ -21,10 +24,8 @@ import BaseLayout from "@/src/layouts/BaseLayout.astro";
         Assistant
       </h1>
       <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">
-        This route is reserved for a private assistant experience. OpenClaw
-        itself should stay off Vercel and behind a dedicated homelab or VPS
-        surface, with the website talking only to a restricted HTTP bridge
-        later.
+        This route is reserved for a future private assistant experience. It is
+        not part of the public portfolio.
       </p>
     </section>
   </main>

@@ -76,7 +76,9 @@ const SkillFocusWeightTable = defineTable({
 
 const ProjectTable = defineTable({
   columns: {
+    caseStudy: column.json({ optional: true }),
     id: column.text({ primaryKey: true }),
+    publicProof: column.json({ optional: true }),
     slug: column.text(),
     title: column.text(),
     summary: column.text({ multiline: true }),

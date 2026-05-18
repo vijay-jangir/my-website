@@ -21,27 +21,45 @@ describe("portfolio focus utilities", () => {
     });
 
     expect(variant.focusIds).toEqual(["flink"]);
-    expect(variant.projects[0]?.id).toBe("context-aware-rule-engine");
+    expect(variant.projects[0]?.id).toBe(
+      "point-of-interest-proximity-streaming",
+    );
     expect(variant.primarySkills.some((skill) => skill.id === "flink")).toBe(
       true,
     );
   });
 
-  it("prefers the portfolio project for portfolio-specific search terms", () => {
+  it("filters query search to lexical project matches", () => {
     const projects = searchProjects({
       focusIds: ["backend-engineering"],
       query: "portfolio nextjs wix",
     });
 
-    expect(projects[0]?.id).toBe("portfolio-website");
+    expect(projects.map((project) => project.id)).toEqual([
+      "portfolio-website",
+    ]);
   });
 
-  it("searches projects using both focus alignment and lexical matches", () => {
+  it("returns no projects for a query with no lexical matches", () => {
     const projects = searchProjects({
       focusIds: ["backend-engineering"],
-      query: "portfolio website",
+      query: "not-a-real-project-term",
     });
 
-    expect(projects[0]?.id).toBe("portfolio-website");
+    expect(projects).toEqual([]);
+  });
+
+  it("prioritizes focus alignment within query matches", () => {
+    const projects = searchProjects({
+      focusIds: ["backend-engineering"],
+      query: "kafka",
+    });
+
+    expect(projects[0]?.id).toBe("point-of-interest-proximity-streaming");
+    expect(projects.map((project) => project.id)).toEqual([
+      "point-of-interest-proximity-streaming",
+      "telecom-network-datalake",
+      "observability",
+    ]);
   });
 });

@@ -92,21 +92,36 @@ setRobotsHeader(Astro.response.headers);
           </section>
 
           <section class="grid gap-4 lg:grid-cols-2">
-            <a
-              class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
-              href="/admin/content"
-            >
-              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
-                Content
-              </p>
-              <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
-                Manage portfolio data
-              </h2>
-              <p class="mt-4 text-sm leading-7 text-slate-600">
-                Edit profile, skills, projects, experience, uploads, and
-                revision history from one place.
-              </p>
-            </a>
+            {session.role === "admin" ? (
+              <a
+                class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
+                href="/admin/content"
+              >
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  Content
+                </p>
+                <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+                  Manage portfolio data
+                </h2>
+                <p class="mt-4 text-sm leading-7 text-slate-600">
+                  Edit profile, skills, projects, experience, uploads, and
+                  revision history from one place.
+                </p>
+              </a>
+            ) : (
+              <div class="rounded-[2rem] border border-slate-200/80 bg-white/62 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.05)] backdrop-blur-xl">
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  Content
+                </p>
+                <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+                  Admin-only publishing
+                </h2>
+                <p class="mt-4 text-sm leading-7 text-slate-600">
+                  Editor accounts can use resume tailoring here. Portfolio
+                  publishing is limited to admin accounts.
+                </p>
+              </div>
+            )}
 
             <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
               <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">

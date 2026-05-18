@@ -1,32 +1,7 @@
 import crypto from "node:crypto";
 
-import {
-  ContentRevisionTable,
-  ExperienceBulletFocusWeightTable,
-  ExperienceBulletSkillLinkTable,
-  ExperienceBulletTable,
-  ExperienceFocusWeightTable,
-  ExperienceTable,
-  FocusDefinitionTable,
-  MediaAssetTable,
-  PortfolioLinkTable,
-  ProfileHighlightFocusWeightTable,
-  ProfileHighlightTable,
-  ProjectFocusWeightTable,
-  ProjectLinkTable,
-  ProjectSkillLinkTable,
-  ProjectTable,
-  SiteProfileTable,
-  SkillFocusWeightTable,
-  SkillTable,
-  SummaryTemplateTable,
-  asc,
-  db,
-  desc,
-} from "astro:db";
-
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
-import { getContentHistoryLimit } from "@/lib/env";
+import { getContentHistoryLimit, isAstroContentDbConfigured } from "@/lib/env";
 import {
   loadBackupSnapshot,
   writeSnapshotToBackup,
@@ -49,39 +24,107 @@ import type {
   SummaryTemplate,
 } from "@/lib/portfolio-types";
 
-const CONTENT_TABLES_TO_RESET = [
-  ExperienceBulletFocusWeightTable,
-  ExperienceBulletSkillLinkTable,
-  ExperienceBulletTable,
-  ExperienceFocusWeightTable,
-  ExperienceTable,
-  MediaAssetTable,
-  ProfileHighlightFocusWeightTable,
-  ProfileHighlightTable,
-  ProjectFocusWeightTable,
-  ProjectSkillLinkTable,
-  ProjectLinkTable,
-  ProjectTable,
-  SkillFocusWeightTable,
-  SkillTable,
-  SummaryTemplateTable,
-  FocusDefinitionTable,
-  PortfolioLinkTable,
-  SiteProfileTable,
+type AstroDbModule = typeof import("astro:db");
+
+const CONTENT_TABLE_KEYS = [
+  "ExperienceBulletFocusWeightTable",
+  "ExperienceBulletSkillLinkTable",
+  "ExperienceBulletTable",
+  "ExperienceFocusWeightTable",
+  "ExperienceTable",
+  "MediaAssetTable",
+  "ProfileHighlightFocusWeightTable",
+  "ProfileHighlightTable",
+  "ProjectFocusWeightTable",
+  "ProjectSkillLinkTable",
+  "ProjectLinkTable",
+  "ProjectTable",
+  "SkillFocusWeightTable",
+  "SkillTable",
+  "SummaryTemplateTable",
+  "FocusDefinitionTable",
+  "PortfolioLinkTable",
+  "SiteProfileTable",
 ] as const;
 
-type SkillFocusWeightRow = typeof SkillFocusWeightTable.$inferSelect;
-type ProjectLinkRow = typeof ProjectLinkTable.$inferSelect;
-type ProjectSkillLinkRow = typeof ProjectSkillLinkTable.$inferSelect;
-type ProjectFocusWeightRow = typeof ProjectFocusWeightTable.$inferSelect;
-type ExperienceFocusWeightRow = typeof ExperienceFocusWeightTable.$inferSelect;
-type ExperienceBulletRow = typeof ExperienceBulletTable.$inferSelect;
-type ExperienceBulletSkillLinkRow =
-  typeof ExperienceBulletSkillLinkTable.$inferSelect;
-type ExperienceBulletFocusWeightRow =
-  typeof ExperienceBulletFocusWeightTable.$inferSelect;
-type ProfileHighlightFocusWeightRow =
-  typeof ProfileHighlightFocusWeightTable.$inferSelect;
+type SkillFocusWeightRow = { focusId: string; skillId: string; weight: number };
+type ProjectLinkRow = {
+  href: string;
+  kind: string;
+  label: string;
+  projectId: string;
+  sortOrder: number;
+};
+type ProjectSkillLinkRow = {
+  projectId: string;
+  skillId: string;
+  sortOrder: number;
+};
+type ProjectFocusWeightRow = {
+  focusId: string;
+  projectId: string;
+  weight: number;
+};
+type ExperienceFocusWeightRow = {
+  experienceId: string;
+  focusId: string;
+  weight: number;
+};
+type ExperienceBulletRow = {
+  experienceId: string;
+  id: string;
+  sortOrder: number;
+  text: string;
+  visibility: string;
+};
+type ExperienceBulletSkillLinkRow = {
+  bulletId: string;
+  skillId: string;
+  sortOrder: number;
+};
+type ExperienceBulletFocusWeightRow = {
+  bulletId: string;
+  focusId: string;
+  weight: number;
+};
+type ProfileHighlightFocusWeightRow = {
+  focusId: string;
+  highlightId: string;
+  weight: number;
+};
+
+let astroDbModulePromise: Promise<AstroDbModule> | null = null;
+
+function shouldLoadAstroDb() {
+  return (
+    process.env.NODE_ENV !== "production" ||
+    Boolean(process.env.ASTRO_DATABASE_FILE) ||
+    isAstroContentDbConfigured()
+  );
+}
+
+async function loadAstroDbModule() {
+  if (!shouldLoadAstroDb()) {
+    return null;
+  }
+
+  try {
+    astroDbModulePromise ??= import("astro:db");
+    return await astroDbModulePromise;
+  } catch {
+    return null;
+  }
+}
+
+async function requireAstroDbModule() {
+  const astroDb = await loadAstroDbModule();
+
+  if (!astroDb) {
+    throw new Error("Astro DB is not available for content persistence.");
+  }
+
+  return astroDb;
+}
 
 function cloneFallbackSnapshot(): PortfolioSnapshot {
   return JSON.parse(
@@ -126,6 +169,37 @@ function sanitizeSnapshot(snapshot: PortfolioSnapshot): PortfolioSnapshot {
 }
 
 async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
+  const astroDb = await loadAstroDbModule();
+
+  if (!astroDb) {
+    return null;
+  }
+
+  const {
+    ContentRevisionTable,
+    ExperienceBulletFocusWeightTable,
+    ExperienceBulletSkillLinkTable,
+    ExperienceBulletTable,
+    ExperienceFocusWeightTable,
+    ExperienceTable,
+    FocusDefinitionTable,
+    MediaAssetTable,
+    PortfolioLinkTable,
+    ProfileHighlightFocusWeightTable,
+    ProfileHighlightTable,
+    ProjectFocusWeightTable,
+    ProjectLinkTable,
+    ProjectSkillLinkTable,
+    ProjectTable,
+    SiteProfileTable,
+    SkillFocusWeightTable,
+    SkillTable,
+    SummaryTemplateTable,
+    asc,
+    db,
+    desc,
+  } = astroDb;
+
   try {
     const [siteProfileRow] = await db.select().from(SiteProfileTable).limit(1);
 
@@ -450,9 +524,9 @@ export async function listContentRevisions() {
   return [...(snapshot.revisions ?? [])];
 }
 
-async function clearContentTables() {
-  for (const table of CONTENT_TABLES_TO_RESET) {
-    await db.delete(table);
+async function clearContentTables(astroDb: AstroDbModule) {
+  for (const tableKey of CONTENT_TABLE_KEYS) {
+    await astroDb.db.delete(astroDb[tableKey] as never);
   }
 }
 
@@ -461,7 +535,8 @@ function now() {
 }
 
 async function insertMany<T extends Record<string, unknown>>(
-  table: { [key: string]: unknown },
+  db: AstroDbModule["db"],
+  table: unknown,
   rows: T[],
 ) {
   if (rows.length === 0) {
@@ -475,12 +550,35 @@ async function applyPortfolioContentSnapshot(
   snapshot: PortfolioSnapshot,
   revision?: Omit<ContentRevision, "id">,
 ) {
+  const astroDb = await requireAstroDbModule();
+  const {
+    ContentRevisionTable,
+    ExperienceBulletFocusWeightTable,
+    ExperienceBulletSkillLinkTable,
+    ExperienceBulletTable,
+    ExperienceFocusWeightTable,
+    ExperienceTable,
+    FocusDefinitionTable,
+    MediaAssetTable,
+    PortfolioLinkTable,
+    ProfileHighlightFocusWeightTable,
+    ProfileHighlightTable,
+    ProjectFocusWeightTable,
+    ProjectLinkTable,
+    ProjectSkillLinkTable,
+    ProjectTable,
+    SiteProfileTable,
+    SkillFocusWeightTable,
+    SkillTable,
+    SummaryTemplateTable,
+    db,
+  } = astroDb;
   const sanitized = sanitizeSnapshot(snapshot);
   const timestamp = now();
 
-  await clearContentTables();
+  await clearContentTables(astroDb);
 
-  await insertMany(SiteProfileTable, [
+  await insertMany(db, SiteProfileTable, [
     {
       contentPromise: sanitized.siteProfile.contentPromise,
       currentFocusLabels: [...sanitized.siteProfile.currentFocusLabels],
@@ -502,6 +600,7 @@ async function applyPortfolioContentSnapshot(
   ]);
 
   await insertMany(
+    db,
     PortfolioLinkTable,
     sanitized.portfolioLinks.map((link, index) => ({
       hash: link.hash,
@@ -513,6 +612,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     FocusDefinitionTable,
     sanitized.focusDefinitions.map((focus, index) => ({
       aliases: [...focus.aliases],
@@ -530,6 +630,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     SkillTable,
     sanitized.skillDefinitions.map((skill, index) => ({
       aliases: [...skill.aliases],
@@ -542,6 +643,7 @@ async function applyPortfolioContentSnapshot(
     })),
   );
   await insertMany(
+    db,
     SkillFocusWeightTable,
     sanitized.skillDefinitions.flatMap((skill) =>
       Object.entries(skill.focusWeights).map(([focusId, weight]) => ({
@@ -555,6 +657,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     ProjectTable,
     sanitized.projects.map((project, index) => ({
       caseStudy: project.caseStudy ?? null,
@@ -572,6 +675,7 @@ async function applyPortfolioContentSnapshot(
     })),
   );
   await insertMany(
+    db,
     ProjectLinkTable,
     sanitized.projects.flatMap((project) =>
       project.proofLinks.map((link, index) => ({
@@ -586,6 +690,7 @@ async function applyPortfolioContentSnapshot(
     ),
   );
   await insertMany(
+    db,
     ProjectSkillLinkTable,
     sanitized.projects.flatMap((project) =>
       project.skillIds.map((skillId, index) => ({
@@ -598,6 +703,7 @@ async function applyPortfolioContentSnapshot(
     ),
   );
   await insertMany(
+    db,
     ProjectFocusWeightTable,
     sanitized.projects.flatMap((project) =>
       Object.entries(project.focusWeights).map(([focusId, weight]) => ({
@@ -611,6 +717,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     ExperienceTable,
     sanitized.experiences.map((experience, index) => ({
       company: experience.company,
@@ -626,6 +733,7 @@ async function applyPortfolioContentSnapshot(
     })),
   );
   await insertMany(
+    db,
     ExperienceFocusWeightTable,
     sanitized.experiences.flatMap((experience) =>
       Object.entries(experience.focusWeights).map(([focusId, weight]) => ({
@@ -638,6 +746,7 @@ async function applyPortfolioContentSnapshot(
     ),
   );
   await insertMany(
+    db,
     ExperienceBulletTable,
     sanitized.experiences.flatMap((experience) =>
       experience.bullets.map((bullet, index) => ({
@@ -651,6 +760,7 @@ async function applyPortfolioContentSnapshot(
     ),
   );
   await insertMany(
+    db,
     ExperienceBulletSkillLinkTable,
     sanitized.experiences.flatMap((experience) =>
       experience.bullets.flatMap((bullet) =>
@@ -665,6 +775,7 @@ async function applyPortfolioContentSnapshot(
     ),
   );
   await insertMany(
+    db,
     ExperienceBulletFocusWeightTable,
     sanitized.experiences.flatMap((experience) =>
       experience.bullets.flatMap((bullet) =>
@@ -680,6 +791,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     ProfileHighlightTable,
     sanitized.profileHighlights.map((highlight, index) => ({
       detail: highlight.detail,
@@ -691,6 +803,7 @@ async function applyPortfolioContentSnapshot(
     })),
   );
   await insertMany(
+    db,
     ProfileHighlightFocusWeightTable,
     sanitized.profileHighlights.flatMap((highlight) =>
       Object.entries(highlight.focusWeights).map(([focusId, weight]) => ({
@@ -704,6 +817,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     SummaryTemplateTable,
     sanitized.summaryTemplates.map((template, index) => ({
       focusIds: [...template.focusIds],
@@ -716,6 +830,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   await insertMany(
+    db,
     MediaAssetTable,
     sanitized.mediaAssets.map((asset) => ({
       createdAt: new Date(asset.createdAt),
@@ -733,7 +848,7 @@ async function applyPortfolioContentSnapshot(
   );
 
   if (revision) {
-    await insertMany(ContentRevisionTable, [
+    await insertMany(db, ContentRevisionTable, [
       {
         backupRepo: revision.backupRepo,
         branch: revision.branch,

@@ -1,0 +1,234 @@
+---
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import BlogCard from "@/src/components/BlogCard.astro";
+import { getWixBlogsResult } from "@/src/lib/wix";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+
+const blogResult = await getWixBlogsResult();
+const posts = blogResult.posts;
+const content = await getPortfolioContent();
+const fallbackReading = [
+  {
+    href: "/projects/telecom-network-datalake",
+    label: "Telecom data platform",
+    summary:
+      "A shareable view of petabyte-scale telemetry work without internal topology.",
+  },
+  {
+    href: "/projects/self-service-data-platform-governance",
+    label: "Self-service data platform",
+    summary:
+      "A shareable view of Kyuubi, Trino, dbt, DataHub, Metabase, RBAC, and governed query access.",
+  },
+  {
+    href: "/projects/automatic-engine-selection-for-kyuubi",
+    label: "Kyuubi engine routing",
+    summary:
+      "A focused example of platform ergonomics and access-pattern-aware defaults.",
+  },
+] as const;
+
+const emptyStateCopy =
+  blogResult.status === "missing_credentials"
+    ? "Blog posts are not connected in this environment yet. The project writeups below are available now."
+    : blogResult.status === "error"
+      ? "Blog posts could not be loaded right now. The project writeups below are available now."
+      : "Long-form posts will appear here when published. The project writeups below are available now.";
+---
+
+<BaseLayout
+  description="Blog posts, architecture notes, and long-form technical posts from Vijay Jangir."
+  siteProfile={content.siteProfile}
+  title="Blog | Vijay Jangir"
+>
+  <main class="space-y-10 pb-4">
+    <section
+      class="rounded-[2.6rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-10 sm:py-10"
+    >
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
+        <div>
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Technical notes
+          </p>
+          <h1
+            class="mt-4 font-display text-5xl font-semibold leading-[0.96] tracking-[-0.05em] text-[#0e1528] sm:text-6xl"
+          >
+            Blog
+          </h1>
+          <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+            Technical posts and architecture notes that support the platform,
+            data, and enterprise AI work featured on this site.
+          </p>
+          <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
+            Start with
+            <a
+              class="font-semibold text-[#1f3b73] hover:text-[#15284c]"
+              href="/projects">projects</a
+            > for public project notes, or the
+            <a
+              class="font-semibold text-[#1f3b73] hover:text-[#15284c]"
+              href="/resume">resume</a
+            > for a role-specific summary.
+          </p>
+        </div>
+
+        <div class="rounded-[2rem] bg-white/60 px-5 py-5">
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Updated
+          </p>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            Profile content was refreshed {
+              content.siteProfile.lastUpdatedLabel
+            }. New posts appear here when published.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {
+      posts.length === 0 ? (
+        <section class="rounded-[2.2rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-8">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div>
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Current reading
+              </p>
+              <h2 class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528]">
+                Project writeups are available now.
+              </h2>
+              <p class="mt-5 text-base leading-8 text-slate-600">
+                {emptyStateCopy}
+              </p>
+            </div>
+            <div class="grid gap-4">
+              {fallbackReading.map((item) => (
+                <a
+                  class="block rounded-[1.5rem] border border-slate-200/80 bg-white/80 px-5 py-5 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                  href={item.href}
+                >
+                  <p class="text-lg font-semibold tracking-tight text-[#0e1528]">
+                    {item.label}
+                  </p>
+                  <p class="mt-2 text-sm leading-7 text-slate-600">
+                    {item.summary}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section class="space-y-5">
+          <div class="flex flex-col gap-4 rounded-[1.8rem] border border-white/70 bg-white/70 p-4 shadow-[0_18px_54px_rgba(31,44,75,0.05)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+            <div
+              aria-label="Blog categories"
+              class="flex flex-wrap gap-2"
+              role="group"
+            >
+              <button
+                aria-pressed="true"
+                class="rounded-full border border-[#101827] bg-[#101827] px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+                data-active="true"
+                data-blog-filter="all"
+                type="button"
+              >
+                All posts
+              </button>
+              <button
+                aria-pressed="false"
+                class="rounded-full border border-slate-200 bg-white/85 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+                data-active="false"
+                data-blog-filter="data engineering"
+                type="button"
+              >
+                Data engineering
+              </button>
+            </div>
+
+            <label class="min-w-0 flex-1 sm:max-w-xs">
+              <span class="sr-only">Search blog posts</span>
+              <input
+                class="w-full rounded-full border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium text-[#0e1528] outline-none transition placeholder:text-slate-400 focus:border-[#1f3b73] focus:ring-4 focus:ring-[#1f3b73]/10"
+                data-blog-search
+                placeholder="Search posts"
+                type="search"
+              />
+            </label>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2" data-blog-list>
+            {posts.map((post) => (
+              <BlogCard post={post} />
+            ))}
+          </div>
+
+          <div
+            class="hidden rounded-[1.5rem] border border-dashed border-slate-300 bg-white/70 px-5 py-6 text-center text-sm font-semibold text-slate-500"
+            data-blog-empty
+          >
+            No matching posts found.
+          </div>
+        </section>
+      )
+    }
+  </main>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  const searchInput = document.querySelector("[data-blog-search]");
+  const filterButtons = Array.from(
+    document.querySelectorAll("[data-blog-filter]"),
+  );
+  const blogCards = Array.from(document.querySelectorAll("[data-blog-card]"));
+  const emptyState = document.querySelector("[data-blog-empty]");
+
+  let activeFilter = "all";
+
+  function setButtonState(button, isActive) {
+    button.setAttribute("aria-pressed", String(isActive));
+    button.dataset.active = String(isActive);
+    button.classList.toggle("border-[#101827]", isActive);
+    button.classList.toggle("bg-[#101827]", isActive);
+    button.classList.toggle("text-white", isActive);
+    button.classList.toggle("border-slate-200", !isActive);
+    button.classList.toggle("bg-white/85", !isActive);
+    button.classList.toggle("text-[#0e1528]", !isActive);
+  }
+
+  function applyBlogFilters() {
+    const query = searchInput?.value.trim().toLowerCase() ?? "";
+    let visibleCount = 0;
+
+    blogCards.forEach((card) => {
+      const title = card.getAttribute("data-blog-title") ?? "";
+      const excerpt = card.getAttribute("data-blog-excerpt") ?? "";
+      const category = card.getAttribute("data-blog-category") ?? "";
+      const matchesCategory =
+        activeFilter === "all" || category.includes(activeFilter);
+      const matchesQuery = !query || `${title} ${excerpt}`.includes(query);
+      const isVisible = matchesCategory && matchesQuery;
+
+      card.classList.toggle("hidden", !isVisible);
+      if (isVisible) {
+        visibleCount += 1;
+      }
+    });
+
+    emptyState?.classList.toggle("hidden", visibleCount > 0);
+  }
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activeFilter = button.getAttribute("data-blog-filter") ?? "all";
+      filterButtons.forEach((item) => setButtonState(item, item === button));
+      applyBlogFilters();
+    });
+  });
+
+  searchInput?.addEventListener("input", applyBlogFilters);
+</script>

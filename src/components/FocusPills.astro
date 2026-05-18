@@ -1,0 +1,69 @@
+---
+import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
+
+type Props = {
+  activeFocusIds: readonly FocusId[];
+  basePath: string;
+  focusOptions: readonly FocusDefinition[];
+  maxItems?: number;
+  query?: Record<string, string | undefined>;
+  tone?: "light" | "dark";
+};
+
+const {
+  activeFocusIds,
+  basePath,
+  focusOptions,
+  maxItems,
+  query = {},
+  tone = "light",
+} = Astro.props;
+
+const activeSet = new Set(activeFocusIds);
+const visibleFocusOptions = maxItems
+  ? focusOptions.filter(
+      (focus, index) => index < maxItems || activeSet.has(focus.id),
+    )
+  : focusOptions;
+---
+
+<div class="flex flex-wrap gap-2">
+  {
+    visibleFocusOptions.map((focus) => {
+      const isActive = activeSet.has(focus.id);
+      const params = new URLSearchParams();
+
+      Object.entries(query).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        }
+      });
+
+      if (focus.id !== "general") {
+        params.set("focus", focus.id);
+      }
+
+      const href =
+        params.size > 0 ? `${basePath}?${params.toString()}` : basePath;
+
+      return (
+        <a
+          aria-current={isActive ? "page" : undefined}
+          class:list={[
+            "rounded-full px-4 py-2 text-sm font-semibold transition",
+            isActive
+              ? tone === "dark"
+                ? "border border-white/20 bg-white/12 text-white"
+                : "bg-[#1f3b73] text-white shadow-[0_10px_24px_rgba(31,44,75,0.12)]"
+              : tone === "dark"
+                ? "border border-white/10 bg-white/10 text-white/75 hover:border-white/20 hover:bg-white/20 hover:text-white"
+                : "border border-slate-200/80 bg-white/90 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-[#0e1528]",
+          ]}
+          href={href}
+        >
+          {focus.shortLabel}
+        </a>
+      );
+    })
+  }
+</div>

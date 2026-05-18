@@ -1,28 +1,27 @@
 {
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": ["node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "content/**/*",
+    "db/**/*",
+    "lib/db.ts",
+    "lib/env.ts",
+    "lib/jd.ts",
+    "lib/portfolio-types.ts",
+    "lib/portfolio.ts",
+    "lib/resume-store.ts",
+    "lib/turnstile.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules", "dist", ".next", "legacy-next"]
 }

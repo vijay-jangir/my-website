@@ -1,0 +1,78 @@
+const metaEnv = import.meta.env as Record<string, string | undefined>;
+const shouldReadMetaEnv = !process.env.VITEST;
+
+function readEnv(key: string) {
+  return process.env[key] ?? (shouldReadMetaEnv ? metaEnv[key] : undefined);
+}
+
+export const env = {
+  astroDbRemoteUrl: readEnv("ASTRO_DB_REMOTE_URL"),
+  astroDbAppToken: readEnv("ASTRO_DB_APP_TOKEN"),
+  databaseUrl: readEnv("DATABASE_URL"),
+  wixApiKey: readEnv("WIX_API_KEY"),
+  wixSiteId: readEnv("WIX_SITE_ID") ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
+  resendApiKey: readEnv("RESEND_API_KEY"),
+  resendFrom:
+    readEnv("RESEND_FROM") ?? "My Website Contact Form <onboarding@resend.dev>",
+  contactToEmail: readEnv("CONTACT_TO_EMAIL") ?? "contact@vijayjangir.com",
+  sessionSecret: readEnv("SESSION_SECRET") ?? readEnv("NEXTAUTH_SECRET"),
+  nextAuthSecret: readEnv("NEXTAUTH_SECRET"),
+  githubId: readEnv("GITHUB_ID"),
+  githubSecret: readEnv("GITHUB_SECRET"),
+  adminGithubLogins: (readEnv("ADMIN_GITHUB_LOGINS") ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean),
+  editorGithubLogins: (readEnv("EDITOR_GITHUB_LOGINS") ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean),
+  turnstileSiteKey: readEnv("TURNSTILE_SITE_KEY"),
+  turnstileSecretKey: readEnv("TURNSTILE_SECRET_KEY"),
+  cronSecret: readEnv("CRON_SECRET"),
+  contentBackupRepo: readEnv("CONTENT_BACKUP_REPO"),
+  contentBackupBranch: readEnv("CONTENT_BACKUP_BRANCH") ?? "content-backup",
+  contentBackupPat: readEnv("CONTENT_BACKUP_PAT"),
+  contentHistoryLimit: Number.parseInt(
+    readEnv("CONTENT_HISTORY_LIMIT") ?? "10",
+    10,
+  ),
+  openAiApiKey: readEnv("OPENAI_API_KEY"),
+  openClawBaseUrl: readEnv("OPENCLAW_BASE_URL"),
+  openClawToken: readEnv("OPENCLAW_TOKEN"),
+};
+
+export function isDatabaseConfigured() {
+  return Boolean(env.databaseUrl);
+}
+
+export function isAstroContentDbConfigured() {
+  return Boolean(env.astroDbRemoteUrl && env.astroDbAppToken);
+}
+
+export function isContentBackupConfigured() {
+  return Boolean(env.contentBackupRepo && env.contentBackupPat);
+}
+
+export function getContentHistoryLimit() {
+  return Number.isFinite(env.contentHistoryLimit) && env.contentHistoryLimit > 0
+    ? env.contentHistoryLimit
+    : 10;
+}
+
+export function isTurnstileConfigured() {
+  return Boolean(env.turnstileSiteKey && env.turnstileSecretKey);
+}
+
+export function isAuthConfigured() {
+  return Boolean(
+    env.sessionSecret &&
+    env.githubId &&
+    env.githubSecret &&
+    env.adminGithubLogins.length > 0,
+  );
+}
+
+export function isEmailConfigured() {
+  return Boolean(env.resendApiKey && env.contactToEmail);
+}

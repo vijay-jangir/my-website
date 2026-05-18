@@ -1,0 +1,44 @@
+---
+import HomePage from "@/src/components/home/HomePage";
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { getPublicProjectsFromContent } from "@/lib/portfolio";
+
+const content = await getPortfolioContent();
+const homeFeaturedOrder = [
+  "governed-conversational-data-platform",
+  "telecom-network-datalake",
+  "ranger-rbac-and-policy-governance",
+] as const;
+const featuredProjects = getPublicProjectsFromContent(content)
+  .filter((project) => project.featured)
+  .sort((left, right) => {
+    const leftIndex = homeFeaturedOrder.findIndex((id) => id === left.id);
+    const rightIndex = homeFeaturedOrder.findIndex((id) => id === right.id);
+    const normalizedLeft =
+      leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+    const normalizedRight =
+      rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+
+    return normalizedLeft - normalizedRight;
+  })
+  .slice(0, 3);
+const homeTitle = "Vijay Jangir | Governed Data Platforms and Enterprise AI";
+const homeDescription =
+  "Architect and hands-on developer building governed conversational data platforms, metadata services, access-governance systems, workflow orchestration, CI/CD onboarding, and telecom-scale analytics.";
+---
+
+<BaseLayout
+  description={homeDescription}
+  siteProfile={content.siteProfile}
+  title={homeTitle}
+>
+  <HomePage
+    client:load
+    experiences={content.experiences}
+    featuredProjects={featuredProjects}
+    profileHighlights={content.profileHighlights}
+    siteProfile={content.siteProfile}
+    skillDefinitions={content.skillDefinitions}
+  />
+</BaseLayout>

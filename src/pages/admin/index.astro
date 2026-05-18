@@ -1,0 +1,209 @@
+---
+import { isAuthConfigured } from "@/lib/env";
+import { getContentPlatformStatus } from "@/lib/content-platform";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import ResumeLab from "@/src/components/admin/ResumeLab";
+import { typographyConfig } from "@/src/config/typography";
+import BaseLayout, { setRobotsHeader } from "@/src/layouts/BaseLayout.astro";
+import { getSessionUser } from "@/src/lib/auth";
+
+const content = await getPortfolioContent();
+const session = await getSessionUser(Astro.cookies);
+const error = Astro.url.searchParams.get("error");
+const platformStatus = getContentPlatformStatus();
+
+setRobotsHeader(Astro.response.headers);
+---
+
+<BaseLayout
+  description="Private resume tailoring and JD analysis tools."
+  nonPublic={true}
+  siteProfile={content.siteProfile}
+  showAdminNav={true}
+  title="Admin | Vijay Jangir"
+>
+  <main class="space-y-8 pb-4">
+    <section
+      class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
+    >
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        Private admin
+      </p>
+      <h1
+        class="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
+      >
+        Resume tailoring lab
+      </h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+        This surface stays private. Public visitors should never have direct
+        access to JD parsing or assistant tooling.
+      </p>
+
+      {
+        !isAuthConfigured() ? (
+          <div class="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/90 p-6">
+            <p class="text-sm leading-7 text-slate-600">
+              Private access is not enabled for this deployment.
+            </p>
+          </div>
+        ) : !session ? (
+          <div class="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/90 p-6">
+            <p class="text-sm leading-7 text-slate-600">
+              This route is restricted to manually allowlisted GitHub accounts.
+            </p>
+            {error ? (
+              <p class="mt-4 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Sign-in failed: {error}.
+              </p>
+            ) : null}
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a
+                class="inline-flex items-center rounded-full bg-[#11192c] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
+                href="/api/auth/github"
+              >
+                Sign in with GitHub
+              </a>
+            </div>
+          </div>
+        ) : null
+      }
+    </section>
+
+    {
+      session ? (
+        <>
+          <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold text-[#0e1528]">
+                  Signed in as {session.login}
+                </p>
+                <p class="mt-1 text-sm text-slate-500">Role: {session.role}</p>
+              </div>
+              <a
+                class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                href="/api/auth/logout"
+              >
+                Sign out
+              </a>
+            </div>
+          </section>
+
+          <section class="grid gap-4 lg:grid-cols-2">
+            {session.role === "admin" ? (
+              <a
+                class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
+                href="/admin/content"
+              >
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  Content
+                </p>
+                <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+                  Manage portfolio data
+                </h2>
+                <p class="mt-4 text-sm leading-7 text-slate-600">
+                  Edit profile, skills, projects, experience, uploads, and
+                  revision history from one place.
+                </p>
+              </a>
+            ) : (
+              <div class="rounded-[2rem] border border-slate-200/80 bg-white/62 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.05)] backdrop-blur-xl">
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  Content
+                </p>
+                <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-0.045em] text-[#0e1528]">
+                  Admin-only publishing
+                </h2>
+                <p class="mt-4 text-sm leading-7 text-slate-600">
+                  Editor accounts can use resume tailoring here. Portfolio
+                  publishing is limited to admin accounts.
+                </p>
+              </div>
+            )}
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Current snapshot
+              </p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.projects.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Projects</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.skillDefinitions.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Skills</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {content.experiences.length}
+                  </p>
+                  <p class="text-sm text-slate-500">Experiences</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid gap-4 lg:grid-cols-2">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Content platform
+              </p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.contentDbLabel}
+                  </p>
+                  <p class="text-sm text-slate-500">Content database</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.backupConfigured ? "Configured" : "Missing"}
+                  </p>
+                  <p class="text-sm text-slate-500">Backup repo</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-[#0e1528]">
+                    {platformStatus.authConfigured ? "Configured" : "Missing"}
+                  </p>
+                  <p class="text-sm text-slate-500">GitHub auth</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Typography
+              </p>
+              <p class="mt-4 text-sm leading-7 text-slate-600">
+                Font roles are now centralized and configurable.
+              </p>
+              <div class="mt-4 space-y-2 text-sm text-slate-600">
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Preset:</span>{" "}
+                  {typographyConfig.preset}
+                </p>
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Body/UI:</span>{" "}
+                  Inter Variable
+                </p>
+                <p>
+                  <span class="font-semibold text-[#0e1528]">Mono:</span> IBM
+                  Plex Mono
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <ResumeLab client:load focusOptions={content.focusDefinitions} />
+        </>
+      ) : null
+    }
+  </main>
+</BaseLayout>

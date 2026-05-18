@@ -1,0 +1,166 @@
+---
+import ContentManager from "@/src/components/admin/ContentManager";
+import { getContentPlatformStatus } from "@/lib/content-platform";
+import BaseLayout, { setRobotsHeader } from "@/src/layouts/BaseLayout.astro";
+import { isAuthConfigured, isContentBackupConfigured } from "@/lib/env";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { typographyConfig } from "@/src/config/typography";
+import { getSessionUser } from "@/src/lib/auth";
+
+const content = await getPortfolioContent();
+const session = await getSessionUser(Astro.cookies);
+const error = Astro.url.searchParams.get("error");
+const backupConfigured = isContentBackupConfigured();
+const platformStatus = getContentPlatformStatus();
+
+setRobotsHeader(Astro.response.headers);
+---
+
+<BaseLayout
+  description="Private content editing for portfolio, resume, and work data."
+  nonPublic={true}
+  siteProfile={content.siteProfile}
+  showAdminNav={true}
+  title="Content Admin | Vijay Jangir"
+>
+  <main class="space-y-8 pb-4">
+    <section
+      class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
+    >
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        Private admin
+      </p>
+      <h1
+        class="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
+      >
+        Content manager
+      </h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+        This is the editable source for profile, skills, projects, experience,
+        uploads, and published revisions.
+      </p>
+
+      {
+        !isAuthConfigured() ? (
+          <div class="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/90 p-6">
+            <p class="text-sm leading-7 text-slate-600">
+              Private access is not enabled for this deployment.
+            </p>
+          </div>
+        ) : !session ? (
+          <div class="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/90 p-6">
+            <p class="text-sm leading-7 text-slate-600">
+              This route is restricted to manually allowlisted GitHub accounts.
+            </p>
+            {error ? (
+              <p class="mt-4 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Sign-in failed: {error}.
+              </p>
+            ) : null}
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a
+                class="inline-flex items-center rounded-full bg-[#11192c] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
+                href="/api/auth/github"
+              >
+                Sign in with GitHub
+              </a>
+            </div>
+          </div>
+        ) : session.role !== "admin" ? (
+          <div class="mt-8 rounded-[1.75rem] border border-red-200 bg-red-50 p-6">
+            <p class="text-sm leading-7 text-red-700">
+              This surface is currently limited to admin accounts because it
+              publishes directly.
+            </p>
+          </div>
+        ) : null
+      }
+    </section>
+
+    {
+      session?.role === "admin" ? (
+        <>
+          <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold text-[#0e1528]">
+                  Signed in as {session.login}
+                </p>
+                <p class="mt-1 text-sm text-slate-500">
+                  Direct publish{" "}
+                  {backupConfigured
+                    ? "enabled"
+                    : "blocked until backup is configured"}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <a
+                  class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                  href="/admin"
+                >
+                  Back to admin hub
+                </a>
+                <a
+                  class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                  href="/api/auth/logout"
+                >
+                  Sign out
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid gap-4 lg:grid-cols-3">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Content DB
+              </p>
+              <p class="mt-4 text-2xl font-semibold text-[#0e1528]">
+                {platformStatus.contentDbLabel}
+              </p>
+              <p class="mt-2 text-sm leading-7 text-slate-600">
+                Public pages read from Astro DB first, then GitHub backup, then
+                bundled fallback content.
+              </p>
+            </div>
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Backup
+              </p>
+              <p class="mt-4 text-2xl font-semibold text-[#0e1528]">
+                {platformStatus.backupConfigured ? "Configured" : "Missing"}
+              </p>
+              <p class="mt-2 text-sm leading-7 text-slate-600">
+                {platformStatus.backupConfigured && platformStatus.backupRepo
+                  ? `Publishing snapshots to ${platformStatus.backupRepo}.`
+                  : "Publishing stays blocked until CONTENT_BACKUP_REPO and CONTENT_BACKUP_PAT are configured."}
+              </p>
+            </div>
+
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Fonts
+              </p>
+              <p class="mt-4 text-2xl font-semibold text-[#0e1528]">
+                {typographyConfig.preset}
+              </p>
+              <p class="mt-2 text-sm leading-7 text-slate-600">
+                Body/UI use Inter Variable, headings use the display role, and
+                metadata uses IBM Plex Mono.
+              </p>
+            </div>
+          </section>
+
+          <ContentManager
+            backupConfigured={backupConfigured}
+            client:load
+            initialContent={content}
+          />
+        </>
+      ) : null
+    }
+  </main>
+</BaseLayout>

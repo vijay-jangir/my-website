@@ -1,0 +1,276 @@
+"use client";
+
+import { type ReactNode, useMemo } from "react";
+import { BsArrowRight, BsLinkedin } from "react-icons/bs";
+import { FaGithubSquare } from "react-icons/fa";
+import { HiDownload } from "react-icons/hi";
+
+import {
+  type ExperienceDefinition,
+  type ProfileHighlight,
+  type ProjectDefinition,
+  type SiteProfile,
+  type SkillDefinition,
+} from "@/lib/portfolio-types";
+import SystemsBackdrop from "@/src/components/home/SystemsBackdrop";
+
+type Props = {
+  experiences: readonly ExperienceDefinition[];
+  featuredProjects: readonly ProjectDefinition[];
+  profileHighlights: readonly ProfileHighlight[];
+  siteProfile: SiteProfile;
+  skillDefinitions: readonly SkillDefinition[];
+};
+
+export default function HomePage({
+  experiences,
+  featuredProjects,
+  profileHighlights,
+  siteProfile,
+  skillDefinitions,
+}: Props) {
+  const skillLabelById = useMemo(
+    () =>
+      Object.fromEntries(
+        skillDefinitions.map((skill) => [skill.id, skill.label]),
+      ) as Record<string, string>,
+    [skillDefinitions],
+  );
+  const featured = featuredProjects.slice(0, 3);
+  const experienceSummary = experiences.slice(0, 3);
+
+  function getSkillLabel(skillId: string) {
+    return skillLabelById[skillId] ?? skillId;
+  }
+
+  function getProjectHref(project: ProjectDefinition) {
+    return project.slug ? `/projects/${project.slug}` : "/projects";
+  }
+
+  return (
+    <main className="pb-8">
+      <section
+        className="relative mx-auto flex min-h-[calc(100svh-7.5rem)] w-full max-w-[82rem] items-center justify-center overflow-hidden px-4 pb-16 pt-6 text-center"
+        id="home"
+      >
+        <SystemsBackdrop />
+        <div className="relative z-10 max-w-5xl">
+          <div className="flex flex-col items-center gap-5">
+            <img
+              alt={`${siteProfile.name} profile`}
+              className="h-24 w-24 rounded-full border-[5px] border-white object-cover shadow-[0_20px_52px_rgba(31,44,75,0.16)] sm:h-32 sm:w-32"
+              src={siteProfile.profileImageUrl ?? "/profile-pic.jpeg"}
+            />
+            <div>
+              <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[#1f3b73]">
+                {siteProfile.title}
+              </p>
+              <p className="mt-3 text-sm font-semibold text-slate-500">
+                {siteProfile.location} / updated {siteProfile.lastUpdatedLabel}
+              </p>
+            </div>
+          </div>
+
+          <h1 className="mx-auto mt-8 max-w-[14ch] font-display text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-[#0e1528] sm:mt-10 sm:text-6xl lg:text-7xl">
+            {siteProfile.heroLabel}
+          </h1>
+          <p className="mx-auto mt-6 max-w-[21rem] text-center text-lg leading-8 text-slate-600 sm:hidden">
+            10+ years building governed data platforms, enterprise AI,
+            orchestration, access governance, and network analytics systems.
+          </p>
+          <p className="mx-auto mt-8 hidden max-w-3xl text-xl leading-9 text-slate-600 sm:block">
+            {siteProfile.recruiterPitch}
+          </p>
+
+          <div className="mt-8 flex flex-wrap justify-center gap-3 sm:mt-10">
+            <a
+              className="group inline-flex items-center gap-2 rounded-full bg-[#101827] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(16,24,39,0.22)] transition hover:-translate-y-0.5 hover:bg-[#0b1220] sm:text-base"
+              href="/projects"
+            >
+              View selected work
+              <BsArrowRight className="transition group-hover:translate-x-1" />
+            </a>
+            <a
+              className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_14px_30px_rgba(31,44,75,0.09)] transition hover:-translate-y-0.5 hover:bg-white sm:text-base"
+              href="/resume"
+            >
+              Resume
+              <HiDownload className="opacity-70 transition group-hover:translate-y-0.5" />
+            </a>
+            <a
+              aria-label="LinkedIn"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+              href={siteProfile.linkedinUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <BsLinkedin className="text-lg" />
+            </a>
+            <a
+              aria-label="GitHub"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+              href={siteProfile.githubUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <FaGithubSquare className="text-xl" />
+            </a>
+          </div>
+
+          <div className="mx-auto mt-8 hidden max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-200/80 shadow-[0_20px_56px_rgba(31,44,75,0.08)] sm:grid">
+            {profileHighlights.slice(0, 2).map((item) => (
+              <div className="bg-white/76 px-6 py-5" key={item.id}>
+                <p className="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                  {item.value}
+                </p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Section
+        copy="Internal names stay private. Each writeup focuses on the problem, my ownership, the architecture, the tradeoffs, and what can be shared publicly."
+        eyebrow="Selected work"
+        id="projects"
+        title="Systems I have actually built."
+      >
+        <div className="mt-12 grid gap-px overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-slate-200/80 shadow-[0_24px_70px_rgba(31,44,75,0.08)] lg:grid-cols-3">
+          {featured.map((project) => (
+            <a
+              className="group flex min-h-[24rem] flex-col bg-white/88 p-7 transition hover:bg-white"
+              href={getProjectHref(project)}
+              key={project.id}
+            >
+              <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#1f3b73]">
+                Selected system
+              </p>
+              <h3 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
+                {project.title}
+              </h3>
+              <p className="mt-5 text-sm leading-7 text-slate-600">
+                {project.caseStudy?.headline ?? project.summary}
+              </p>
+              <div className="mt-6 grid grid-cols-3 gap-2">
+                {project.skillIds.slice(0, 3).map((skillId) => (
+                  <span
+                    className="min-h-14 rounded-[1rem] border border-slate-200 bg-white px-3 py-3 text-xs font-semibold leading-tight text-slate-500"
+                    key={skillId}
+                  >
+                    {getSkillLabel(skillId)}
+                  </span>
+                ))}
+              </div>
+              <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[#1f3b73]">
+                Open case study
+                <BsArrowRight className="transition group-hover:translate-x-1" />
+              </span>
+            </a>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <a
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+            href="/projects"
+          >
+            Browse all projects
+            <BsArrowRight />
+          </a>
+        </div>
+      </Section>
+
+      <Section
+        copy="I usually work on systems that already matter in production: heavy data movement, unclear ownership, fragile access paths, and platform work that has to become easier to operate."
+        eyebrow="Experience"
+        id="experience"
+        title="Built across telecom, retail, and platform teams."
+      >
+        <div className="mt-12 divide-y divide-slate-200/80 rounded-[1.8rem] border border-slate-200/80 bg-white/82 shadow-[0_24px_70px_rgba(31,44,75,0.08)]">
+          {experienceSummary.map((experience) => (
+            <article
+              className="grid gap-6 p-6 text-left md:grid-cols-[12rem_minmax(0,1fr)] md:p-8"
+              key={experience.id}
+            >
+              <div>
+                <p className="text-sm font-semibold text-[#0e1528]">
+                  {experience.company}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">{experience.date}</p>
+              </div>
+              <div>
+                <h3 className="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                  {experience.title}
+                </h3>
+                <p className="mt-3 text-base leading-8 text-slate-600">
+                  {experience.description}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <section
+        className="mx-auto mt-24 max-w-[76rem] rounded-[2rem] bg-[#101827] px-6 py-12 text-center text-white shadow-[0_28px_80px_rgba(16,24,39,0.22)] sm:px-10"
+        id="contact"
+      >
+        <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/55">
+          Contact
+        </p>
+        <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
+          I am most useful where data systems need clearer ownership, safer
+          access, and better day-to-day operation.
+        </h2>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#101827] transition hover:-translate-y-0.5"
+            href={`mailto:${siteProfile.email}`}
+          >
+            Email {siteProfile.name}
+            <BsArrowRight />
+          </a>
+          <a
+            className="inline-flex items-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+            href="/resume"
+          >
+            Open resume
+          </a>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function Section({
+  copy,
+  eyebrow,
+  id,
+  title,
+  children,
+}: {
+  copy: string;
+  eyebrow: string;
+  id: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="mx-auto max-w-[76rem] px-4 py-20" id={id}>
+      <div className="mx-auto max-w-4xl text-center">
+        <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#1f3b73]">
+          {eyebrow}
+        </p>
+        <h2 className="mx-auto mt-4 max-w-[15ch] text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-[#0e1528] sm:text-6xl">
+          {title}
+        </h2>
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+          {copy}
+        </p>
+      </div>
+      {children}
+    </section>
+  );
+}

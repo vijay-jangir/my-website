@@ -1,0 +1,480 @@
+---
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import {
+  buildResumeVariantFromContent,
+  getSkillLabel,
+  parseFocusIds,
+} from "@/lib/portfolio";
+import { getResumeVariantByToken } from "@/lib/resume-store";
+import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
+import FocusPills from "@/src/components/FocusPills.astro";
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+
+const content = await getPortfolioContent();
+const focusIds = parseFocusIds(Astro.url.searchParams.get("focus"));
+const variantToken = Astro.url.searchParams.get("variant") ?? undefined;
+const storedVariant = variantToken
+  ? await getResumeVariantByToken(variantToken)
+  : null;
+const variant =
+  storedVariant?.variant ??
+  buildResumeVariantFromContent(content, {
+    focusIds,
+  });
+const selectedFocusIds: readonly FocusId[] =
+  variant.focusIds.length > 0 ? variant.focusIds : ["general"];
+const selectedFocusDefinitions = selectedFocusIds
+  .map((focusId) =>
+    content.focusDefinitions.find((focus) => focus.id === focusId),
+  )
+  .filter((focus): focus is FocusDefinition => Boolean(focus));
+const selectedFocusLabels =
+  selectedFocusDefinitions.length > 0
+    ? selectedFocusDefinitions.map((focus) => focus.shortLabel).join(" + ")
+    : "Overall";
+const hasFocusedView = !selectedFocusIds.includes("general");
+const displayHeadline = hasFocusedView
+  ? variant.headline
+  : "Governed data platform and enterprise AI resume";
+const pdfParams = storedVariant?.token
+  ? new URLSearchParams({ variant: storedVariant.token })
+  : new URLSearchParams({ focus: selectedFocusIds.join(",") });
+const relatedProjectsHref = hasFocusedView
+  ? `/projects?${new URLSearchParams({
+      focus: selectedFocusIds.join(","),
+    }).toString()}`
+  : "/projects";
+const pdfLabel = storedVariant?.token
+  ? "Download tailored PDF"
+  : hasFocusedView
+    ? `Download ${selectedFocusLabels} PDF`
+    : "Download resume PDF";
+const skillLabels = Object.fromEntries(
+  content.skillDefinitions.map((skill) => [skill.id, skill.label]),
+) as Record<string, string>;
+const focusPresetGroups = [
+  {
+    label: "Backend platform",
+    description: "Service ownership, data APIs, and production reliability.",
+    focusIds: ["backend-engineering", "platform-engineering"] as const,
+  },
+  {
+    label: "Data platform",
+    description: "Pipelines, mesh foundations, streaming, and governance.",
+    focusIds: ["data-platform", "kafka", "flink"] as const,
+  },
+  {
+    label: "AI data products",
+    description: "Governed agents, text-to-data, visualization, and Python.",
+    focusIds: ["ai", "agentic-development", "python"] as const,
+  },
+];
+
+function buildResumeHref(focusIds: readonly FocusId[]) {
+  if (focusIds.includes("general")) {
+    return "/resume";
+  }
+
+  return `/resume?${new URLSearchParams({
+    focus: focusIds.join(","),
+  }).toString()}`;
+}
+---
+
+<BaseLayout
+  description="Focused resume views for data, platform, streaming, AI, and backend roles."
+  siteProfile={content.siteProfile}
+  title="Resume | Vijay Jangir"
+>
+  <main class="space-y-12 pb-4">
+    <section
+      class="grid gap-8 px-1 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
+    >
+      <article>
+        <p
+          class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+        >
+          Resume
+        </p>
+        <h1
+          class="mt-4 max-w-5xl font-display text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
+        >
+          {displayHeadline}
+        </h1>
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-600">
+          {variant.summary}
+        </p>
+        <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-500">
+          Switch views to reorder the same experience around backend, platform,
+          data, or AI roles. Current content refreshed {
+            content.siteProfile.lastUpdatedLabel
+          }.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            class="inline-flex items-center rounded-full bg-[#101827] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(16,24,39,0.18)] transition hover:-translate-y-0.5"
+            href={`/api/resume/pdf?${pdfParams.toString()}`}
+          >
+            {pdfLabel}
+          </a>
+          <a
+            class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+            href={relatedProjectsHref}
+          >
+            See related projects
+          </a>
+        </div>
+      </article>
+
+      <aside
+        class="rounded-[1.8rem] border border-slate-200/80 bg-white/78 px-6 py-7 shadow-[0_18px_48px_rgba(31,44,75,0.06)] backdrop-blur-xl"
+      >
+        <p
+          class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+        >
+          Quick view
+        </p>
+        <div class="mt-5 space-y-6">
+          {
+            variant.highlights.slice(0, 3).map((highlight) => (
+              <div class="border-t border-slate-200/80 pt-6 first:border-t-0 first:pt-0">
+                <p class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {highlight.label}
+                </p>
+                <p class="mt-3 text-3xl font-semibold tracking-tight text-[#0e1528]">
+                  {highlight.value}
+                </p>
+                <p class="mt-2 text-sm leading-7 text-slate-600">
+                  {highlight.detail}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </aside>
+    </section>
+
+    <section
+      class="rounded-[1.8rem] border border-slate-200/80 bg-white/78 px-6 py-8 shadow-[0_18px_48px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-8"
+    >
+      <div
+        class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,1.05fr)] lg:items-start"
+      >
+        <div>
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Role views
+          </p>
+          <h2
+            class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528] sm:text-5xl"
+          >
+            Choose the role view.
+          </h2>
+          <p class="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+            Current view:
+            <span class="font-semibold text-[#0e1528]">
+              {selectedFocusLabels}
+            </span>
+            . The page and PDF stay aligned around the selected evidence.
+          </p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-3">
+          {
+            focusPresetGroups.map((preset) => {
+              const isActive =
+                preset.focusIds.length === selectedFocusIds.length &&
+                preset.focusIds.every((focusId) =>
+                  selectedFocusIds.includes(focusId),
+                );
+
+              return (
+                <a
+                  class:list={[
+                    "rounded-[1.35rem] border px-4 py-4 transition hover:-translate-y-0.5",
+                    isActive
+                      ? "border-[#1f3b73] bg-[#11192c] text-white shadow-[0_16px_34px_rgba(17,25,44,0.14)]"
+                      : "border-slate-200/80 bg-white/80 text-slate-600 hover:border-slate-300 hover:bg-white",
+                  ]}
+                  href={buildResumeHref(preset.focusIds)}
+                >
+                  <span
+                    class:list={[
+                      "block text-sm font-semibold",
+                      isActive ? "text-white" : "text-[#0e1528]",
+                    ]}
+                  >
+                    {preset.label}
+                  </span>
+                  <span
+                    class:list={[
+                      "mt-2 block text-sm leading-6",
+                      isActive ? "text-white/72" : "text-slate-600",
+                    ]}
+                  >
+                    {preset.description}
+                  </span>
+                </a>
+              );
+            })
+          }
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div>
+          <p
+            class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500"
+          >
+            Fine tune by focus
+          </p>
+          <div class="mt-4">
+            <FocusPills
+              activeFocusIds={selectedFocusIds}
+              basePath="/resume"
+              focusOptions={content.focusDefinitions}
+              maxItems={6}
+            />
+          </div>
+        </div>
+        <aside
+          class="rounded-[1.5rem] border border-slate-200/80 bg-white/80 px-5 py-5"
+        >
+          <p class="text-sm font-semibold text-[#0e1528]">What changes</p>
+          <ul class="mt-3 space-y-2 text-sm leading-6 text-slate-600">
+            <li>Projects and bullets are reordered for the selected role.</li>
+            <li>Skills regroup into primary and supporting sets.</li>
+            <li>The PDF exports the same focused view.</li>
+          </ul>
+        </aside>
+      </div>
+      {
+        hasFocusedView ? (
+          <div class="mt-4">
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-[#0e1528]"
+              href="/resume"
+            >
+              Overall profile
+            </a>
+          </div>
+        ) : null
+      }
+    </section>
+
+    <section
+      class="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(17rem,0.92fr)]"
+    >
+      <div class="space-y-6">
+        <article
+          class="rounded-[2.3rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-8"
+        >
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Projects
+          </p>
+          <h2
+            class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528]"
+          >
+            Relevant projects
+          </h2>
+          <div class="mt-6 space-y-6">
+            {
+              variant.projects.map((project) => (
+                <article class="border-t border-slate-200/80 pt-6 first:border-t-0 first:pt-0">
+                  <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <h3 class="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                        <a
+                          class="transition hover:text-[#1f3b73]"
+                          href={`/projects/${project.slug}`}
+                        >
+                          {project.title}
+                        </a>
+                      </h3>
+                      <p class="mt-3 text-base leading-8 text-slate-600">
+                        {project.summary}
+                      </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 lg:max-w-[14rem] lg:justify-end">
+                      {project.skillIds.slice(0, 4).map((skillId) => (
+                        <span class="rounded-full border border-slate-200/80 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600">
+                          {skillLabels[skillId] ?? getSkillLabel(skillId)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <p class="mt-4 text-base leading-8 text-slate-600">
+                    {project.impact}
+                  </p>
+                  <a
+                    class="mt-4 inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                    href={`/projects/${project.slug}`}
+                  >
+                    Read case study
+                  </a>
+                </article>
+              ))
+            }
+          </div>
+        </article>
+
+        <article
+          class="rounded-[2.3rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-8"
+        >
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Experience
+          </p>
+          <h2
+            class="mt-4 font-display text-4xl font-semibold leading-tight tracking-[-0.05em] text-[#0e1528]"
+          >
+            Relevant experience
+          </h2>
+          <div class="mt-6 space-y-6">
+            {
+              variant.experiences.map((experience) => (
+                <article class="border-t border-slate-200/80 pt-6 first:border-t-0 first:pt-0">
+                  <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <h3 class="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                        {experience.title} · {experience.company}
+                      </h3>
+                      <p class="mt-2 text-base leading-8 text-slate-600">
+                        {experience.description}
+                      </p>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500">
+                      {experience.date}
+                    </p>
+                  </div>
+                  <ul class="mt-5 space-y-3 text-base leading-8 text-slate-600">
+                    {experience.bullets.map((bullet) => (
+                      <li class="flex gap-3">
+                        <span class="mt-[0.72rem] h-2 w-2 rounded-full bg-[#1f3b73]" />
+                        <span>{bullet.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))
+            }
+          </div>
+        </article>
+      </div>
+
+      <div class="space-y-6">
+        <article
+          class="rounded-[1.8rem] border border-slate-200/80 bg-white/78 px-6 py-8 shadow-[0_18px_48px_rgba(31,44,75,0.06)] backdrop-blur-xl"
+        >
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Skill stack
+          </p>
+          <h2
+            class="mt-4 font-display text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]"
+          >
+            Primary skills
+          </h2>
+          <div class="mt-6 flex flex-wrap gap-2">
+            {
+              variant.primarySkills.map((skill) => (
+                <span class="rounded-full bg-[#11192c] px-4 py-2 text-sm font-semibold text-white">
+                  {skill.label}
+                </span>
+              ))
+            }
+          </div>
+
+          <h3 class="mt-8 text-lg font-semibold tracking-tight text-[#0e1528]">
+            Supporting skills
+          </h3>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {
+              variant.secondarySkills.map((skill) => (
+                <span class="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600">
+                  {skill.label}
+                </span>
+              ))
+            }
+          </div>
+
+          <h3 class="mt-8 text-lg font-semibold tracking-tight text-[#0e1528]">
+            Additional skills
+          </h3>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {
+              variant.supportingSkills.map((skill) => (
+                <span class="rounded-full border border-dashed border-slate-200/80 px-4 py-2 text-sm font-semibold text-slate-600">
+                  {skill.label}
+                </span>
+              ))
+            }
+          </div>
+        </article>
+
+        <article
+          class="rounded-[2.3rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl"
+        >
+          <p
+            class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+          >
+            Links
+          </p>
+          <h2
+            class="mt-4 font-display text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]"
+          >
+            Contact and profile
+          </h2>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              href={relatedProjectsHref}
+            >
+              Projects
+            </a>
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              href={`mailto:${content.siteProfile.email}`}
+            >
+              Email
+            </a>
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              href={content.siteProfile.linkedinUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              LinkedIn
+            </a>
+          </div>
+        </article>
+
+        {
+          variant.analysis ? (
+            <article class="rounded-[2.3rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                JD notes
+              </p>
+              <h2 class="mt-4 font-display text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#0e1528]">
+                Captured from the role
+              </h2>
+              <ul class="mt-6 space-y-3 text-base leading-8 text-slate-600">
+                {variant.analysis.extractedHighlights.map((highlight) => (
+                  <li class="flex gap-3">
+                    <span class="mt-[0.72rem] h-2 w-2 rounded-full bg-[#1f3b73]" />
+                    <span>{highlight}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ) : null
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>

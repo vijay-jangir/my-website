@@ -1,9 +1,6 @@
 "use client";
 
 import { type ReactNode, useMemo } from "react";
-import { BsArrowRight, BsLinkedin } from "react-icons/bs";
-import { FaGithubSquare } from "react-icons/fa";
-import { HiDownload } from "react-icons/hi";
 
 import {
   type ExperienceDefinition,
@@ -88,14 +85,14 @@ export default function HomePage({
               href="/projects"
             >
               View selected work
-              <BsArrowRight className="transition group-hover:translate-x-1" />
+              <ArrowRightIcon className="transition group-hover:translate-x-1" />
             </a>
             <a
               className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_14px_30px_rgba(31,44,75,0.09)] transition hover:-translate-y-0.5 hover:bg-white sm:text-base"
               href="/resume"
             >
               Resume
-              <HiDownload className="opacity-70 transition group-hover:translate-y-0.5" />
+              <DownloadIcon className="opacity-70 transition group-hover:translate-y-0.5" />
             </a>
             <a
               aria-label="LinkedIn"
@@ -104,7 +101,7 @@ export default function HomePage({
               rel="noreferrer"
               target="_blank"
             >
-              <BsLinkedin className="text-lg" />
+              <LinkedinIcon className="h-4 w-4" />
             </a>
             <a
               aria-label="GitHub"
@@ -113,7 +110,7 @@ export default function HomePage({
               rel="noreferrer"
               target="_blank"
             >
-              <FaGithubSquare className="text-xl" />
+              <GitHubIcon className="h-5 w-5" />
             </a>
           </div>
 
@@ -166,7 +163,7 @@ export default function HomePage({
               </div>
               <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[#1f3b73]">
                 Open case study
-                <BsArrowRight className="transition group-hover:translate-x-1" />
+                <ArrowRightIcon className="transition group-hover:translate-x-1" />
               </span>
             </a>
           ))}
@@ -177,7 +174,7 @@ export default function HomePage({
             href="/projects"
           >
             Browse all projects
-            <BsArrowRight />
+            <ArrowRightIcon />
           </a>
         </div>
       </Section>
@@ -230,7 +227,7 @@ export default function HomePage({
             href={`mailto:${siteProfile.email}`}
           >
             Email {siteProfile.name}
-            <BsArrowRight />
+            <ArrowRightIcon />
           </a>
           <a
             className="inline-flex items-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
@@ -241,6 +238,86 @@ export default function HomePage({
         </div>
       </section>
     </main>
+  );
+}
+
+type IconProps = {
+  className?: string;
+};
+
+function ArrowRightIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="1em"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14m-6-6 6 6-6 6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function DownloadIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="1em"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M5.7 8.9H2.8v12h2.9v-12Zm.2-3.7a1.7 1.7 0 1 0-3.4 0 1.7 1.7 0 0 0 3.4 0Zm8.5 3.5a4 4 0 0 0-3.1 1.3V8.9H8.5v12h2.9v-6.2c0-2 1.1-3.1 2.6-3.1 1.4 0 2.2.9 2.2 2.7v6.6h2.9v-7.2c0-3.2-1.8-5-4.7-5Z" />
+    </svg>
+  );
+}
+
+function GitHubIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        clipRule="evenodd"
+        d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.7.6-3.3-1.1-3.3-1.1-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 0 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.4-2.2-.2-4.5-1.1-4.5-4.8 0-1.1.4-2 1-2.7-.1-.2-.4-1.2.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 4.8 0c1.8-1.3 2.6-1 2.6-1 .6 1.4.2 2.4.1 2.6.7.7 1 1.6 1 2.7 0 3.7-2.3 4.6-4.5 4.8.4.3.7 1 .7 2v3c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"
+        fillRule="evenodd"
+      />
+    </svg>
   );
 }
 

@@ -39,13 +39,17 @@ export default function SystemsBackdrop() {
           </div>
         ))}
 
-        {nodes.map((node) => (
+        {nodes.map((node, index) => (
           <div
             className="systems-node"
             data-detail={node.detail}
             data-label={node.label}
             key={node.label}
-            style={{ left: node.x, top: node.y }}
+            style={{
+              animationDelay: `${0.34 + index * 0.08}s`,
+              left: node.x,
+              top: node.y,
+            }}
           />
         ))}
       </div>
@@ -58,6 +62,7 @@ export default function SystemsBackdrop() {
             radial-gradient(circle at 30% 18%, rgba(31, 59, 115, 0.12), transparent 18rem),
             radial-gradient(circle at 78% 30%, rgba(20, 184, 166, 0.12), transparent 18rem);
           filter: blur(2px);
+          animation: systems-soft-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         .systems-grid {
@@ -69,6 +74,7 @@ export default function SystemsBackdrop() {
           background-size: 72px 72px;
           mask-image: radial-gradient(circle at 50% 42%, black 0, transparent 62%);
           opacity: 0.6;
+          animation: systems-grid-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         .systems-map {
@@ -90,6 +96,7 @@ export default function SystemsBackdrop() {
           text-align: left;
           backdrop-filter: blur(18px);
           opacity: 0.72;
+          animation: systems-node-enter 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         .systems-node::before {
@@ -187,7 +194,46 @@ export default function SystemsBackdrop() {
           }
         }
 
+        @keyframes systems-soft-enter {
+          from {
+            opacity: 0;
+            transform: scale(0.96);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes systems-grid-enter {
+          from {
+            opacity: 0;
+            transform: translateY(1rem);
+          }
+          to {
+            opacity: 0.6;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes systems-node-enter {
+          from {
+            opacity: 0;
+            transform: translate(-50%, calc(-50% + 0.85rem)) scale(0.96);
+          }
+          to {
+            opacity: 0.72;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
         @media (prefers-reduced-motion: reduce) {
+          .systems-halo,
+          .systems-grid,
+          .systems-node {
+            animation: none;
+          }
+
           .systems-rail span {
             animation: none;
             opacity: 0;

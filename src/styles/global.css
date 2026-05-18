@@ -35,3 +35,47 @@
 @view-transition {
   navigation: auto;
 }
+
+@keyframes route-header-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-1.35rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes route-nav-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.site-route-header {
+  animation: route-header-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.site-route-nav-item {
+  animation: route-nav-item-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(90ms + var(--nav-index, 0) * 42ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  .site-route-header,
+  .site-route-nav-item {
+    animation: none;
+  }
+}

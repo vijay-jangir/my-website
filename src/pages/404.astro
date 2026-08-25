@@ -1,0 +1,45 @@
+---
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+
+Astro.response.status = 404;
+---
+
+<BaseLayout
+  description="The page you were looking for does not exist. Explore Vijay Jangir's projects, resume, and blog instead."
+  title="Page not found | Vijay Jangir"
+>
+  <main class="pb-4">
+    <section
+      class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-12"
+    >
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        404
+      </p>
+      <h1
+        class="mt-4 max-w-3xl font-display text-5xl font-semibold leading-[0.98] tracking-[-0.05em] text-[#0e1528] sm:text-6xl"
+      >
+        That page does not exist.
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+        The link may be outdated. The work, resume, and writing are all still
+        here:
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          class="inline-flex items-center rounded-full bg-[#101827] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(16,24,39,0.18)] transition hover:-translate-y-0.5"
+          href="/projects">Browse projects</a
+        >
+        <a
+          class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+          href="/resume">Open resume</a
+        >
+        <a
+          class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+          href="/blog">Read the blog</a
+        >
+      </div>
+    </section>
+  </main>
+</BaseLayout>

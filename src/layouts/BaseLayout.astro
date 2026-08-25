@@ -16,6 +16,7 @@ export const setRobotsHeader = (
 type Props = {
   description?: string;
   nonPublic?: boolean;
+  ogType?: "website" | "article";
   robots?: string;
   siteProfile?: SiteProfile;
   showAdminNav?: boolean;
@@ -28,6 +29,7 @@ type Props = {
 const {
   description = "Portfolio, resume, and selected work for Vijay Jangir across data platforms, backend systems, and streaming infrastructure.",
   nonPublic = false,
+  ogType = "website",
   robots: robotsOverride,
   siteProfile: siteProfileOverride,
   showAdminNav = false,
@@ -91,14 +93,20 @@ const pathname = Astro.url.pathname;
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content={description} name="description" />
     {robotsContent ? <meta content={robotsContent} name="robots" /> : null}
-    <link href="/favico.ico" rel="icon" sizes="any" />
-    <link href="/favico.png" rel="icon" type="image/png" />
-    <link href="/favico.png" rel="apple-touch-icon" />
+    <link href="/favicon.ico" rel="icon" sizes="any" />
+    <link href="/favicon.png" rel="icon" type="image/png" />
+    <link href="/favicon.png" rel="apple-touch-icon" />
+    <link
+      href={new URL("/rss.xml", siteBase).toString()}
+      rel="alternate"
+      title={`${siteProfile.name} — Blog`}
+      type="application/rss+xml"
+    />
     <meta content={siteProfile.name} property="og:site_name" />
     <meta content={title} property="og:title" />
     <meta content={description} property="og:description" />
     <meta content={canonicalUrl} property="og:url" />
-    <meta content="website" property="og:type" />
+    <meta content={ogType} property="og:type" />
     <meta content={socialImageUrl} property="og:image" />
     <meta content={socialImageAlt} property="og:image:alt" />
     <meta content="1200" property="og:image:width" />

@@ -5,7 +5,7 @@ export const prerender = true;
 const disallowedPaths = ["/admin", "/assistant", "/api"];
 
 export const GET: APIRoute = ({ site }) => {
-  const baseUrl = site ?? new URL("https://www.vijayjangir.com");
+  const baseUrl = site ?? new URL("https://vijayjangir.com");
   const sitemapUrl = new URL("/sitemap.xml", baseUrl).toString();
   const body = [
     "User-agent: *",

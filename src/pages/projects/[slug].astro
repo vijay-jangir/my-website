@@ -98,6 +98,54 @@ function getRelatedProjects(sourceProject?: ProjectDefinition) {
 const relatedProjects = getRelatedProjects(project);
 const publicProof = project?.publicProof;
 const publicScopeText = caseStudy?.confidentiality;
+const projectPageUrl = project
+  ? new URL(`/projects/${project.slug}`, Astro.site ?? Astro.url).toString()
+  : null;
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      item: new URL("/", Astro.site ?? Astro.url).toString(),
+      name: "Home",
+      position: 1,
+    },
+    {
+      "@type": "ListItem",
+      item: new URL("/projects", Astro.site ?? Astro.url).toString(),
+      name: "Projects",
+      position: 2,
+    },
+    ...(project && projectPageUrl
+      ? [
+          {
+            "@type": "ListItem",
+            item: projectPageUrl,
+            name: project.title,
+            position: 3,
+          },
+        ]
+      : []),
+  ],
+});
+
+const projectJsonLd =
+  project && projectPageUrl
+    ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        abstract: description,
+        author: {
+          "@type": "Person",
+          name: content.siteProfile.name,
+          url: new URL("/", Astro.site ?? Astro.url).toString(),
+        },
+        headline: project.title,
+        mainEntityOfPage: projectPageUrl,
+        ...(caseStudy?.timeframe ? { dateCreated: caseStudy.timeframe } : {}),
+      })
+    : null;
 ---
 
 <BaseLayout
@@ -105,6 +153,12 @@ const publicScopeText = caseStudy?.confidentiality;
   siteProfile={content.siteProfile}
   title={project ? `${project.title} | Vijay Jangir` : "Project | Vijay Jangir"}
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
+  {
+    projectJsonLd ? (
+      <script is:inline set:html={projectJsonLd} type="application/ld+json" />
+    ) : null
+  }
   <main class="space-y-10 pb-4">
     {
       project ? (

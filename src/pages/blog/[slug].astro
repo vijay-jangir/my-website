@@ -25,6 +25,56 @@ const sourceUrl = post ? getWixBlogSourceUrl(post) : null;
 const publishedLabel = formatDate(post?.firstPublishedDate);
 const updatedLabel = formatDate(post?.lastPublishedDate);
 const fallbackCopy = getFallbackCopy(lookup.status, slug);
+const pageUrl = new URL(
+  `/blog/${encodeURIComponent(slug)}`,
+  Astro.site ?? Astro.url,
+).toString();
+
+const articleJsonLd = post
+  ? JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      author: {
+        "@type": "Person",
+        name: content.siteProfile.name,
+        url: new URL("/", Astro.site ?? Astro.url).toString(),
+      },
+      dateModified: post.lastPublishedDate ?? post.firstPublishedDate,
+      datePublished: post.firstPublishedDate,
+      description,
+      headline: post.title,
+      mainEntityOfPage: pageUrl,
+    })
+  : null;
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      item: new URL("/", Astro.site ?? Astro.url).toString(),
+      name: "Home",
+      position: 1,
+    },
+    {
+      "@type": "ListItem",
+      item: new URL("/blog", Astro.site ?? Astro.url).toString(),
+      name: "Blog",
+      position: 2,
+    },
+    ...(post
+      ? [
+          {
+            "@type": "ListItem",
+            item: pageUrl,
+            name: post.title,
+            position: 3,
+          },
+        ]
+      : []),
+  ],
+});
 
 Astro.response.headers.set(
   "Cache-Control",
@@ -67,9 +117,16 @@ function getFallbackCopy(status: typeof lookup.status, requestedSlug: string) {
 
 <BaseLayout
   description={description}
+  ogType={post ? "article" : "website"}
   siteProfile={content.siteProfile}
   title={post ? `${post.title} | Vijay Jangir` : "Blog post | Vijay Jangir"}
 >
+  {
+    articleJsonLd ? (
+      <script is:inline set:html={articleJsonLd} type="application/ld+json" />
+    ) : null
+  }
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
   <main class="space-y-10 pb-4">
     <section
       class="rounded-[2.6rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-10 sm:py-10"

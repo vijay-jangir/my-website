@@ -1,26 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSitemapRoutes } from "@/src/pages/sitemap.xml";
+import { buildSitemapEntries } from "@/src/pages/sitemap.xml";
 
-describe("buildSitemapRoutes", () => {
+describe("buildSitemapEntries", () => {
   it("includes local blog detail routes when Wix slugs are available", () => {
-    expect(
-      buildSitemapRoutes([
-        {
-          slug: "astro-caching-notes",
-          url: {
-            base: "https://example.com",
-            path: "/blog/post/astro-caching-notes",
-          },
+    const entries = buildSitemapEntries([
+      {
+        slug: "astro-caching-notes",
+        url: {
+          base: "https://example.com",
+          path: "/blog/post/astro-caching-notes",
         },
-        {
-          url: {
-            base: "https://example.com",
-            path: "/blog/post/platform-review",
-          },
+      },
+      {
+        url: {
+          base: "https://example.com",
+          path: "/blog/post/platform-review",
         },
-      ]),
-    ).toEqual(
+      },
+    ]);
+
+    expect(entries.map((entry) => entry.loc)).toEqual(
       expect.arrayContaining([
         "/",
         "/projects",
@@ -33,17 +33,19 @@ describe("buildSitemapRoutes", () => {
   });
 
   it("excludes redirected public routes", () => {
-    expect(buildSitemapRoutes()).not.toContain("/work");
-  });
-
-  it("includes public project detail routes", () => {
-    expect(buildSitemapRoutes([], ["portfolio-website"])).toEqual(
-      expect.arrayContaining(["/projects/portfolio-website"]),
+    expect(buildSitemapEntries().map((entry) => entry.loc)).not.toContain(
+      "/work",
     );
   });
 
+  it("includes public project detail routes", () => {
+    expect(
+      buildSitemapEntries([], ["portfolio-website"]).map((entry) => entry.loc),
+    ).toEqual(expect.arrayContaining(["/projects/portfolio-website"]));
+  });
+
   it("deduplicates repeated routes", () => {
-    const routes = buildSitemapRoutes([
+    const entries = buildSitemapEntries([
       {
         slug: "astro-caching-notes",
         url: {
@@ -60,7 +62,46 @@ describe("buildSitemapRoutes", () => {
     ]);
 
     expect(
-      routes.filter((route) => route === "/blog/astro-caching-notes"),
+      entries.filter((entry) => entry.loc === "/blog/astro-caching-notes"),
     ).toHaveLength(1);
+  });
+
+  it("attaches lastmod from the most recent publish date", () => {
+    const entries = buildSitemapEntries([
+      {
+        slug: "astro-caching-notes",
+        firstPublishedDate: "2024-01-01T00:00:00.000Z",
+        lastPublishedDate: "2025-03-15T10:30:00.000Z",
+        url: {
+          base: "https://example.com",
+          path: "/blog/post/astro-caching-notes",
+        },
+      },
+    ]);
+
+    const blogEntry = entries.find(
+      (entry) => entry.loc === "/blog/astro-caching-notes",
+    );
+
+    expect(blogEntry?.lastmod).toBe(
+      new Date("2025-03-15T10:30:00.000Z").toISOString(),
+    );
+  });
+
+  it("omits lastmod when no publish dates exist", () => {
+    const entries = buildSitemapEntries([
+      {
+        url: {
+          base: "https://example.com",
+          path: "/blog/post/platform-review",
+        },
+      },
+    ]);
+
+    const blogEntry = entries.find(
+      (entry) => entry.loc === "/blog/platform-review",
+    );
+
+    expect(blogEntry?.lastmod).toBeUndefined();
   });
 });

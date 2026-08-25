@@ -28,7 +28,7 @@
 
 ## Content Added
 
-- New case study: `enterprise-text-to-sql-agent` — full discovery-to-delivery narrative covering RASL-based schema linking (arXiv:2507.23104), Trino as governed execution boundary, LangGraph subgraphs/tool nodes, MCP servers, Langfuse tracing, Open WebUI delivery. Qualitative scale only; owner to refine specifics.
+- Expanded the `governed-conversational-data-platform` case study with the text-to-SQL journey: RASL-based schema linking (arXiv:2507.23104), discovery framing of why text-to-SQL fails, pre-execution SQL validation, purpose-scoped MCP servers, and evaluation loops. Qualitative scale only; owner to refine specifics. (A standalone duplicate project was merged into this entry after owner review.)
 
 ## Validation Gap
 

@@ -144,7 +144,7 @@
 - JD alias matching uses lookaround boundaries so `C++`/`C#`-style aliases match; regression tests added.
 - Removed fake blog category filter; homepage mobile pitch and featured lineup now derive from snapshot data.
 - SEO: `/rss.xml` + autodiscovery, sitemap lastmod for posts, Article/Breadcrumb/CreativeWork JSON-LD, `og:type=article`, dedicated 404 page, `favicon.ico/png` naming, apex-host consistency, security headers in `vercel.json`.
-- Content: added `enterprise-text-to-sql-agent` case study (RASL schema linking per arXiv:2507.23104, Trino governed execution, LangGraph subgraphs, MCP servers, Langfuse, Open WebUI); added MCP skill entry.
+- Content: expanded `governed-conversational-data-platform` with the text-to-SQL journey (RASL schema linking per arXiv:2507.23104, governed execution framing, MCP servers, evaluation loops); added MCP skill entry. A standalone text-to-SQL project draft was merged into this entry after owner review.
 - Docs: rewrote AGENTS.md for Astro reality; replaced stale site-review.md with findings + disposition.
 
 ### Validation

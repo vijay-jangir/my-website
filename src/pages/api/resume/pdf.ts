@@ -35,10 +35,15 @@ export const GET: APIRoute = async ({ url }) => {
     }) as React.ReactElement,
   );
 
+  const headers = new Headers({
+    "Content-Disposition": 'attachment; filename="Vijay_Jangir_Resume.pdf"',
+    "Content-Type": "application/pdf",
+    "Cache-Control": storedVariant
+      ? "private, no-store"
+      : "public, max-age=3600, s-maxage=86400",
+  });
+
   return new Response(new Uint8Array(pdfBuffer), {
-    headers: {
-      "Content-Disposition": 'attachment; filename="Vijay_Jangir_Resume.pdf"',
-      "Content-Type": "application/pdf",
-    },
+    headers,
   });
 };

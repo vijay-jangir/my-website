@@ -58,11 +58,7 @@ describe("wix blog helpers", () => {
 
     const [requestUrl, requestInit] = fetchMock.mock.calls[0] as [
       string,
-      RequestInit & {
-        next?: {
-          revalidate?: number;
-        };
-      },
+      RequestInit,
     ];
 
     expect(requestUrl).toContain(
@@ -70,8 +66,15 @@ describe("wix blog helpers", () => {
     );
     const requestParams = new URL(requestUrl).searchParams;
     expect(requestParams.getAll("fieldsets")).toEqual(["URL", "CONTENT_TEXT"]);
-    expect(requestInit.cache).toBe("force-cache");
-    expect(requestInit.next?.revalidate).toBe(1800);
+    // Astro/Vercel functions ignore Next.js fetch cache options; caching is
+    // handled by response headers instead. Requests must carry a timeout.
+    expect(
+      "cache" in requestInit ? requestInit.cache : undefined,
+    ).toBeUndefined();
+    expect(
+      "next" in requestInit ? requestInit.next : undefined,
+    ).toBeUndefined();
+    expect(requestInit.signal).toBeInstanceOf(AbortSignal);
     expect((requestInit.headers as Headers).get("Authorization")).toBe(
       "test-key",
     );

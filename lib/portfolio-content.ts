@@ -111,7 +111,11 @@ async function loadAstroDbModule() {
   try {
     astroDbModulePromise ??= import("astro:db");
     return await astroDbModulePromise;
-  } catch {
+  } catch (error) {
+    // Reset so a transient import failure is retried on the next call
+    // instead of poisoning the cached promise for the lifetime of the isolate.
+    astroDbModulePromise = null;
+    console.warn("[portfolio-content] astro:db unavailable:", error);
     return null;
   }
 }
@@ -498,7 +502,8 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
     };
 
     return snapshot;
-  } catch {
+  } catch (error) {
+    console.warn("[portfolio-content] Astro DB load failed:", error);
     return null;
   }
 }

@@ -42,7 +42,8 @@ export async function saveResumeVariant(options: {
     );
 
     return result?.rows[0] ?? null;
-  } catch {
+  } catch (error) {
+    console.warn("[resume-store] failed to save resume variant:", error);
     return null;
   }
 }
@@ -74,7 +75,8 @@ export async function getResumeVariantByToken(
       analysis: row.analysis ?? undefined,
       createdAt: row.created_at,
     };
-  } catch {
+  } catch (error) {
+    console.warn("[resume-store] failed to load resume variant:", error);
     return null;
   }
 }

@@ -1,8 +1,10 @@
 ---
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import BlogCard from "@/src/components/BlogCard.astro";
-import { getWixBlogsResult } from "@/src/lib/wix";
+import { getWixBlogsResult, PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 import { getPortfolioContent } from "@/lib/portfolio-content";
+
+Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
 const blogResult = await getWixBlogsResult();
 const posts = blogResult.posts;

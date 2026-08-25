@@ -9,6 +9,9 @@ import { getResumeVariantByToken } from "@/lib/resume-store";
 import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
 import FocusPills from "@/src/components/FocusPills.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
+
+Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
 const content = await getPortfolioContent();
 const focusIds = parseFocusIdsInContent(

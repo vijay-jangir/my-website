@@ -1,7 +1,7 @@
 import { env } from "@/lib/env";
 
 const WIX_POSTS_API_URL = "https://www.wixapis.com/v3/posts";
-const WIX_BLOG_REVALIDATE_SECONDS = 60 * 30;
+const WIX_FETCH_TIMEOUT_MS = 8000;
 
 export type WixBlogPost = {
   id: string;
@@ -24,12 +24,6 @@ type WixPostsResponse = {
 
 type WixPostResponse = {
   post?: WixBlogPost;
-};
-
-type WixRequestInit = RequestInit & {
-  next?: {
-    revalidate?: number;
-  };
 };
 
 type WixFetchResult<T> =
@@ -62,6 +56,8 @@ export type WixBlogPostLookupResult =
 
 export const WIX_BLOG_DETAIL_CACHE_CONTROL =
   "public, s-maxage=1800, stale-while-revalidate=86400";
+export const PORTFOLIO_PAGE_CACHE_CONTROL =
+  "public, s-maxage=600, stale-while-revalidate=86400";
 const WIX_BLOG_DETAIL_FIELDSETS = new URLSearchParams([
   ["fieldsets", "URL"],
   ["fieldsets", "CONTENT_TEXT"],
@@ -71,7 +67,7 @@ function hasWixBlogCredentials() {
   return Boolean(env.wixApiKey);
 }
 
-function buildWixRequestInit(init: WixRequestInit = {}): WixRequestInit {
+function buildWixRequestInit(init: RequestInit = {}): RequestInit {
   const headers = new Headers(init.headers);
 
   headers.set("Authorization", env.wixApiKey ?? "");
@@ -79,19 +75,15 @@ function buildWixRequestInit(init: WixRequestInit = {}): WixRequestInit {
   headers.set("Content-Type", "application/json");
 
   return {
-    cache: "force-cache",
     ...init,
     headers,
-    next: {
-      revalidate: WIX_BLOG_REVALIDATE_SECONDS,
-      ...init.next,
-    },
+    signal: AbortSignal.timeout(WIX_FETCH_TIMEOUT_MS),
   };
 }
 
 async function wixFetch<T>(
   path: string,
-  init?: WixRequestInit,
+  init?: RequestInit,
 ): Promise<WixFetchResult<T>> {
   if (!hasWixBlogCredentials()) {
     return { status: "missing_credentials" };

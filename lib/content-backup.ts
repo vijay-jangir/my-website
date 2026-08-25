@@ -158,6 +158,7 @@ export async function loadBackupSnapshot(): Promise<PortfolioSnapshot | null> {
       headers: {
         Accept: "application/json",
       },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!response.ok) {
@@ -165,7 +166,8 @@ export async function loadBackupSnapshot(): Promise<PortfolioSnapshot | null> {
     }
 
     return (await response.json()) as PortfolioSnapshot;
-  } catch {
+  } catch (error) {
+    console.warn("[content-backup] fallback snapshot fetch failed:", error);
     return null;
   }
 }

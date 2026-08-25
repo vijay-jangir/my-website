@@ -11,10 +11,6 @@ export const env = {
   databaseUrl: readEnv("DATABASE_URL"),
   wixApiKey: readEnv("WIX_API_KEY"),
   wixSiteId: readEnv("WIX_SITE_ID") ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
-  resendApiKey: readEnv("RESEND_API_KEY"),
-  resendFrom:
-    readEnv("RESEND_FROM") ?? "My Website Contact Form <onboarding@resend.dev>",
-  contactToEmail: readEnv("CONTACT_TO_EMAIL") ?? "contact@vijayjangir.com",
   sessionSecret: readEnv("SESSION_SECRET") ?? readEnv("NEXTAUTH_SECRET"),
   nextAuthSecret: readEnv("NEXTAUTH_SECRET"),
   githubId: readEnv("GITHUB_ID"),
@@ -27,9 +23,6 @@ export const env = {
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean),
-  turnstileSiteKey: readEnv("TURNSTILE_SITE_KEY"),
-  turnstileSecretKey: readEnv("TURNSTILE_SECRET_KEY"),
-  cronSecret: readEnv("CRON_SECRET"),
   contentBackupRepo: readEnv("CONTENT_BACKUP_REPO"),
   contentBackupBranch: readEnv("CONTENT_BACKUP_BRANCH") ?? "content-backup",
   contentBackupPat: readEnv("CONTENT_BACKUP_PAT"),
@@ -37,9 +30,6 @@ export const env = {
     readEnv("CONTENT_HISTORY_LIMIT") ?? "10",
     10,
   ),
-  openAiApiKey: readEnv("OPENAI_API_KEY"),
-  openClawBaseUrl: readEnv("OPENCLAW_BASE_URL"),
-  openClawToken: readEnv("OPENCLAW_TOKEN"),
 };
 
 export function isDatabaseConfigured() {
@@ -60,10 +50,6 @@ export function getContentHistoryLimit() {
     : 10;
 }
 
-export function isTurnstileConfigured() {
-  return Boolean(env.turnstileSiteKey && env.turnstileSecretKey);
-}
-
 export function isAuthConfigured() {
   return Boolean(
     env.sessionSecret &&
@@ -71,8 +57,4 @@ export function isAuthConfigured() {
     env.githubSecret &&
     env.adminGithubLogins.length > 0,
   );
-}
-
-export function isEmailConfigured() {
-  return Boolean(env.resendApiKey && env.contactToEmail);
 }

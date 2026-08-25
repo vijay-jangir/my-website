@@ -70,17 +70,6 @@ Database-backed variant storage:
 
 - `DATABASE_URL`
 
-Optional extras:
-
-- `RESEND_API_KEY`
-- `RESEND_FROM`
-- `CONTACT_TO_EMAIL`
-- `TURNSTILE_SITE_KEY`
-- `TURNSTILE_SECRET_KEY`
-- `OPENAI_API_KEY`
-- `OPENCLAW_BASE_URL`
-- `OPENCLAW_TOKEN`
-
 ## Commands
 
 ```bash

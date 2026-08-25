@@ -29,7 +29,6 @@ const metaParts = [publishedLabel, readTimeLabel].filter(Boolean);
 <a
   class="block rounded-[1.75rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl transition hover:-translate-y-1"
   data-blog-card
-  data-blog-category="data engineering"
   data-blog-excerpt={post.excerpt.toLowerCase()}
   data-blog-title={post.title.toLowerCase()}
   href={href}
@@ -39,7 +38,7 @@ const metaParts = [publishedLabel, readTimeLabel].filter(Boolean);
   <p
     class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
   >
-    Data engineering
+    Technical note
   </p>
   {
     metaParts.length > 0 && (

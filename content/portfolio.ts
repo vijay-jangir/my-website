@@ -1052,6 +1052,143 @@ export const projects: readonly ProjectDefinition[] = [
     },
   },
   {
+    id: "telecom-network-datalake",
+    slug: "telecom-network-datalake",
+    title: "Telecom network data lake",
+    summary:
+      "Designed and implemented data lake and warehouse foundations for mobile tower network events at petabyte scale and roughly five trillion events per day.",
+    impact:
+      "Created the analytics foundation for network data products, reporting, and large-scale downstream consumption.",
+    detail:
+      "Worked across ingestion, storage, multi-level aggregation, processing, and operational concerns for very large mobile tower network-event datasets.",
+    skillIds: [
+      "flink",
+      "kafka",
+      "java",
+      "elastic-stack",
+      "influx",
+      "airflow",
+      "iceberg",
+      "hudi",
+    ],
+    focusWeights: {
+      general: 1,
+      "backend-engineering": 0.4,
+      "platform-engineering": 0.8,
+      "data-platform": 1,
+      flink: 0.8,
+      kafka: 0.8,
+    },
+    featured: true,
+    visibility: "public",
+    proofLinks: [],
+    publicProof: {
+      proofTypes: ["private-enterprise", "sanitized-diagram", "metric"],
+      architectureShape: [
+        "Mobile tower network events enter ingestion paths through streaming and batch movement.",
+        "Flink and Java services process high-volume streams and derived datasets.",
+        "Multi-level aggregation paths reduce raw tower-event volume into analytical outputs before downstream consumers use the data.",
+        "Data lake table-format experience includes Iceberg/Hudi-style foundations for large analytical datasets.",
+        "Airflow, Elastic Stack, and Influx support orchestration and operational visibility.",
+      ],
+      scaleSignals: [
+        {
+          label: "Event scale",
+          value: "~5T events/day",
+          detail:
+            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
+        },
+        {
+          label: "Data scale",
+          value: "Petabyte-scale",
+          detail:
+            "Shareable description stays at scale category level and avoids internal capacity details.",
+        },
+      ],
+      responsibilities: [
+        "Designed and implemented ingestion, processing, storage, and reliability pieces.",
+        "Worked across pipeline boundaries needed for downstream reporting and data products.",
+        "Kept network topology and operational thresholds confidential.",
+      ],
+      constraints: [
+        "Network topology, tower identifiers, vendor details, and operational thresholds are confidential.",
+        "Site notes present scale as rounded signals only.",
+      ],
+      artifacts: [
+        {
+          label: "High-level telecom data lake shape",
+          type: "sanitized-diagram",
+          detail:
+            "Can be shown as ingestion, streaming, storage, orchestration, observability, and downstream consumption layers.",
+        },
+        {
+          label: "Scale signal",
+          type: "metric",
+          detail:
+            "About five trillion events per day and petabyte-scale are acceptable shareable indicators without internal topology.",
+        },
+      ],
+      confidentialityNotes: [
+        "Not shown here: network topology, dataset names, exact retention policies, service-level thresholds, and internal platform names.",
+      ],
+    },
+    caseStudy: {
+      headline:
+        "Petabyte-scale network data lake and multi-level analytics for mobile tower events.",
+      context:
+        "Network data from mobile towers needed an analytics foundation that could support reporting, downstream data products, and very high event volume.",
+      role: "Designed and implemented large-scale ingestion, storage, processing, and operational pieces.",
+      timeframe: "Airtel Digital, 2021-present",
+      organization: "Airtel Digital",
+      team: "Telecom data platform and analytics stakeholders",
+      confidentiality:
+        "This case study excludes network topology, internal platform names, and operational thresholds.",
+      metrics: [
+        {
+          label: "Event scale",
+          value: "~5T events/day",
+          detail:
+            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
+        },
+        {
+          label: "Data scale",
+          value: "Petabyte-scale",
+          detail:
+            "The system supported very large telecom datasets across ingestion, storage, and downstream consumption.",
+        },
+      ],
+      architecture: [
+        "Streaming and batch ingestion paths moved mobile tower network events across the platform.",
+        "Flink and Java supported streaming and processing workloads.",
+        "Multi-level aggregation paths reduced raw tower-event volume into analytical outputs.",
+        "Table-format experience around Iceberg and Hudi supported the broader data lake skill set.",
+        "Airflow, Elastic Stack, and Influx supported orchestration and operational visibility.",
+      ],
+      responsibilities: [
+        "Designed data flows for very high-volume mobile tower network events.",
+        "Worked on petabyte-scale tower-event data and multi-level aggregation paths.",
+        "Implemented platform pieces across ingestion, processing, and operational reliability.",
+        "Created a foundation for downstream reporting and data product consumption.",
+      ],
+      decisions: [
+        {
+          label: "Treat operations as a first-class requirement",
+          detail:
+            "At this scale, pipeline correctness and visibility mattered as much as raw throughput.",
+        },
+        {
+          label: "Separate ingestion, processing, and consumption concerns",
+          detail:
+            "Clear system boundaries helped the platform support downstream analytics and products.",
+        },
+      ],
+      lessons: [
+        "Large data systems fail at the boundaries unless ownership and observability are explicit.",
+        "Scale claims are only useful when tied to the operational systems that made them sustainable.",
+      ],
+    },
+  },
+  {
     id: "hive-metastore-sync-governance",
     slug: "hive-metastore-sync-governance",
     title: "Hive metastore synchronization and metadata governance",
@@ -2470,143 +2607,6 @@ export const projects: readonly ProjectDefinition[] = [
       lessons: [
         "Real-time location products are as much about signal quality and timing as they are about geospatial math.",
         "A useful proximity system needs clear event boundaries, reference data ownership, and operational visibility from the start.",
-      ],
-    },
-  },
-  {
-    id: "telecom-network-datalake",
-    slug: "telecom-network-datalake",
-    title: "Telecom network data lake",
-    summary:
-      "Designed and implemented data lake and warehouse foundations for mobile tower network events at petabyte scale and roughly five trillion events per day.",
-    impact:
-      "Created the analytics foundation for network data products, reporting, and large-scale downstream consumption.",
-    detail:
-      "Worked across ingestion, storage, multi-level aggregation, processing, and operational concerns for very large mobile tower network-event datasets.",
-    skillIds: [
-      "flink",
-      "kafka",
-      "java",
-      "elastic-stack",
-      "influx",
-      "airflow",
-      "iceberg",
-      "hudi",
-    ],
-    focusWeights: {
-      general: 1,
-      "backend-engineering": 0.4,
-      "platform-engineering": 0.8,
-      "data-platform": 1,
-      flink: 0.8,
-      kafka: 0.8,
-    },
-    featured: true,
-    visibility: "public",
-    proofLinks: [],
-    publicProof: {
-      proofTypes: ["private-enterprise", "sanitized-diagram", "metric"],
-      architectureShape: [
-        "Mobile tower network events enter ingestion paths through streaming and batch movement.",
-        "Flink and Java services process high-volume streams and derived datasets.",
-        "Multi-level aggregation paths reduce raw tower-event volume into analytical outputs before downstream consumers use the data.",
-        "Data lake table-format experience includes Iceberg/Hudi-style foundations for large analytical datasets.",
-        "Airflow, Elastic Stack, and Influx support orchestration and operational visibility.",
-      ],
-      scaleSignals: [
-        {
-          label: "Event scale",
-          value: "~5T events/day",
-          detail:
-            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
-        },
-        {
-          label: "Data scale",
-          value: "Petabyte-scale",
-          detail:
-            "Shareable description stays at scale category level and avoids internal capacity details.",
-        },
-      ],
-      responsibilities: [
-        "Designed and implemented ingestion, processing, storage, and reliability pieces.",
-        "Worked across pipeline boundaries needed for downstream reporting and data products.",
-        "Kept network topology and operational thresholds confidential.",
-      ],
-      constraints: [
-        "Network topology, tower identifiers, vendor details, and operational thresholds are confidential.",
-        "Site notes present scale as rounded signals only.",
-      ],
-      artifacts: [
-        {
-          label: "High-level telecom data lake shape",
-          type: "sanitized-diagram",
-          detail:
-            "Can be shown as ingestion, streaming, storage, orchestration, observability, and downstream consumption layers.",
-        },
-        {
-          label: "Scale signal",
-          type: "metric",
-          detail:
-            "About five trillion events per day and petabyte-scale are acceptable shareable indicators without internal topology.",
-        },
-      ],
-      confidentialityNotes: [
-        "Not shown here: network topology, dataset names, exact retention policies, service-level thresholds, and internal platform names.",
-      ],
-    },
-    caseStudy: {
-      headline:
-        "Petabyte-scale network data lake and multi-level analytics for mobile tower events.",
-      context:
-        "Network data from mobile towers needed an analytics foundation that could support reporting, downstream data products, and very high event volume.",
-      role: "Designed and implemented large-scale ingestion, storage, processing, and operational pieces.",
-      timeframe: "Airtel Digital, 2021-present",
-      organization: "Airtel Digital",
-      team: "Telecom data platform and analytics stakeholders",
-      confidentiality:
-        "This case study excludes network topology, internal platform names, and operational thresholds.",
-      metrics: [
-        {
-          label: "Event scale",
-          value: "~5T events/day",
-          detail:
-            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
-        },
-        {
-          label: "Data scale",
-          value: "Petabyte-scale",
-          detail:
-            "The system supported very large telecom datasets across ingestion, storage, and downstream consumption.",
-        },
-      ],
-      architecture: [
-        "Streaming and batch ingestion paths moved mobile tower network events across the platform.",
-        "Flink and Java supported streaming and processing workloads.",
-        "Multi-level aggregation paths reduced raw tower-event volume into analytical outputs.",
-        "Table-format experience around Iceberg and Hudi supported the broader data lake skill set.",
-        "Airflow, Elastic Stack, and Influx supported orchestration and operational visibility.",
-      ],
-      responsibilities: [
-        "Designed data flows for very high-volume mobile tower network events.",
-        "Worked on petabyte-scale tower-event data and multi-level aggregation paths.",
-        "Implemented platform pieces across ingestion, processing, and operational reliability.",
-        "Created a foundation for downstream reporting and data product consumption.",
-      ],
-      decisions: [
-        {
-          label: "Treat operations as a first-class requirement",
-          detail:
-            "At this scale, pipeline correctness and visibility mattered as much as raw throughput.",
-        },
-        {
-          label: "Separate ingestion, processing, and consumption concerns",
-          detail:
-            "Clear system boundaries helped the platform support downstream analytics and products.",
-        },
-      ],
-      lessons: [
-        "Large data systems fail at the boundaries unless ownership and observability are explicit.",
-        "Scale claims are only useful when tied to the operational systems that made them sustainable.",
       ],
     },
   },

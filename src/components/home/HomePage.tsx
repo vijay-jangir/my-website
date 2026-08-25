@@ -151,11 +151,10 @@ export default function HomePage({
               {siteProfile.heroLabel}
             </motion.h1>
             <motion.p
-              className="mx-auto mt-6 max-w-[21rem] text-center text-lg leading-8 text-slate-600 sm:hidden"
+              className="mx-auto mt-6 line-clamp-4 max-w-[21rem] text-center text-lg leading-8 text-slate-600 sm:hidden"
               variants={riseVariants}
             >
-              10+ years building governed data platforms, enterprise AI,
-              orchestration, access governance, and network analytics systems.
+              {siteProfile.recruiterPitch}
             </motion.p>
             <motion.p
               className="mx-auto mt-8 hidden max-w-3xl text-xl leading-9 text-slate-600 sm:block"

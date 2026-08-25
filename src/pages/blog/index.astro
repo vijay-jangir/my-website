@@ -125,33 +125,8 @@ const emptyStateCopy =
         </section>
       ) : (
         <section class="space-y-5">
-          <div class="flex flex-col gap-4 rounded-[1.8rem] border border-white/70 bg-white/70 p-4 shadow-[0_18px_54px_rgba(31,44,75,0.05)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
-            <div
-              aria-label="Blog categories"
-              class="flex flex-wrap gap-2"
-              role="group"
-            >
-              <button
-                aria-pressed="true"
-                class="rounded-full border border-[#101827] bg-[#101827] px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                data-active="true"
-                data-blog-filter="all"
-                type="button"
-              >
-                All posts
-              </button>
-              <button
-                aria-pressed="false"
-                class="rounded-full border border-slate-200 bg-white/85 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
-                data-active="false"
-                data-blog-filter="data engineering"
-                type="button"
-              >
-                Data engineering
-              </button>
-            </div>
-
-            <label class="min-w-0 flex-1 sm:max-w-xs">
+          <div class="flex flex-col gap-4 rounded-[1.8rem] border border-white/70 bg-white/70 p-4 shadow-[0_18px_54px_rgba(31,44,75,0.05)] backdrop-blur-xl sm:flex-row sm:items-center">
+            <label class="min-w-0 flex-1">
               <span class="sr-only">Search blog posts</span>
               <input
                 class="w-full rounded-full border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium text-[#0e1528] outline-none transition placeholder:text-slate-400 focus:border-[#1f3b73] focus:ring-4 focus:ring-[#1f3b73]/10"
@@ -183,24 +158,8 @@ const emptyStateCopy =
 <script>
   // @ts-nocheck
   const searchInput = document.querySelector("[data-blog-search]");
-  const filterButtons = Array.from(
-    document.querySelectorAll("[data-blog-filter]"),
-  );
   const blogCards = Array.from(document.querySelectorAll("[data-blog-card]"));
   const emptyState = document.querySelector("[data-blog-empty]");
-
-  let activeFilter = "all";
-
-  function setButtonState(button, isActive) {
-    button.setAttribute("aria-pressed", String(isActive));
-    button.dataset.active = String(isActive);
-    button.classList.toggle("border-[#101827]", isActive);
-    button.classList.toggle("bg-[#101827]", isActive);
-    button.classList.toggle("text-white", isActive);
-    button.classList.toggle("border-slate-200", !isActive);
-    button.classList.toggle("bg-white/85", !isActive);
-    button.classList.toggle("text-[#0e1528]", !isActive);
-  }
 
   function applyBlogFilters() {
     const query = searchInput?.value.trim().toLowerCase() ?? "";
@@ -209,28 +168,16 @@ const emptyStateCopy =
     blogCards.forEach((card) => {
       const title = card.getAttribute("data-blog-title") ?? "";
       const excerpt = card.getAttribute("data-blog-excerpt") ?? "";
-      const category = card.getAttribute("data-blog-category") ?? "";
-      const matchesCategory =
-        activeFilter === "all" || category.includes(activeFilter);
       const matchesQuery = !query || `${title} ${excerpt}`.includes(query);
-      const isVisible = matchesCategory && matchesQuery;
 
-      card.classList.toggle("hidden", !isVisible);
-      if (isVisible) {
+      card.classList.toggle("hidden", !matchesQuery);
+      if (matchesQuery) {
         visibleCount += 1;
       }
     });
 
     emptyState?.classList.toggle("hidden", visibleCount > 0);
   }
-
-  filterButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      activeFilter = button.getAttribute("data-blog-filter") ?? "all";
-      filterButtons.forEach((item) => setButtonState(item, item === button));
-      applyBlogFilters();
-    });
-  });
 
   searchInput?.addEventListener("input", applyBlogFilters);
 </script>

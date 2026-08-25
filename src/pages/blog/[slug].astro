@@ -44,9 +44,25 @@ const articleJsonLd = post
       datePublished: post.firstPublishedDate,
       description,
       headline: post.title,
+      image: new URL("/og-preview.jpg", Astro.site ?? Astro.url).toString(),
       mainEntityOfPage: pageUrl,
     })
   : null;
+
+const articleMetas = post
+  ? [
+      {
+        content: toIsoDate(post.firstPublishedDate),
+        property: "article:published_time",
+      },
+      {
+        content: toIsoDate(post.lastPublishedDate ?? post.firstPublishedDate),
+        property: "article:modified_time",
+      },
+    ].filter((meta): meta is { content: string; property: string } =>
+      Boolean(meta.content),
+    )
+  : [];
 
 const breadcrumbJsonLd = JSON.stringify(
   buildBreadcrumbJsonLd({
@@ -86,6 +102,16 @@ function formatDate(value?: string) {
   });
 }
 
+function toIsoDate(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
 function getFallbackCopy(status: typeof lookup.status, requestedSlug: string) {
   switch (status) {
     case "missing_credentials":
@@ -112,6 +138,15 @@ function getFallbackCopy(status: typeof lookup.status, requestedSlug: string) {
     ) : null
   }
   <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
+  {
+    articleMetas.length > 0 ? (
+      <Fragment slot="head">
+        {articleMetas.map((meta) => (
+          <meta content={meta.content} property={meta.property} />
+        ))}
+      </Fragment>
+    ) : null
+  }
   <main class="space-y-10 pb-4">
     <section
       class="rounded-[2.6rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-10 sm:py-10"

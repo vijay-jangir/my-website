@@ -110,6 +110,7 @@ const pathname = Astro.url.pathname;
     <meta content={socialImageAlt} name="twitter:image:alt" />
     <link href={canonicalUrl} rel="canonical" />
     <script is:inline set:html={personJsonLd} type="application/ld+json" />
+    <slot name="head" />
     <title>{title}</title>
   </head>
   <body

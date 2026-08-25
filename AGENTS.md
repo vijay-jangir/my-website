@@ -2,50 +2,47 @@
 
 ## Mission
 
-Improve Vijay Jangir's personal website without introducing paid infrastructure.
-
-This repo is a Next.js portfolio deployed on Vercel, with blog content currently sourced from Wix and contact handled through Resend. Future work should keep the site compatible with free Vercel hosting and avoid adding infrastructure that requires a paid database, queue, worker, or always-on backend.
+Keep vijayjangir.com a fast, honest, SEO-strong portfolio and resume generator without introducing paid infrastructure.
 
 ## Read First
 
-1. `docs/site-review.md`
-2. `docs/implementation-plan.md`
+1. `docs/site-review.md` (current review + disposition)
+2. `docs/implementation-plan.md` (migration history)
 3. `README.md`
 
 ## Current Architecture
 
-- `/` is a single-page portfolio with hero, about, projects, skills, experience, and contact sections.
-- `/blog` fetches a Wix post list and renders summary cards that currently link out to the Wix-hosted post URLs.
-- Contact form submission uses a Next.js server action and Resend.
-- Most portfolio content is hardcoded in `lib/data.ts`.
+This is an **Astro 6** app deployed to Vercel in server mode. The legacy Next.js app is quarantined under `legacy-next/` and must not be imported.
+
+- Public routes: `/`, `/projects`, `/projects/[slug]`, `/resume`, `/blog`, `/blog/[slug]`, plus `/rss.xml`, `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/404`.
+- Private routes: `/admin`, `/admin/content`, `/assistant` (noindex; GitHub allowlist auth via `src/lib/auth.ts`, arctic OAuth + jose JWT session cookies).
+- Content pipeline: Astro DB (`db/config.ts`) → GitHub backup (`lib/content-backup.ts`) → bundled fallback (`content/portfolio.ts`). Loader with fallback chain lives in `lib/portfolio-content.ts`.
+- Focus engine + resume variants: `lib/portfolio.ts`; deterministic JD parser: `lib/jd.ts`. Both operate on any snapshot via the `*FromContent` / `*InContent` variants.
+- Admin mutations: Astro Actions in `src/actions/index.ts`; every publish writes a GitHub backup snapshot before rewriting Astro DB tables.
+- PDF export: `src/pages/api/resume/pdf.ts` renders `AtsResumeDocument` (Helvetica-only, ATS-safe).
+- Blog: Wix API via `src/lib/wix.ts`; posts render locally at `/blog/[slug]`.
 
 ## Non-Negotiables
 
-- Keep deployment compatible with Vercel Hobby.
-- Treat Wix as the current blog source of truth unless the user explicitly wants to replace it.
-- Prefer static or cached server rendering over highly dynamic per-request work.
-- Do not add paid SaaS dependencies when a free option or built-in Next.js capability is sufficient.
-- Preserve the current simple editing flow: portfolio content in-repo, blog authoring in Wix.
+- Keep deployment compatible with free Vercel Hobby hosting.
+- Keep Wix as the blog authoring source unless there is an explicit product decision to replace it.
+- Prefer cached server rendering: public SSR pages carry `Cache-Control: s-maxage` headers so admin publishes appear within minutes without redeploys. Do not trade this away for build-time prerender on content pages.
+- No paid SaaS dependencies when a free option or built-in Next/Astro capability suffices. Contact is mailto-only by product decision.
+- Never invent facts, metrics, or claims in personal content. Flag gaps to the owner instead.
+- Public features must work with no LLM and no AI provider configured.
 
-## Immediate Priorities
+## Known Issues / Deferred
 
-1. Fix credibility and content quality issues in the main portfolio.
-2. Harden the existing Wix integration instead of removing it.
-3. Improve metadata, SEO, and share previews.
-4. Refresh the visual system so the site feels more intentional and less template-like.
-5. Validate deployability after cleanup.
-
-## Known Issues
-
-- `components/blogs/blog.tsx` still sends readers to the Wix subdomain instead of keeping them on `vijayjangir.com`.
-- `actions/sendEmail.ts` still uses a hardcoded sender and destination address.
-- `components/intro.tsx` still positions Vijay too broadly across multiple roles at once.
-- `lib/data.ts` is cleaner now, but the projects and skills sections still need sharper curation.
-- Build and lint still need to be verified in a real Node environment.
+- Media assets are served from `raw.githubusercontent.com` via the backup repo; acceptable stopgap, not an image CDN.
+- The focus taxonomy mixes roles, domains, and technologies (`ai`, `backend-engineering`, `flink`, `python` as sibling focuses). Works, but confusing over time.
+- Publishing rewrites all content tables non-transactionally after the backup succeeds; single-admin usage keeps the risk low.
+- `parseFocusIdsInContent` fixed the fallback-vs-DB split, but tests still exercise mostly the fallback path.
+- Real deployment validation (`vercel build` with linked project) still requires local Vercel auth.
 
 ## Implementation Rules
 
-- Prefer Next.js `fetch` with caching or `revalidate` over extra HTTP client dependencies for Wix calls.
-- If improving blog integration, first keep the current index page stable, then add local post routes such as `app/blog/[slug]/page.tsx`.
-- Any Wix failure state should degrade cleanly: empty list or clear fallback, not a broken page.
-- Content quality matters as much as code quality on this repo; remove filler, repetition, and weak claims.
+- Use built-in `fetch`. Next.js-only options (`next.revalidate`, `cache: "force-cache"`) are no-ops here; cache via response headers instead.
+- Every external fetch gets a timeout (`AbortSignal.timeout`). Fallback paths log warnings; do not reintroduce silent `catch {}`.
+- New URL params that reference taxonomy (focus ids) must validate against live content (`parseFocusIdsInContent`), not the bundled fallback.
+- Any new page passes a unique `description` to `BaseLayout` and sets appropriate cache headers.
+- Validate with `npm run check` (lint + typecheck + tests + build) before pushing.

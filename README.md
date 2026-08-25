@@ -99,5 +99,6 @@ npm run vercel:build
 
 - Keep deployment compatible with free Vercel hosting.
 - Keep Wix as the current blog authoring source unless there is an explicit product decision to replace it.
-- Keep OpenClaw off Vercel and behind a private future integration path.
+- Public pages use edge-cached server rendering (`Cache-Control: s-maxage`) so admin publishes appear without redeploys.
+- Contact is mailto-only by product decision; no email-delivery service is used.
 - Public features must work without any LLM or paid AI provider.

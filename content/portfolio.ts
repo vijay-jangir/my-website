@@ -677,6 +677,22 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     },
   },
   {
+    id: "mcp",
+    label: "MCP (Model Context Protocol)",
+    category: "ai",
+    aliases: [
+      "mcp",
+      "model context protocol",
+      "mcp server",
+      "mcp servers",
+      "tool servers",
+    ],
+    focusWeights: {
+      ai: 0.8,
+      "agentic-development": 1,
+    },
+  },
+  {
     id: "langfuse",
     label: "Langfuse",
     category: "tooling",
@@ -1185,6 +1201,214 @@ export const projects: readonly ProjectDefinition[] = [
       lessons: [
         "Large data systems fail at the boundaries unless ownership and observability are explicit.",
         "Scale claims are only useful when tied to the operational systems that made them sustainable.",
+      ],
+    },
+  },
+  {
+    id: "enterprise-text-to-sql-agent",
+    slug: "enterprise-text-to-sql-agent",
+    title: "Enterprise text-to-SQL agent platform",
+    summary:
+      "I designed and built a production text-to-SQL agent for an enterprise warehouse: retrieval-grounded schema linking selects the right tables from a catalog too large to prompt, LangGraph subgraphs draft and validate SQL with tool nodes, and every query executes through Trino as the single governed boundary.",
+    impact:
+      "Most text-to-SQL projects fail in one of two places: they cannot find the right tables once the schema outgrows the context window, or they generate SQL that never safely reaches production systems. This platform attacked both failure modes structurally instead of prompt-by-prompt - retrieval-augmented semantic schema linking for table selection, and engine-side authorization through Trino so safety never depended on model behavior.",
+    detail:
+      "The work covered the full journey from discovery to delivery and into steady state: proving where naive prompting breaks at enterprise scale, designing the retrieval and execution architecture, building the agent graph with tool nodes and specialized subgraphs, instrumenting every retrieval and generation step with Langfuse, delivering the analyst-facing experience through Open WebUI, and exposing metadata lookup, controlled query execution, and charting as purpose-scoped MCP servers.",
+    skillIds: [
+      "python",
+      "langgraph",
+      "mcp",
+      "langfuse",
+      "trino",
+      "vector-search",
+      "datahub",
+      "openwebui",
+      "sql",
+    ],
+    focusWeights: {
+      general: 0.9,
+      ai: 1,
+      "agentic-development": 1,
+      "backend-engineering": 0.8,
+      "data-platform": 0.8,
+      python: 0.9,
+    },
+    featured: false,
+    visibility: "public",
+    proofLinks: [],
+    publicProof: {
+      proofTypes: ["private-enterprise", "sanitized-diagram", "metric"],
+      architectureShape: [
+        "Analysts ask questions through Open WebUI; the interface stays conversational while execution controls stay in the platform.",
+        "A LangGraph runtime organizes the work into subgraphs - intent and entity extraction, schema linking, SQL drafting, validation, execution, and answer explanation - with typed state moving between nodes.",
+        "Schema linking is retrieval-based: schemas and metadata are decomposed into semantic units, indexed, and retrieved per question with relevance calibration, following the RASL approach (arXiv:2507.23104) - zero fine-tuning, resilient to catalog changes.",
+        "MCP servers expose metadata lookup, governed query execution, and chart generation as discrete tools the agent can call, rather than free-form code paths.",
+        "Trino is the only execution path. User identity and Ranger-based authorization travel with the query; the model never receives raw row data.",
+        "Langfuse traces every retrieval, prompt version, and graph step, which turns production traffic into an evaluation set.",
+      ],
+      scaleSignals: [
+        {
+          label: "Catalog scale",
+          value: "Beyond-prompt-scale",
+          detail:
+            "The warehouse schema is far too large to include in any prompt; table selection is handled entirely by retrieval over decomposed semantic units rather than schema stuffing.",
+        },
+        {
+          label: "Failure-mode coverage",
+          value: "Linking + execution",
+          detail:
+            "The two places text-to-SQL deployments typically die - wrong tables and unsafe execution - each have a dedicated mechanism instead of a shared hope.",
+        },
+        {
+          label: "Governance model",
+          value: "Engine-side authz",
+          detail:
+            "Authorization is enforced by Trino with propagated user identity, so what the agent may read is decided by the same rules that govern human analysts.",
+        },
+        {
+          label: "Adaptation cost",
+          value: "Zero fine-tuning",
+          detail:
+            "New or changed tables require re-indexing metadata, not retraining or rewriting prompts, keeping the system operable by the data platform team.",
+        },
+      ],
+      responsibilities: [
+        "Ran the discovery phase: cataloged why prior text-to-SQL attempts fail on this class of warehouse and defined the non-negotiables for a production system.",
+        "Designed the overall architecture across retrieval, orchestration, execution, observability, and interface layers.",
+        "Implemented the LangGraph agent runtime with tool nodes, subgraphs, and structured inter-node state contracts.",
+        "Built and operated MCP servers for metadata lookup, governed execution, and chart generation.",
+        "Integrated Trino-based execution with identity propagation and Ranger-backed authorization.",
+        "Set up Langfuse tracing and prompt management so quality could be measured and regressed safely.",
+        "Delivered the analyst experience through a customized Open WebUI deployment and ran the path to production hardening.",
+      ],
+      constraints: [
+        "Internal product names, dataset names, business metrics, user groups, prompts, traces, and screenshots are not published.",
+        "This page describes architecture topology, technology choices, agent patterns, governance model, ownership scope, and implementation responsibilities.",
+      ],
+      artifacts: [
+        {
+          label: "Text-to-SQL agent topology",
+          type: "sanitized-diagram",
+          detail:
+            "A shareable diagram can show the Open WebUI surface, LangGraph subgraphs with tool nodes, retrieval-based schema linking, MCP tool servers, Trino execution with Ranger authorization, and Langfuse instrumentation.",
+        },
+        {
+          label: "Research grounding",
+          type: "article",
+          detail:
+            "The schema-linking design follows RASL: Retrieval Augmented Schema Linking for Massive Database Text-to-SQL (arXiv:2507.23104), which decomposes database schemas into semantic entities, indexes them for retrieval, and narrows candidate tables through multi-stage relevance calibration without fine-tuning.",
+        },
+      ],
+      confidentialityNotes: [
+        "Not shown here: internal product names, repository names, datasets, user groups, prompts, traces, screenshots, and business metrics.",
+      ],
+    },
+    caseStudy: {
+      headline:
+        "A production text-to-SQL agent built around the two places these systems fail: finding the right tables, and executing safely.",
+      context:
+        "Text-to-SQL demos are easy on small clean schemas. Enterprise warehouses are different: hundreds of tables across domains, opaque column names, undocumented joins, and strict access rules. Most initiatives stall because the model cannot reliably find the right tables at that scale, or because generated SQL has no safe path to execution. The goal was a system analysts could actually use, inside the governance perimeter, not a prototype behind a demo firewall.",
+      role: "Architect and hands-on developer across the full platform.",
+      timeframe: "Airtel Digital, 2026-present",
+      organization: "Airtel Digital",
+      team: "Data platform, analytics, and enterprise AI stakeholders",
+      confidentiality:
+        "This page excludes internal product names, repository names, datasets, prompts, user groups, screenshots, and business metrics.",
+      metrics: [
+        {
+          label: "Schema linking",
+          value: "Retrieval-grounded",
+          detail:
+            "Table selection uses RASL-style decomposition and multi-stage retrieval with relevance calibration, replacing schema-stuffing approaches that break beyond a handful of tables.",
+        },
+        {
+          label: "Execution safety",
+          value: "Single governed path",
+          detail:
+            "Every query - regardless of how it was drafted - flows through Trino with user identity and Ranger authorization, cancellation, and guardrails applied uniformly.",
+        },
+        {
+          label: "Orchestration",
+          value: "Graphs, not loops",
+          detail:
+            "Intent extraction, linking, drafting, validation, execution, and explanation run as LangGraph subgraphs with tool nodes and typed state, making each step inspectable and independently fixable.",
+        },
+        {
+          label: "Observability",
+          value: "Every step traced",
+          detail:
+            "Langfuse captures retrievals, prompt versions, and graph transitions, so accuracy work targets measured failures instead of anecdotes.",
+        },
+        {
+          label: "Extension surface",
+          value: "Purpose-scoped MCP",
+          detail:
+            "Metadata lookup, controlled execution, and charting ship as MCP servers, giving the agent stable tools and giving the platform one place to audit each capability.",
+        },
+      ],
+      architecture: [
+        "Analysts interact through Open WebUI; the conversation layer never becomes the authorization layer.",
+        "A LangGraph runtime splits the work into subgraphs with explicit state contracts: intent and entity extraction, schema linking, SQL drafting, validation, execution, and answer explanation.",
+        "Tool nodes wrap discrete capabilities - metadata lookup, query execution, charting - exposed to the graph through dedicated MCP servers.",
+        "Schema linking follows the RASL design: build-time decomposition of schemas and metadata into semantic units indexed in a vector store, then inference-time keyword-based multi-stage retrieval with relevance calibration to narrow candidate tables within a context budget.",
+        "Drafted SQL is validated before submission: dialect checks, guardrails, and plan inspection happen outside the prompt.",
+        "Trino is the central query engine and the only execution boundary, carrying user identity for Ranger-based authorization, with cancellation and result persistence handled platform-side.",
+        "Answer explanation works from governed result references rather than raw rows, keeping enterprise data out of model context.",
+        "Langfuse instruments retrieval hits, prompt versions, and graph transitions, turning live traffic into a regression corpus.",
+      ],
+      responsibilities: [
+        "Led discovery: interviewed stakeholders, audited earlier failed attempts, and defined what 'production' had to mean for this system.",
+        "Owned the architecture end to end and implemented the core services personally.",
+        "Built the LangGraph orchestration layer with tool nodes, subgraphs, and structured state contracts.",
+        "Created the MCP servers wrapping metadata access, governed execution, and visualization as auditable tools.",
+        "Integrated retrieval-based schema linking and tuned its indexing pipeline against the enterprise catalog.",
+        "Wired Trino execution with identity propagation, Ranger authorization, guardrails, and cancellation.",
+        "Established Langfuse-based tracing and evaluation loops used for ongoing quality work after launch.",
+        "Hardened and delivered the analyst-facing experience through Open WebUI customization.",
+      ],
+      decisions: [
+        {
+          label: "Retrieve schemas, do not stuff them",
+          detail:
+            "Prompt-stuffing fails past a trivial catalog. Decomposing schemas into indexed semantic units and retrieving per question scales table selection to the warehouse, not the context window.",
+        },
+        {
+          label: "Follow a proven linking design",
+          detail:
+            "Adopting the RASL pattern (arXiv:2507.23104) gave zero-fine-tuning schema linking with relevance calibration, and made catalog growth an indexing task rather than a modeling problem.",
+        },
+        {
+          label: "Make Trino the only door",
+          detail:
+            "Routing all execution through Trino means authorization, auditing, quotas, and cancellation exist engine-side. A model that misbehaves still cannot read data it should not.",
+        },
+        {
+          label: "Model the journey as subgraphs",
+          detail:
+            "Splitting intent, linking, drafting, validation, execution, and explanation into subgraphs isolates failures: a bad retrieval does not silently become bad SQL, and each stage can be evaluated on its own.",
+        },
+        {
+          label: "Give tools protocol boundaries",
+          detail:
+            "Exposing capabilities as MCP servers keeps tool contracts explicit and versioned, separates platform concerns from prompt concerns, and gives security a single review surface per capability.",
+        },
+        {
+          label: "Trace first, tune later",
+          detail:
+            "Instrumenting every retrieval and generation step with Langfuse came before accuracy tuning; measured failure beats intuition when deciding what to improve next.",
+        },
+        {
+          label: "Validate outside the prompt",
+          detail:
+            "SQL validation runs as deterministic pre-execution checks rather than asking the model to check itself, because self-critique is not a safety boundary.",
+        },
+      ],
+      lessons: [
+        "Text-to-SQL succeeds or fails at schema linking long before generation quality matters.",
+        "The execution path is the product: governed engines with real authorization turn a demo into something deployable.",
+        "Structured graphs beat free-form agent loops wherever determinism, cancellation, and audits matter.",
+        "Traces are evaluation data; without them, accuracy work is guesswork dressed up as engineering.",
+        "Most text-to-SQL projects fail for architectural reasons, not model-quality reasons - which means they are solvable.",
       ],
     },
   },

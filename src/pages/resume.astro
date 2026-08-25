@@ -9,6 +9,7 @@ import { getResumeVariantByToken } from "@/lib/resume-store";
 import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
 import FocusPills from "@/src/components/FocusPills.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
@@ -58,6 +59,15 @@ const pdfLabel = storedVariant?.token
 const skillLabels = Object.fromEntries(
   content.skillDefinitions.map((skill) => [skill.id, skill.label]),
 ) as Record<string, string>;
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Resume", path: "/resume" },
+    ],
+  }),
+);
 const focusPresetGroups = [
   {
     label: "Backend platform",
@@ -92,6 +102,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
   siteProfile={content.siteProfile}
   title="Resume | Vijay Jangir"
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
   <main class="space-y-12 pb-4">
     <section
       class="grid gap-8 px-1 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"

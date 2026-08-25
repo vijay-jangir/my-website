@@ -8,6 +8,7 @@ import type { FocusId } from "@/lib/portfolio-types";
 import FocusPills from "@/src/components/FocusPills.astro";
 import ProjectCard from "@/src/components/ProjectCard.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildItemListJsonLd } from "@/src/lib/jsonld";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
@@ -28,6 +29,18 @@ const projects = searchProjectsInContent(content, {
 const skillLabels = Object.fromEntries(
   content.skillDefinitions.map((skill) => [skill.id, skill.label]),
 ) as Record<string, string>;
+const itemListJsonLd = JSON.stringify(
+  buildItemListJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: content.projects
+      .filter((project) => project.visibility === "public" && project.slug)
+      .map((project) => ({
+        name: project.title,
+        path: `/projects/${project.slug}`,
+      })),
+    name: "Public projects",
+  }),
+);
 ---
 
 <BaseLayout
@@ -35,6 +48,7 @@ const skillLabels = Object.fromEntries(
   siteProfile={content.siteProfile}
   title="Projects | Vijay Jangir"
 >
+  <script is:inline set:html={itemListJsonLd} type="application/ld+json" />
   <main class="space-y-10 pb-4">
     <section class="px-1 py-8 sm:py-14">
       <p

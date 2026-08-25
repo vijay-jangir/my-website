@@ -3,6 +3,7 @@ import HomePage from "@/src/components/home/HomePage";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import { getPublicProjectsFromContent } from "@/lib/portfolio";
+import { buildProfilePageJsonLd, buildWebsiteJsonLd } from "@/src/lib/jsonld";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
@@ -14,6 +15,16 @@ const featuredProjects = getPublicProjectsFromContent(content)
 const homeTitle = "Vijay Jangir | Governed Data Platforms and Enterprise AI";
 const homeDescription =
   "Architect and hands-on developer building governed conversational data platforms, metadata services, access-governance systems, workflow orchestration, CI/CD onboarding, and telecom-scale analytics.";
+const siteBase = Astro.site ?? Astro.url;
+const profilePageJsonLd = JSON.stringify(
+  buildProfilePageJsonLd({
+    baseUrl: siteBase,
+    siteProfile: content.siteProfile,
+  }),
+);
+const websiteJsonLd = JSON.stringify(
+  buildWebsiteJsonLd({ baseUrl: siteBase, siteProfile: content.siteProfile }),
+);
 ---
 
 <BaseLayout
@@ -21,6 +32,8 @@ const homeDescription =
   siteProfile={content.siteProfile}
   title={homeTitle}
 >
+  <script is:inline set:html={profilePageJsonLd} type="application/ld+json" />
+  <script is:inline set:html={websiteJsonLd} type="application/ld+json" />
   <HomePage
     client:load
     experiences={content.experiences}

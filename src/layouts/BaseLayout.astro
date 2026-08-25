@@ -1,6 +1,7 @@
 ---
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import type { SiteProfile } from "@/lib/portfolio-types";
+import { buildPersonJsonLd } from "@/src/lib/jsonld";
 import { buildTypographyCssVariables } from "@/src/config/typography";
 import "@/src/styles/global.css";
 
@@ -53,23 +54,14 @@ if (robotsContent) {
   setRobotsHeader(Astro.response.headers, robotsContent);
 }
 
-const personJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Person",
-  description,
-  email: siteProfile.email,
-  image: new URL(
-    siteProfile.profileImageUrl ?? socialImagePath,
-    siteBase,
-  ).toString(),
-  jobTitle: siteProfile.title,
-  knowsAbout: siteProfile.currentFocusLabels,
-  mainEntityOfPage: canonicalUrl,
-  name: siteProfile.name,
-  sameAs: [siteProfile.githubUrl, siteProfile.linkedinUrl].filter(Boolean),
-  url: new URL("/", siteBase).toString(),
-  worksFor: undefined,
-});
+const personJsonLd = JSON.stringify(
+  buildPersonJsonLd({
+    baseUrl: siteBase,
+    description,
+    fallbackImagePath: socialImagePath,
+    siteProfile,
+  }),
+);
 
 const routeNavItems = [
   { href: "/", label: "Vijay", activeOn: ["/"] },

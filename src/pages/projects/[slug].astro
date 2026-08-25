@@ -8,6 +8,7 @@ import ProjectPager from "@/src/components/projects/ProjectPager.astro";
 import PublicProof from "@/src/components/projects/PublicProof.astro";
 import RelatedProjects from "@/src/components/projects/RelatedProjects.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 
 export const prerender = false;
 
@@ -101,34 +102,18 @@ const publicScopeText = caseStudy?.confidentiality;
 const projectPageUrl = project
   ? new URL(`/projects/${project.slug}`, Astro.site ?? Astro.url).toString()
   : null;
-const breadcrumbJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      item: new URL("/", Astro.site ?? Astro.url).toString(),
-      name: "Home",
-      position: 1,
-    },
-    {
-      "@type": "ListItem",
-      item: new URL("/projects", Astro.site ?? Astro.url).toString(),
-      name: "Projects",
-      position: 2,
-    },
-    ...(project && projectPageUrl
-      ? [
-          {
-            "@type": "ListItem",
-            item: projectPageUrl,
-            name: project.title,
-            position: 3,
-          },
-        ]
-      : []),
-  ],
-});
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Projects", path: "/projects" },
+      ...(project
+        ? [{ name: project.title, path: `/projects/${project.slug}` }]
+        : []),
+    ],
+  }),
+);
 
 const projectJsonLd =
   project && projectPageUrl

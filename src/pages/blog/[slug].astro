@@ -1,6 +1,7 @@
 ---
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 import {
   WIX_BLOG_DETAIL_CACHE_CONTROL,
   getWixBlogDescription,
@@ -47,34 +48,18 @@ const articleJsonLd = post
     })
   : null;
 
-const breadcrumbJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      item: new URL("/", Astro.site ?? Astro.url).toString(),
-      name: "Home",
-      position: 1,
-    },
-    {
-      "@type": "ListItem",
-      item: new URL("/blog", Astro.site ?? Astro.url).toString(),
-      name: "Blog",
-      position: 2,
-    },
-    ...(post
-      ? [
-          {
-            "@type": "ListItem",
-            item: pageUrl,
-            name: post.title,
-            position: 3,
-          },
-        ]
-      : []),
-  ],
-});
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Blog", path: "/blog" },
+      ...(post
+        ? [{ name: post.title, path: `/blog/${encodeURIComponent(slug)}` }]
+        : []),
+    ],
+  }),
+);
 
 Astro.response.headers.set(
   "Cache-Control",

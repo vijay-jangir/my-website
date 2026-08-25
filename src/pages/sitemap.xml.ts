@@ -11,21 +11,25 @@ export const prerender = false;
 
 const publicRoutes = ["/", "/projects", "/resume", "/blog"];
 
+type SitemapEntry = { loc: string; lastmod?: string };
+
 export function buildSitemapEntries(
   posts: readonly (Pick<WixBlogPost, "slug" | "url"> &
     Partial<
       Pick<WixBlogPost, "firstPublishedDate" | "lastPublishedDate">
     >)[] = [],
   projectSlugs: readonly string[] = [],
-) {
-  const staticEntries = publicRoutes.map((route) => ({ loc: route }));
+): SitemapEntry[] {
+  const staticEntries: SitemapEntry[] = publicRoutes.map((route) => ({
+    loc: route,
+  }));
 
-  const projectEntries = projectSlugs.map((slug) => ({
+  const projectEntries: SitemapEntry[] = projectSlugs.map((slug) => ({
     loc: `/projects/${slug}`,
   }));
 
   const blogEntries = posts
-    .map((post) => {
+    .map((post): SitemapEntry | null => {
       const route = getWixBlogLocalPath(post);
 
       if (!route) {
@@ -42,9 +46,7 @@ export function buildSitemapEntries(
           : {}),
       };
     })
-    .filter(
-      (entry): entry is { loc: string; lastmod?: string } => entry !== null,
-    );
+    .filter((entry): entry is SitemapEntry => entry !== null);
 
   return [
     ...new Map(

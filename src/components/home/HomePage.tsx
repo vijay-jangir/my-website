@@ -151,7 +151,7 @@ export default function HomePage({
               {siteProfile.heroLabel}
             </motion.h1>
             <motion.p
-              className="mx-auto mt-6 line-clamp-4 max-w-[21rem] text-center text-lg leading-8 text-slate-600 sm:hidden"
+              className="mx-auto mt-6 max-w-[24rem] text-center text-lg leading-8 text-slate-600 sm:hidden"
               variants={riseVariants}
             >
               {siteProfile.recruiterPitch}
@@ -206,16 +206,16 @@ export default function HomePage({
             </motion.div>
 
             <motion.div
-              className="mx-auto mt-8 hidden max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-200/80 shadow-[0_20px_56px_rgba(31,44,75,0.08)] sm:grid"
+              className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-200/80 shadow-[0_20px_56px_rgba(31,44,75,0.08)]"
               variants={staggerVariants}
             >
-              {profileHighlights.slice(0, 2).map((item) => (
+              {profileHighlights.slice(0, 4).map((item) => (
                 <motion.div
-                  className="bg-white/76 px-6 py-5"
+                  className="bg-white/76 px-4 py-4 sm:px-6 sm:py-5"
                   key={item.id}
                   variants={compactItemVariants}
                 >
-                  <p className="text-2xl font-semibold tracking-tight text-[#0e1528]">
+                  <p className="text-xl font-semibold leading-snug tracking-tight text-[#0e1528] sm:text-2xl">
                     {item.value}
                   </p>
                   <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">

@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import {
   buildResumeVariant,
   parseFocusIds,
+  parseFocusIdsInContent,
   searchProjects,
 } from "@/lib/portfolio";
+import type { FocusDefinition } from "@/lib/portfolio-types";
 
 describe("portfolio focus utilities", () => {
   it("parses focus ids, deduplicates them, and caps the selection", () => {
@@ -61,5 +64,43 @@ describe("portfolio focus utilities", () => {
       "telecom-network-datalake",
       "observability",
     ]);
+  });
+});
+
+describe("content-aware focus parsing", () => {
+  const extraFocus: FocusDefinition = {
+    id: "custom-focus",
+    label: "Custom",
+    shortLabel: "Custom",
+    category: "domain",
+    headline: "h",
+    summary: "s",
+    description: "d",
+    aliases: [],
+    relatedSkillIds: [],
+  };
+
+  it("accepts focuses that exist in live content beyond the fallback set", () => {
+    const content = {
+      ...fallbackPortfolioSnapshot,
+      focusDefinitions: [
+        ...fallbackPortfolioSnapshot.focusDefinitions,
+        extraFocus,
+      ],
+    };
+
+    expect(parseFocusIdsInContent(content, "ai,custom-focus,bogus")).toEqual([
+      "ai",
+      "custom-focus",
+    ]);
+  });
+
+  it("dedupes, trims, and caps at three like the fallback parser", () => {
+    expect(
+      parseFocusIdsInContent(
+        fallbackPortfolioSnapshot,
+        " ai, ai,flink,kafka,x ",
+      ),
+    ).toEqual(["ai", "flink", "kafka"]);
   });
 });

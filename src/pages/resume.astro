@@ -3,7 +3,7 @@ import { getPortfolioContent } from "@/lib/portfolio-content";
 import {
   buildResumeVariantFromContent,
   getSkillLabel,
-  parseFocusIds,
+  parseFocusIdsInContent,
 } from "@/lib/portfolio";
 import { getResumeVariantByToken } from "@/lib/resume-store";
 import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
@@ -11,7 +11,10 @@ import FocusPills from "@/src/components/FocusPills.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 
 const content = await getPortfolioContent();
-const focusIds = parseFocusIds(Astro.url.searchParams.get("focus"));
+const focusIds = parseFocusIdsInContent(
+  content,
+  Astro.url.searchParams.get("focus"),
+);
 const variantToken = Astro.url.searchParams.get("variant") ?? undefined;
 const storedVariant = variantToken
   ? await getResumeVariantByToken(variantToken)

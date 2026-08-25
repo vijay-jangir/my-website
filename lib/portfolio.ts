@@ -25,9 +25,6 @@ type PortfolioContentInput = Pick<
 >;
 
 const fallbackContent = fallbackPortfolioSnapshot;
-const fallbackFocusIds = new Set<FocusId>(
-  fallbackContent.focusDefinitions.map((focus) => focus.id),
-);
 
 export const focusDefinitionMap = Object.fromEntries(
   fallbackContent.focusDefinitions.map((focus) => [focus.id, focus]),
@@ -37,15 +34,23 @@ export const skillDefinitionMap = Object.fromEntries(
   fallbackContent.skillDefinitions.map((skill) => [skill.id, skill]),
 ) as Record<string, (typeof fallbackContent.skillDefinitions)[number]>;
 
-export function parseFocusIds(rawValue?: string | string[] | null): FocusId[] {
+export function parseFocusIdsInContent(
+  content: Pick<PortfolioSnapshot, "focusDefinitions">,
+  rawValue?: string | string[] | null,
+): FocusId[] {
   const value = Array.isArray(rawValue) ? rawValue.join(",") : (rawValue ?? "");
+  const validIds = new Set(content.focusDefinitions.map((focus) => focus.id));
 
   const parsed = value
     .split(",")
     .map((item) => item.trim().toLowerCase())
-    .filter((item): item is FocusId => fallbackFocusIds.has(item as FocusId));
+    .filter((item): item is FocusId => validIds.has(item as FocusId));
 
   return Array.from(new Set(parsed)).slice(0, 3);
+}
+
+export function parseFocusIds(rawValue?: string | string[] | null): FocusId[] {
+  return parseFocusIdsInContent(fallbackContent, rawValue);
 }
 
 export function buildQueryFocusVector(

@@ -1,5 +1,8 @@
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
-import { buildResumeVariantFromContent, parseFocusIds } from "@/lib/portfolio";
+import {
+  buildResumeVariantFromContent,
+  parseFocusIdsInContent,
+} from "@/lib/portfolio";
 import type {
   FocusScore,
   JobDescriptionAnalysis,
@@ -352,7 +355,10 @@ export function buildResumeVariantFromJobDescriptionWithContent(
   },
 ): { analysis: JobDescriptionAnalysis; variant: ResumeVariant } {
   const analysis = analyzeJobDescriptionWithContent(content, options.rawText);
-  const overrideFocusIds = parseFocusIds(options.focusOverride ?? "");
+  const overrideFocusIds = parseFocusIdsInContent(
+    content,
+    options.focusOverride ?? "",
+  );
 
   const mergedFocusIds =
     overrideFocusIds.length > 0

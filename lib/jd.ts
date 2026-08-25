@@ -77,7 +77,10 @@ function escapeRegExp(value: string) {
 }
 
 function countAliasMatches(content: string, alias: string) {
-  const regex = new RegExp(`\\b${escapeRegExp(alias.toLowerCase())}\\b`, "g");
+  const normalizedAlias = escapeRegExp(alias.toLowerCase());
+  // Alphanumeric-token boundaries via lookarounds so aliases with
+  // trailing symbols (+, #, .) still match: "C++", "C#", ".NET".
+  const regex = new RegExp(`(?<![a-z0-9])${normalizedAlias}(?![a-z0-9])`, "g");
   return content.match(regex)?.length ?? 0;
 }
 

@@ -1,0 +1,138 @@
+Task 2 — vitest coverage baseline
+=================================
+
+Measured with NO thresholds (first run of `npm run test:coverage`):
+  Statements : 34.55% ( 292/845 )
+  Branches   : 28.39% ( 138/486 )
+  Functions  : 41.42% ( 116/280 )
+  Lines      : 34.67% ( 285/822 )
+
+Floored thresholds set in vitest.config.ts (round DOWN, never above measured):
+  statements: 34
+  branches:   28
+  functions:  41
+  lines:      34
+
+Provider: v8
+Reporters: text, json-summary
+Include: lib/**, src/lib/**, src/actions/**, src/pages/api/**
+Exclude: legacy-next/**, **/*.d.ts
+DevDep: @vitest/coverage-v8 ^4.1.11 (compatible with vitest ^4.1.2)
+Script: "test:coverage": "vitest run --coverage"
+
+Existing tests: 42 passed / 8 files. Untouched.
+
+------------------------------------------------------------------------------
+HAPPY PATH — npm run test:coverage with floored thresholds (exit 0)
+------------------------------------------------------------------------------
+
+> vijayjangir@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 /Users/b0228188/projects/github_repos/vijayjangir/my-website
+      Coverage enabled with v8
+
+
+ Test Files  8 passed (8)
+      Tests  42 passed (42)
+   Start at  03:16:50
+   Duration  324ms (transform 347ms, setup 0ms, import 460ms, tests 111ms, environment 0ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   34.55 |    28.39 |   41.42 |   34.67 |
+ lib               |    40.6 |    29.23 |   43.98 |   41.03 |
+  ...ent-backup.ts |       0 |        0 |       0 |       0 | 4-247
+  ...t-platform.ts |       0 |        0 |       0 |       0 | 9
+  db.ts            |       0 |        0 |       0 |       0 | 5-36
+  env.ts           |   54.54 |    53.57 |    37.5 |   54.54 | 36-54
+  jd.ts            |   98.14 |    79.48 |     100 |   98.07 | 91,125
+  ...olio-admin.ts |       0 |        0 |       0 |       0 | 17-148
+  ...io-content.ts |       0 |        0 |       0 |       0 | 29-922
+  portfolio.ts     |   83.57 |    63.52 |   77.21 |   84.44 | ...52,404,440-495
+  resume-store.ts  |       0 |        0 |       0 |       0 | 23-80
+ src/actions       |       0 |        0 |       0 |       0 |
+  index.ts         |       0 |        0 |       0 |       0 | 35-539
+ src/lib           |    52.5 |    48.71 |   61.76 |    52.5 |
+  auth.ts          |       0 |        0 |       0 |       0 | 7-168
+  jsonld.ts        |     100 |    71.42 |     100 |     100 | 19-45
+  wix.ts           |   89.65 |     73.8 |   92.85 |   89.65 | ...52,167,194,213
+  xml.ts           |       0 |      100 |       0 |       0 | 2
+ ...pages/api/auth |       0 |      100 |       0 |       0 |
+  logout.ts        |       0 |      100 |       0 |       0 | 5-9
+ ...pi/auth/github |       0 |        0 |       0 |       0 |
+  callback.ts      |       0 |        0 |       0 |       0 | 12-44
+  index.ts         |       0 |        0 |       0 |       0 | 6-19
+ src/pages/api/jd  |       0 |        0 |       0 |       0 |
+  analyze.ts       |       0 |        0 |       0 |       0 | 11-115
+ ...ges/api/resume |       0 |        0 |       0 |       0 |
+  pdf.ts           |       0 |        0 |       0 |       0 | 13-46
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 34.55% ( 292/845 )
+Branches     : 28.39% ( 138/486 )
+Functions    : 41.42% ( 116/280 )
+Lines        : 34.67% ( 285/822 )
+================================================================================
+
+------------------------------------------------------------------------------
+FAILURE PATH — temporarily raised lines threshold 34 -> 39 (measured + 5)
+------------------------------------------------------------------------------
+Command: npm run test:coverage
+Result: EXIT_CODE=1
+Error line:
+ERROR: Coverage for lines (34.67%) does not meet global threshold (39%)
+
+Proves the threshold gate actually bites. A config that never fails is not a gate.
+
+Then restored lines: 34. Confirming run:
+RESTORE_EXIT=0
+Tests 42 passed (42)
+Statements 34.55% / Branches 28.39% / Functions 41.42% / Lines 34.67%
+
+------------------------------------------------------------------------------
+ADVERSARIAL CLASSES
+------------------------------------------------------------------------------
+
+misleading_success_output: PASS
+  Printed table includes `portfolio.ts` (lib/portfolio.ts, 83.57% stmts) and
+  `wix.ts` (src/lib/wix.ts, 89.65% stmts). No `legacy-next/` row appears in
+  the coverage table. Include globs match intended files; exclude works.
+
+stale_state: PASS
+  Deleted coverage/ (`rm -rf coverage`; confirmed directory gone), then
+  re-ran `npm run test:coverage`. STALE_EXIT=0. Numbers identical to the
+  first measurement (34.55 / 28.39 / 41.42 / 34.67). Freshly computed, not
+  read from a cached artifact.
+
+flaky_tests: PASS
+  Two consecutive `npm run test:coverage` runs after restore:
+    run 1: Tests 42 passed (42); 34.55 / 28.39 / 41.42 / 34.67; exit 0
+    run 2: Tests 42 passed (42); 34.55 / 28.39 / 41.42 / 34.67; exit 0
+  Identical pass counts and identical coverage percentages.
+
+ui_regression: not-applicable — no UI/CSS/markup change.
+visual_qa: not-applicable — no rendered surface.
+a11y: not-applicable — no interactive or document surface.
+perf_budget: not-applicable — coverage reporter is a test-time tool, not a runtime path.
+security: not-applicable — no auth, secrets, or network surface changed.
+data_loss: not-applicable — no persistence or mutation path touched.
+idempotency: not-applicable — config is declarative; re-running coverage is covered by flaky_tests.
+concurrency: not-applicable — no shared mutable state or parallel writers.
+i18n: not-applicable — no user-facing strings.
+mobile_responsive: not-applicable — no layout.
+empty_state: not-applicable — no empty/error UI.
+authz: not-applicable — no authorization change.
+ssr_hydration: not-applicable — no SSR/client component change.
+cache: covered by stale_state (coverage/ artifact is not a runtime cache).
+network_failure: not-applicable — coverage run is local, no external fetch.
+schema_compat: not-applicable — no schema/API contract change.
+rollback: not-applicable — single additive config; revert is `git revert`.
+feature_flag: not-applicable — no flags.
+observability: not-applicable — no logging/metrics change.
+docs_drift: not-applicable — README commands not required by this task.
+license: not-applicable — @vitest/coverage-v8 is MIT, same family as vitest.

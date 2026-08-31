@@ -1,0 +1,40 @@
+# Task 1 evidence — pre-platform-v2 backup refs
+# Captured on branch feat/platform-v2 immediately before committing this file.
+
+$ git ls-remote --heads origin | grep -E 'backup/pre-platform-v2-(head|main)'
+79384a66e92e88f1c033d89f248a40786355f707	refs/heads/backup/pre-platform-v2-head
+573a1f553671aca3dce293f04af3e9e0f59e48ea	refs/heads/backup/pre-platform-v2-main
+
+$ git ls-remote --tags origin | grep pre-platform-v2
+e3988cba08a33247ed39f8d575b3cb71246bcfa7	refs/tags/pre-platform-v2
+573a1f553671aca3dce293f04af3e9e0f59e48ea	refs/tags/pre-platform-v2^{}
+
+$ git rev-parse backup/pre-platform-v2-head backup/pre-platform-v2-main pre-platform-v2^{commit}
+79384a66e92e88f1c033d89f248a40786355f707
+573a1f553671aca3dce293f04af3e9e0f59e48ea
+573a1f553671aca3dce293f04af3e9e0f59e48ea
+
+$ git rev-parse --abbrev-ref HEAD
+feat/platform-v2
+
+$ git status --short
+?? .omo/evidence/
+# (only untracked entry is this evidence file itself; committed immediately after capture
+#  as "chore: branch and tag pre-platform-v2 backups", leaving the tree clean)
+
+# --- failure-path verification: backups are independently restorable ---
+$ git show backup/pre-platform-v2-main:package.json | head -5
+{
+  "name": "vijayjangir",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+
+$ git show backup/pre-platform-v2-head:AGENTS.md | head -3
+# AGENTS.md
+
+## Mission
+
+$ git log --oneline -1 backup/pre-platform-v2-head; git rev-parse backup/pre-platform-v2-head^
+79384a6 chore: checkpoint working tree before platform-v2
+f478855ee12dee2914bcc6cd07197367318c4438

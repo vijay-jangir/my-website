@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "active_work_id": "portfolio-platform-v2",
+  "works": {
+    "portfolio-platform-v2": {
+      "work_id": "portfolio-platform-v2",
+      "active_plan": ".omo/plans/portfolio-platform-v2.md",
+      "plan_name": "portfolio-platform-v2",
+      "session_ids": ["opencode:portfolio-platform-v2"],
+      "status": "active",
+      "worktree_path": null,
+      "total_tasks": 41,
+      "final_verifiers": 5,
+      "pre_change_state": {
+        "branch": "improve/seo-aeo-geo",
+        "head_sha": "f478855ee12dee2914bcc6cd07197367318c4438",
+        "origin_main_sha": "573a1f553671aca3dce293f04af3e9e0f59e48ea",
+        "untracked": [".omo/", "docs/superpowers/plans/seo-aeo-geo-wave.md"],
+        "remote": "https://github.com/vijay-jangir/my-website.git"
+      }
+    }
+  }
+}

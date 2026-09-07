@@ -5,7 +5,7 @@ import { asc, desc } from "drizzle-orm";
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import * as schema from "@/db/drizzle/schema";
 import { getDrizzleDb } from "@/lib/drizzle";
-import { getContentHistoryLimit, isAstroContentDbConfigured } from "@/lib/env";
+import { getContentHistoryLimit } from "@/lib/env";
 import {
   loadBackupSnapshot,
   writeSnapshotToBackup,
@@ -27,29 +27,6 @@ import type {
   SkillDefinition,
   SummaryTemplate,
 } from "@/lib/portfolio-types";
-
-type AstroDbModule = typeof import("astro:db");
-
-const CONTENT_TABLE_KEYS = [
-  "ExperienceBulletFocusWeightTable",
-  "ExperienceBulletSkillLinkTable",
-  "ExperienceBulletTable",
-  "ExperienceFocusWeightTable",
-  "ExperienceTable",
-  "MediaAssetTable",
-  "ProfileHighlightFocusWeightTable",
-  "ProfileHighlightTable",
-  "ProjectFocusWeightTable",
-  "ProjectSkillLinkTable",
-  "ProjectLinkTable",
-  "ProjectTable",
-  "SkillFocusWeightTable",
-  "SkillTable",
-  "SummaryTemplateTable",
-  "FocusDefinitionTable",
-  "PortfolioLinkTable",
-  "SiteProfileTable",
-] as const;
 
 type SkillFocusWeightRow = { focusId: string; skillId: string; weight: number };
 type ProjectLinkRow = {
@@ -96,43 +73,6 @@ type ProfileHighlightFocusWeightRow = {
   highlightId: string;
   weight: number;
 };
-
-let astroDbModulePromise: Promise<AstroDbModule> | null = null;
-
-function shouldLoadAstroDb() {
-  return (
-    process.env.NODE_ENV !== "production" ||
-    Boolean(process.env.ASTRO_DATABASE_FILE) ||
-    isAstroContentDbConfigured()
-  );
-}
-
-async function loadAstroDbModule() {
-  if (!shouldLoadAstroDb()) {
-    return null;
-  }
-
-  try {
-    astroDbModulePromise ??= import("astro:db");
-    return await astroDbModulePromise;
-  } catch (error) {
-    // Reset so a transient import failure is retried on the next call
-    // instead of poisoning the cached promise for the lifetime of the isolate.
-    astroDbModulePromise = null;
-    console.warn("[portfolio-content] astro:db unavailable:", error);
-    return null;
-  }
-}
-
-async function requireAstroDbModule() {
-  const astroDb = await loadAstroDbModule();
-
-  if (!astroDb) {
-    throw new Error("Astro DB is not available for content persistence.");
-  }
-
-  return astroDb;
-}
 
 function cloneFallbackSnapshot(): PortfolioSnapshot {
   return JSON.parse(
@@ -514,345 +454,326 @@ export async function listContentRevisions() {
   return [...(snapshot.revisions ?? [])];
 }
 
-async function clearContentTables(astroDb: AstroDbModule) {
-  for (const tableKey of CONTENT_TABLE_KEYS) {
-    await astroDb.db.delete(astroDb[tableKey] as never);
-  }
-}
-
 function now() {
   return new Date();
-}
-
-async function insertMany<T extends Record<string, unknown>>(
-  db: AstroDbModule["db"],
-  table: unknown,
-  rows: T[],
-) {
-  if (rows.length === 0) {
-    return;
-  }
-
-  await db.insert(table as never).values(rows as never);
 }
 
 async function applyPortfolioContentSnapshot(
   snapshot: PortfolioSnapshot,
   revision?: Omit<ContentRevision, "id">,
 ) {
-  const astroDb = await requireAstroDbModule();
-  const {
-    ContentRevisionTable,
-    ExperienceBulletFocusWeightTable,
-    ExperienceBulletSkillLinkTable,
-    ExperienceBulletTable,
-    ExperienceFocusWeightTable,
-    ExperienceTable,
-    FocusDefinitionTable,
-    MediaAssetTable,
-    PortfolioLinkTable,
-    ProfileHighlightFocusWeightTable,
-    ProfileHighlightTable,
-    ProjectFocusWeightTable,
-    ProjectLinkTable,
-    ProjectSkillLinkTable,
-    ProjectTable,
-    SiteProfileTable,
-    SkillFocusWeightTable,
-    SkillTable,
-    SummaryTemplateTable,
-    db,
-  } = astroDb;
+  const db = getDrizzleDb();
+
+  if (!db) {
+    throw new Error("Drizzle DB is not available for content persistence.");
+  }
+
   const sanitized = sanitizeSnapshot(snapshot);
   const timestamp = now();
 
-  await clearContentTables(astroDb);
+  await db.transaction(async (tx) => {
+    // Helper: skip inserts for empty row arrays
+    const insert = async <T extends Record<string, unknown>>(
+      table: unknown,
+      rows: T[],
+    ) => {
+      if (rows.length > 0) {
+        await tx.insert(table as never).values(rows as never);
+      }
+    };
 
-  await insertMany(db, SiteProfileTable, [
-    {
-      contentPromise: sanitized.siteProfile.contentPromise,
-      currentFocusLabels: [...sanitized.siteProfile.currentFocusLabels],
-      email: sanitized.siteProfile.email,
-      githubUrl: sanitized.siteProfile.githubUrl,
-      heroLabel: sanitized.siteProfile.heroLabel,
-      id: "site-profile",
-      lastUpdatedLabel: sanitized.siteProfile.lastUpdatedLabel,
-      linkedinUrl: sanitized.siteProfile.linkedinUrl,
-      location: sanitized.siteProfile.location,
-      name: sanitized.siteProfile.name,
-      overview: [...sanitized.siteProfile.overview],
-      profileImageUrl: sanitized.siteProfile.profileImageUrl,
-      recruiterPitch: sanitized.siteProfile.recruiterPitch,
-      timezone: sanitized.siteProfile.timezone,
-      title: sanitized.siteProfile.title,
-      updatedAt: timestamp,
-    },
-  ]);
+    // ----- Clear all content tables in FK dependency order (children first) -----
+    await tx.delete(schema.experienceBulletFocusWeight);
+    await tx.delete(schema.experienceBulletSkillLink);
+    await tx.delete(schema.experienceBullet);
+    await tx.delete(schema.experienceFocusWeight);
+    await tx.delete(schema.profileHighlightFocusWeight);
+    await tx.delete(schema.projectFocusWeight);
+    await tx.delete(schema.projectSkillLink);
+    await tx.delete(schema.projectLink);
+    await tx.delete(schema.skillFocusWeight);
+    await tx.delete(schema.experience);
+    await tx.delete(schema.project);
+    await tx.delete(schema.skill);
+    await tx.delete(schema.profileHighlight);
+    await tx.delete(schema.summaryTemplate);
+    await tx.delete(schema.mediaAsset);
+    await tx.delete(schema.contentRevision);
+    await tx.delete(schema.portfolioLink);
+    await tx.delete(schema.focusDefinition);
+    await tx.delete(schema.siteProfile);
 
-  await insertMany(
-    db,
-    PortfolioLinkTable,
-    sanitized.portfolioLinks.map((link, index) => ({
-      hash: link.hash,
-      id: `portfolio-link:${index}`,
-      name: link.name,
-      sortOrder: index,
-      updatedAt: timestamp,
-    })),
-  );
+    // ----- Insert in parent-first FK order -----
 
-  await insertMany(
-    db,
-    FocusDefinitionTable,
-    sanitized.focusDefinitions.map((focus, index) => ({
-      aliases: [...focus.aliases],
-      category: focus.category,
-      description: focus.description,
-      headline: focus.headline,
-      id: focus.id,
-      label: focus.label,
-      relatedSkillIds: [...focus.relatedSkillIds],
-      shortLabel: focus.shortLabel,
-      sortOrder: index,
-      summary: focus.summary,
-      updatedAt: timestamp,
-    })),
-  );
-
-  await insertMany(
-    db,
-    SkillTable,
-    sanitized.skillDefinitions.map((skill, index) => ({
-      aliases: [...skill.aliases],
-      category: skill.category,
-      highlights: skill.highlights ? [...skill.highlights] : null,
-      id: skill.id,
-      label: skill.label,
-      sortOrder: index,
-      updatedAt: timestamp,
-    })),
-  );
-  await insertMany(
-    db,
-    SkillFocusWeightTable,
-    sanitized.skillDefinitions.flatMap((skill) =>
-      Object.entries(skill.focusWeights).map(([focusId, weight]) => ({
-        focusId,
-        id: `skill-weight:${skill.id}:${focusId}`,
-        skillId: skill.id,
+    await insert(schema.siteProfile, [
+      {
+        contentPromise: sanitized.siteProfile.contentPromise,
+        currentFocusLabels: [...sanitized.siteProfile.currentFocusLabels],
+        email: sanitized.siteProfile.email,
+        githubUrl: sanitized.siteProfile.githubUrl,
+        heroLabel: sanitized.siteProfile.heroLabel,
+        id: "site-profile",
+        lastUpdatedLabel: sanitized.siteProfile.lastUpdatedLabel,
+        linkedinUrl: sanitized.siteProfile.linkedinUrl,
+        location: sanitized.siteProfile.location,
+        name: sanitized.siteProfile.name,
+        overview: [...sanitized.siteProfile.overview],
+        profileImageUrl: sanitized.siteProfile.profileImageUrl,
+        recruiterPitch: sanitized.siteProfile.recruiterPitch,
+        timezone: sanitized.siteProfile.timezone,
+        title: sanitized.siteProfile.title,
         updatedAt: timestamp,
-        weight,
-      })),
-    ),
-  );
+      },
+    ]);
 
-  await insertMany(
-    db,
-    ProjectTable,
-    sanitized.projects.map((project, index) => ({
-      caseStudy: project.caseStudy ?? null,
-      detail: project.detail,
-      featured: project.featured,
-      id: project.id,
-      impact: project.impact,
-      publicProof: project.publicProof ?? null,
-      slug: project.slug,
-      sortOrder: index,
-      summary: project.summary,
-      title: project.title,
-      updatedAt: timestamp,
-      visibility: project.visibility,
-    })),
-  );
-  await insertMany(
-    db,
-    ProjectLinkTable,
-    sanitized.projects.flatMap((project) =>
-      project.proofLinks.map((link, index) => ({
-        href: link.href,
-        id: `project-link:${project.id}:${index}`,
-        kind: link.kind,
-        label: link.label,
-        projectId: project.id,
+    await insert(
+      schema.portfolioLink,
+      sanitized.portfolioLinks.map((link, index) => ({
+        hash: link.hash,
+        id: `portfolio-link:${index}`,
+        name: link.name,
         sortOrder: index,
         updatedAt: timestamp,
       })),
-    ),
-  );
-  await insertMany(
-    db,
-    ProjectSkillLinkTable,
-    sanitized.projects.flatMap((project) =>
-      project.skillIds.map((skillId, index) => ({
-        id: `project-skill:${project.id}:${skillId}`,
-        projectId: project.id,
-        skillId,
-        sortOrder: index,
-        updatedAt: timestamp,
-      })),
-    ),
-  );
-  await insertMany(
-    db,
-    ProjectFocusWeightTable,
-    sanitized.projects.flatMap((project) =>
-      Object.entries(project.focusWeights).map(([focusId, weight]) => ({
-        focusId,
-        id: `project-weight:${project.id}:${focusId}`,
-        projectId: project.id,
-        updatedAt: timestamp,
-        weight,
-      })),
-    ),
-  );
+    );
 
-  await insertMany(
-    db,
-    ExperienceTable,
-    sanitized.experiences.map((experience, index) => ({
-      company: experience.company,
-      companyUrl: experience.companyUrl,
-      date: experience.date,
-      description: experience.description,
-      icon: experience.icon,
-      id: experience.id,
-      sortOrder: index,
-      title: experience.title,
-      type: experience.type,
-      updatedAt: timestamp,
-    })),
-  );
-  await insertMany(
-    db,
-    ExperienceFocusWeightTable,
-    sanitized.experiences.flatMap((experience) =>
-      Object.entries(experience.focusWeights).map(([focusId, weight]) => ({
-        experienceId: experience.id,
-        focusId,
-        id: `experience-weight:${experience.id}:${focusId}`,
-        updatedAt: timestamp,
-        weight,
-      })),
-    ),
-  );
-  await insertMany(
-    db,
-    ExperienceBulletTable,
-    sanitized.experiences.flatMap((experience) =>
-      experience.bullets.map((bullet, index) => ({
-        experienceId: experience.id,
-        id: bullet.id,
+    await insert(
+      schema.focusDefinition,
+      sanitized.focusDefinitions.map((focus, index) => ({
+        aliases: [...focus.aliases],
+        category: focus.category,
+        description: focus.description,
+        headline: focus.headline,
+        id: focus.id,
+        label: focus.label,
+        relatedSkillIds: [...focus.relatedSkillIds],
+        shortLabel: focus.shortLabel,
         sortOrder: index,
-        text: bullet.text,
+        summary: focus.summary,
         updatedAt: timestamp,
-        visibility: bullet.visibility,
       })),
-    ),
-  );
-  await insertMany(
-    db,
-    ExperienceBulletSkillLinkTable,
-    sanitized.experiences.flatMap((experience) =>
-      experience.bullets.flatMap((bullet) =>
-        bullet.skillIds.map((skillId, index) => ({
-          bulletId: bullet.id,
-          id: `bullet-skill:${bullet.id}:${skillId}`,
+    );
+
+    await insert(
+      schema.skill,
+      sanitized.skillDefinitions.map((skill, index) => ({
+        aliases: [...skill.aliases],
+        category: skill.category,
+        highlights: skill.highlights ? [...skill.highlights] : null,
+        id: skill.id,
+        label: skill.label,
+        sortOrder: index,
+        updatedAt: timestamp,
+      })),
+    );
+    await insert(
+      schema.skillFocusWeight,
+      sanitized.skillDefinitions.flatMap((skill) =>
+        Object.entries(skill.focusWeights).map(([focusId, weight]) => ({
+          focusId,
+          id: `skill-weight:${skill.id}:${focusId}`,
+          skillId: skill.id,
+          updatedAt: timestamp,
+          weight,
+        })),
+      ),
+    );
+
+    await insert(
+      schema.project,
+      sanitized.projects.map((project, index) => ({
+        caseStudy: project.caseStudy ?? null,
+        detail: project.detail,
+        featured: project.featured,
+        id: project.id,
+        impact: project.impact,
+        publicProof: project.publicProof ?? null,
+        slug: project.slug,
+        sortOrder: index,
+        summary: project.summary,
+        title: project.title,
+        updatedAt: timestamp,
+        visibility: project.visibility,
+      })),
+    );
+    await insert(
+      schema.projectLink,
+      sanitized.projects.flatMap((project) =>
+        project.proofLinks.map((link, index) => ({
+          href: link.href,
+          id: `project-link:${project.id}:${index}`,
+          kind: link.kind,
+          label: link.label,
+          projectId: project.id,
+          sortOrder: index,
+          updatedAt: timestamp,
+        })),
+      ),
+    );
+    await insert(
+      schema.projectSkillLink,
+      sanitized.projects.flatMap((project) =>
+        project.skillIds.map((skillId, index) => ({
+          id: `project-skill:${project.id}:${skillId}`,
+          projectId: project.id,
           skillId,
           sortOrder: index,
           updatedAt: timestamp,
         })),
       ),
-    ),
-  );
-  await insertMany(
-    db,
-    ExperienceBulletFocusWeightTable,
-    sanitized.experiences.flatMap((experience) =>
-      experience.bullets.flatMap((bullet) =>
-        Object.entries(bullet.focusWeights).map(([focusId, weight]) => ({
-          bulletId: bullet.id,
+    );
+    await insert(
+      schema.projectFocusWeight,
+      sanitized.projects.flatMap((project) =>
+        Object.entries(project.focusWeights).map(([focusId, weight]) => ({
           focusId,
-          id: `bullet-weight:${bullet.id}:${focusId}`,
+          id: `project-weight:${project.id}:${focusId}`,
+          projectId: project.id,
           updatedAt: timestamp,
           weight,
         })),
       ),
-    ),
-  );
+    );
 
-  await insertMany(
-    db,
-    ProfileHighlightTable,
-    sanitized.profileHighlights.map((highlight, index) => ({
-      detail: highlight.detail,
-      id: highlight.id,
-      label: highlight.label,
-      sortOrder: index,
-      updatedAt: timestamp,
-      value: highlight.value,
-    })),
-  );
-  await insertMany(
-    db,
-    ProfileHighlightFocusWeightTable,
-    sanitized.profileHighlights.flatMap((highlight) =>
-      Object.entries(highlight.focusWeights).map(([focusId, weight]) => ({
-        focusId,
-        highlightId: highlight.id,
-        id: `highlight-weight:${highlight.id}:${focusId}`,
+    await insert(
+      schema.experience,
+      sanitized.experiences.map((experience, index) => ({
+        company: experience.company,
+        companyUrl: experience.companyUrl,
+        date: experience.date,
+        description: experience.description,
+        icon: experience.icon,
+        id: experience.id,
+        sortOrder: index,
+        title: experience.title,
+        type: experience.type,
         updatedAt: timestamp,
-        weight,
       })),
-    ),
-  );
+    );
+    await insert(
+      schema.experienceFocusWeight,
+      sanitized.experiences.flatMap((experience) =>
+        Object.entries(experience.focusWeights).map(([focusId, weight]) => ({
+          experienceId: experience.id,
+          focusId,
+          id: `experience-weight:${experience.id}:${focusId}`,
+          updatedAt: timestamp,
+          weight,
+        })),
+      ),
+    );
+    await insert(
+      schema.experienceBullet,
+      sanitized.experiences.flatMap((experience) =>
+        experience.bullets.map((bullet, index) => ({
+          experienceId: experience.id,
+          id: bullet.id,
+          sortOrder: index,
+          text: bullet.text,
+          updatedAt: timestamp,
+          visibility: bullet.visibility,
+        })),
+      ),
+    );
+    await insert(
+      schema.experienceBulletSkillLink,
+      sanitized.experiences.flatMap((experience) =>
+        experience.bullets.flatMap((bullet) =>
+          bullet.skillIds.map((skillId, index) => ({
+            bulletId: bullet.id,
+            id: `bullet-skill:${bullet.id}:${skillId}`,
+            skillId,
+            sortOrder: index,
+            updatedAt: timestamp,
+          })),
+        ),
+      ),
+    );
+    await insert(
+      schema.experienceBulletFocusWeight,
+      sanitized.experiences.flatMap((experience) =>
+        experience.bullets.flatMap((bullet) =>
+          Object.entries(bullet.focusWeights).map(([focusId, weight]) => ({
+            bulletId: bullet.id,
+            focusId,
+            id: `bullet-weight:${bullet.id}:${focusId}`,
+            updatedAt: timestamp,
+            weight,
+          })),
+        ),
+      ),
+    );
 
-  await insertMany(
-    db,
-    SummaryTemplateTable,
-    sanitized.summaryTemplates.map((template, index) => ({
-      focusIds: [...template.focusIds],
-      headline: template.headline,
-      id: template.id,
-      sortOrder: index,
-      summary: template.summary,
-      updatedAt: timestamp,
-    })),
-  );
+    await insert(
+      schema.profileHighlight,
+      sanitized.profileHighlights.map((highlight, index) => ({
+        detail: highlight.detail,
+        id: highlight.id,
+        label: highlight.label,
+        sortOrder: index,
+        updatedAt: timestamp,
+        value: highlight.value,
+      })),
+    );
+    await insert(
+      schema.profileHighlightFocusWeight,
+      sanitized.profileHighlights.flatMap((highlight) =>
+        Object.entries(highlight.focusWeights).map(([focusId, weight]) => ({
+          focusId,
+          highlightId: highlight.id,
+          id: `highlight-weight:${highlight.id}:${focusId}`,
+          updatedAt: timestamp,
+          weight,
+        })),
+      ),
+    );
 
-  await insertMany(
-    db,
-    MediaAssetTable,
-    sanitized.mediaAssets.map((asset) => ({
-      createdAt: new Date(asset.createdAt),
-      entityId: asset.entityId,
-      entityType: asset.entityType,
-      fileName: asset.fileName,
-      id: asset.id,
-      kind: asset.kind,
-      label: asset.label,
-      mimeType: asset.mimeType,
-      path: asset.path,
-      updatedAt: new Date(asset.updatedAt),
-      url: asset.url,
-    })),
-  );
+    await insert(
+      schema.summaryTemplate,
+      sanitized.summaryTemplates.map((template, index) => ({
+        focusIds: [...template.focusIds],
+        headline: template.headline,
+        id: template.id,
+        sortOrder: index,
+        summary: template.summary,
+        updatedAt: timestamp,
+      })),
+    );
 
-  if (revision) {
-    await insertMany(db, ContentRevisionTable, [
-      {
-        backupRepo: revision.backupRepo,
-        branch: revision.branch,
-        commitSha: revision.commitSha,
-        currentPath: revision.currentPath,
-        id: crypto.randomUUID(),
-        publishedAt: new Date(revision.publishedAt),
-        publishedBy: revision.publishedBy,
-        snapshotPath: revision.snapshotPath,
-        status: revision.status,
-        summary: revision.summary,
-      },
-    ]);
-  }
+    await insert(
+      schema.mediaAsset,
+      sanitized.mediaAssets.map((asset) => ({
+        createdAt: new Date(asset.createdAt),
+        entityId: asset.entityId,
+        entityType: asset.entityType,
+        fileName: asset.fileName,
+        id: asset.id,
+        kind: asset.kind,
+        label: asset.label,
+        mimeType: asset.mimeType,
+        path: asset.path,
+        updatedAt: new Date(asset.updatedAt),
+        url: asset.url,
+      })),
+    );
+
+    if (revision) {
+      await insert(schema.contentRevision, [
+        {
+          backupRepo: revision.backupRepo,
+          branch: revision.branch,
+          commitSha: revision.commitSha,
+          currentPath: revision.currentPath,
+          id: crypto.randomUUID(),
+          publishedAt: new Date(revision.publishedAt),
+          publishedBy: revision.publishedBy,
+          snapshotPath: revision.snapshotPath,
+          status: revision.status,
+          summary: revision.summary,
+        },
+      ]);
+    }
+  });
 }
 
 export async function publishPortfolioSnapshot(options: {
@@ -883,7 +804,7 @@ export async function publishPortfolioSnapshot(options: {
     await applyPortfolioContentSnapshot(sanitized, revision);
   } catch {
     const publishError = new Error(
-      "Backup succeeded, but applying the content snapshot to Astro DB failed.",
+      "Backup succeeded, but applying the content snapshot to the database failed.",
     ) as Error & {
       backup: typeof backup;
       reason: string;

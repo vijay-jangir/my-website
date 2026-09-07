@@ -362,6 +362,18 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     },
   },
   {
+    id: "typescript",
+    label: "TypeScript",
+    category: "language",
+    aliases: ["typescript", "ts"],
+    focusWeights: {
+      general: 0.35,
+      "backend-engineering": 0.55,
+      ai: 0.25,
+      "agentic-development": 0.25,
+    },
+  },
+  {
     id: "mongodb",
     label: "MongoDB",
     category: "data",
@@ -1250,7 +1262,7 @@ export const projects: readonly ProjectDefinition[] = [
   {
     id: "access-governance-platform",
     slug: "access-governance-platform",
-    title: "Access governance platform (AGP)",
+    title: "Access governance platform",
     summary:
       "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
     impact:
@@ -1289,8 +1301,77 @@ export const projects: readonly ProjectDefinition[] = [
         "Multi-repository workspace orchestrated via manifest files, lockfile-based snapshot pinning, and a custom repoctl CLI for clone/sync/status/checkout across all component repos.",
       ],
       scaleSignals: [],
+      responsibilities: [
+        "Platform architecture across control plane, policy compilation, bundle distribution, and local enforcement boundaries.",
+        "Service implementation for attributes, approvals, distribution, and audit workflows.",
+        "Adapter design for external identity, metadata, and approval systems.",
+      ],
+      constraints: [
+        "Control plane could not sit in the live authorization path.",
+        "Architecture details had to remain sanitized for public sharing.",
+        "Policy artifacts needed to serve multiple enforcement engines without duplicating governance logic.",
+      ],
+      artifacts: [
+        {
+          label: "Sanitized system shape",
+          type: "sanitized-diagram",
+          detail:
+            "High-level control-plane and enforcement-plane architecture shared without internal identifiers or policy data.",
+        },
+      ],
+      confidentialityNotes: [
+        "Internal service names, policy data, and enterprise-specific identifiers stay private; the public writeup focuses on architecture, interfaces, and operating model.",
+      ],
     },
-    caseStudy: null,
+    caseStudy: {
+      headline:
+        "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+      context:
+        "Large enterprises usually accumulate access rules across catalogs, query engines, workflow tools, and custom services. The goal here was to give the organization one governed path for attributes, approvals, policy authoring, distribution, and audit — without making the control plane a runtime dependency for every authorization decision.",
+      role: "Sole architect and lead developer",
+      timeframe: "2026",
+      organization: "Large telecom enterprise",
+      team:
+        "Built directly while partnering with identity, data-platform, and security stakeholders for source-system and enforcement integration.",
+      confidentiality:
+        "This was an internal project for a large telecom enterprise. The writeup keeps internal service names, policy data, and system identifiers private while sharing the architecture and operating model in sanitized form.",
+      metrics: [],
+      architecture: [
+        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
+        "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
+        "Distribution service assembles signed bundles containing only the attributes each policy set references, publishes to a registry, and notifies subscribers.",
+        "Enforcement stays local: OPA PDPs, Ranger plugins, and OPAL clients continue making decisions even if the control plane is unavailable.",
+      ],
+      responsibilities: [
+        "Defined the control-plane and enforcement-plane split so policy authoring, approvals, and bundle generation never sat in the authorization hot path.",
+        "Designed the canonical policy IR and the compilation pipeline for OPA, OpenFGA, and Ranger targets.",
+        "Built the PostgreSQL-backed services for attributes, approvals, distribution, and audit, plus the adapter boundaries for external systems.",
+        "Created the multi-repository workspace workflow and orchestration CLI used to clone, sync, pin, and operate the platform consistently.",
+      ],
+      decisions: [
+        {
+          label: "Keep enforcement offline-capable",
+          detail:
+            "Authorization checks had to keep working during control-plane outages, so bundles were signed and delivered to local enforcement points instead of calling home on every decision.",
+        },
+        {
+          label: "Compile once, enforce many ways",
+          detail:
+            "A canonical policy representation made it possible to author once and emit target-specific artifacts for OPA, Ranger, and OpenFGA without duplicating governance logic.",
+        },
+        {
+          label: "Hide enterprise dependencies behind adapters",
+          detail:
+            "Identity sources, data catalogs, approval tooling, and cloud services all sat behind adapter interfaces so the core platform stayed testable and replaceable.",
+        },
+      ],
+      lessons: [
+        "Access governance works better when metadata, approvals, and policy compilation are treated as one platform instead of separate admin tools.",
+        "A control plane should improve authoring and auditability, not become a latency or availability dependency for authorization itself.",
+        "Bundle signing, projection, and offline enforcement are what turn central policy management into something production teams will trust.",
+      ],
+    },
   },
   {
     id: "telecom-network-datalake",

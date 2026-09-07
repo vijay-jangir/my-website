@@ -173,4 +173,26 @@ describe("content-aware focus parsing", () => {
       ),
     ).toBe(false);
   });
+
+  it("ships a real case study for the access governance platform project", () => {
+    const accessGovernancePlatform = fallbackPortfolioSnapshot.projects.find(
+      (project) => project.id === "access-governance-platform",
+    );
+
+    expect(accessGovernancePlatform?.title).toBe("Access governance platform");
+    expect(accessGovernancePlatform?.caseStudy).toMatchObject({
+      organization: "Large telecom enterprise",
+      role: "Sole architect and lead developer",
+      timeframe: "2026",
+    });
+    expect(accessGovernancePlatform?.caseStudy?.confidentiality).toContain(
+      "internal project",
+    );
+    expect(accessGovernancePlatform?.publicProof).toMatchObject({
+      artifacts: expect.any(Array),
+      confidentialityNotes: expect.any(Array),
+      constraints: expect.any(Array),
+      responsibilities: expect.any(Array),
+    });
+  });
 });

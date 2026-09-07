@@ -1,48 +1,64 @@
 import type { APIRoute } from "astro";
 
-import {
-  getWixBlogLocalPath,
-  getWixBlogs,
-  type WixBlogPost,
-} from "@/src/lib/wix";
+import type { BlogPost } from "@/lib/blog";
+import { getUnifiedBlogPosts } from "@/lib/blog";
+import { escapeXml } from "@/src/lib/xml";
 
 export const prerender = false;
 
-const publicRoutes = ["/", "/projects", "/resume", "/blog"];
+const publicRoutes = ["/", "/projects", "/resume", "/blog", "/market-signals"];
 
-const escapeXml = (value: string) =>
-  value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+type SitemapEntry = { readonly loc: string; readonly lastmod?: string };
 
-export function buildSitemapRoutes(
-  posts: readonly Pick<WixBlogPost, "slug" | "url">[] = [],
+export function buildSitemapEntries(
+  posts: readonly BlogPost[] = [],
   projectSlugs: readonly string[] = [],
-) {
-  const blogRoutes = posts
-    .map((post) => getWixBlogLocalPath(post))
-    .filter((route): route is string => Boolean(route));
-  const projectRoutes = projectSlugs.map((slug) => `/projects/${slug}`);
+): SitemapEntry[] {
+  const staticEntries: SitemapEntry[] = publicRoutes.map((route) => ({
+    loc: route,
+  }));
 
-  return [...new Set([...publicRoutes, ...projectRoutes, ...blogRoutes])];
+  const projectEntries: SitemapEntry[] = projectSlugs.map((slug) => ({
+    loc: `/projects/${slug}`,
+  }));
+
+  const blogEntries: SitemapEntry[] = posts.map((post) => {
+    const loc = `/blog/${encodeURIComponent(post.slug)}`;
+    const lastModDate = post.updatedAt ?? post.publishedAt;
+    const lastmod =
+      lastModDate && !Number.isNaN(lastModDate.getTime())
+        ? lastModDate.toISOString()
+        : undefined;
+
+    return { loc, ...(lastmod ? { lastmod } : {}) };
+  });
+
+  return [
+    ...new Map(
+      [...staticEntries, ...projectEntries, ...blogEntries].map((entry) => [
+        entry.loc,
+        entry,
+      ]),
+    ).values(),
+  ];
 }
 
 export const GET: APIRoute = async ({ site }) => {
-  const baseUrl = site ?? new URL("https://www.vijayjangir.com");
+  const baseUrl = site ?? new URL("https://vijayjangir.com");
   const { getPortfolioContent } = await import("@/lib/portfolio-content");
   const content = await getPortfolioContent();
-  const posts = await getWixBlogs();
+  const posts = await getUnifiedBlogPosts();
   const publicProjectSlugs = content.projects
     .filter((project) => project.visibility === "public")
     .map((project) => project.slug);
-  const urlEntries = buildSitemapRoutes(posts, publicProjectSlugs)
-    .map((route) => {
-      const loc = escapeXml(new URL(route, baseUrl).toString());
+  const urlEntries = buildSitemapEntries(posts, publicProjectSlugs)
+    .map((entry) => {
+      const loc = escapeXml(new URL(entry.loc, baseUrl).toString());
+      const lastmodTag = entry.lastmod
+        ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`
+        : "";
 
-      return `  <url>\n    <loc>${loc}</loc>\n  </url>`;
+      return `  <url>\n    <loc>${loc}</loc>${lastmodTag}\n  </url>`;
     })
     .join("\n");
   const body =

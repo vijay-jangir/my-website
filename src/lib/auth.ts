@@ -8,7 +8,7 @@ const SESSION_COOKIE = "vj_session";
 const STATE_COOKIE = "vj_oauth_state";
 const COOKIE_SECURE = process.env.NODE_ENV === "production";
 
-export type SessionRole = "admin" | "editor";
+export type SessionRole = "owner";
 
 export type SessionUser = {
   login: string;
@@ -29,11 +29,7 @@ function getRoleForLogin(login: string): SessionRole | null {
   const normalized = login.trim().toLowerCase();
 
   if (env.adminGithubLogins.includes(normalized)) {
-    return "admin";
-  }
-
-  if (env.editorGithubLogins.includes(normalized)) {
-    return "editor";
+    return "owner";
   }
 
   return null;

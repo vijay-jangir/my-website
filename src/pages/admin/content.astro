@@ -68,19 +68,12 @@ setRobotsHeader(Astro.response.headers);
               </a>
             </div>
           </div>
-        ) : session.role !== "admin" ? (
-          <div class="mt-8 rounded-[1.75rem] border border-red-200 bg-red-50 p-6">
-            <p class="text-sm leading-7 text-red-700">
-              This surface is currently limited to admin accounts because it
-              publishes directly.
-            </p>
-          </div>
         ) : null
       }
     </section>
 
     {
-      session?.role === "admin" ? (
+      session ? (
         <>
           <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

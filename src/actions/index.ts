@@ -20,12 +20,10 @@ import {
   listContentRevisions,
   publishPortfolioSnapshot,
 } from "@/lib/portfolio-content";
-import {
-  isAstroContentDbConfigured,
-  isContentBackupConfigured,
-} from "@/lib/env";
+import { isDatabaseConfigured, isContentBackupConfigured } from "@/lib/env";
 import type {
   FocusDefinition,
+  FocusPreset,
   PortfolioSnapshot,
   ProfileHighlight,
   SummaryTemplate,
@@ -194,9 +192,18 @@ const summaryTemplateSchema = z.object({
   summary: z.string().min(1),
 });
 
+const focusPresetSchema = z.object({
+  description: z.string().min(1),
+  focusIds: z.array(z.string()).default([]),
+  id: z.string().min(1),
+  label: z.string().min(1),
+  sortOrder: z.number().int().min(0),
+});
+
 const portfolioSnapshotSchema = z.object({
   experiences: z.array(experienceSchema),
   focusDefinitions: z.array(focusDefinitionSchema),
+  focusPresets: z.array(focusPresetSchema),
   mediaAssets: z
     .array(
       z.object({
@@ -232,13 +239,13 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-async function requireAdmin(cookies: Parameters<typeof getSessionUser>[0]) {
+async function requireOwner(cookies: Parameters<typeof getSessionUser>[0]) {
   const session = await getSessionUser(cookies);
 
-  if (!session || session.role !== "admin") {
+  if (!session || session.role !== "owner") {
     throw new ActionError({
       code: "UNAUTHORIZED",
-      message: "Admin authentication is required.",
+      message: "Owner authentication is required.",
     });
   }
 
@@ -250,11 +257,11 @@ async function requireAdmin(cookies: Parameters<typeof getSessionUser>[0]) {
     });
   }
 
-  if (process.env.NODE_ENV === "production" && !isAstroContentDbConfigured()) {
+  if (process.env.NODE_ENV === "production" && !isDatabaseConfigured()) {
     throw new ActionError({
       code: "PRECONDITION_FAILED",
       message:
-        "Remote Astro DB must be configured before production content publishing is enabled.",
+        "DATABASE_URL must be configured before production content publishing is enabled.",
     });
   }
 
@@ -304,6 +311,12 @@ function toSummaryTemplates(
   return summaryTemplates as unknown as readonly SummaryTemplate[] | undefined;
 }
 
+function toFocusPresets(
+  focusPresets?: z.infer<typeof focusPresetSchema>[],
+): readonly FocusPreset[] | undefined {
+  return focusPresets as unknown as readonly FocusPreset[] | undefined;
+}
+
 function inferFileExtension(fileName: string, mimeType: string) {
   const existing = fileName.split(".").pop();
 
@@ -328,7 +341,7 @@ export const server = {
   upsertProfile: defineAction({
     input: siteProfileSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -340,7 +353,7 @@ export const server = {
   createSkill: defineAction({
     input: skillSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -352,7 +365,7 @@ export const server = {
   updateSkill: defineAction({
     input: skillSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -364,7 +377,7 @@ export const server = {
   deleteSkill: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -376,7 +389,7 @@ export const server = {
   createProject: defineAction({
     input: projectSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -388,7 +401,7 @@ export const server = {
   updateProject: defineAction({
     input: projectSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -400,7 +413,7 @@ export const server = {
   deleteProject: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -412,7 +425,7 @@ export const server = {
   createExperience: defineAction({
     input: experienceSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -424,7 +437,7 @@ export const server = {
   updateExperience: defineAction({
     input: experienceSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -436,7 +449,7 @@ export const server = {
   deleteExperience: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -448,18 +461,20 @@ export const server = {
   publishContentSnapshot: defineAction({
     input: z.object({
       focusDefinitions: z.array(focusDefinitionSchema).optional(),
+      focusPresets: z.array(focusPresetSchema).optional(),
       profileHighlights: z.array(profileHighlightSchema).optional(),
       snapshot: portfolioSnapshotSchema.optional(),
       summary: z.string().max(200).optional(),
       summaryTemplates: z.array(summaryTemplateSchema).optional(),
     }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const current = await getPortfolioContent();
       const nextSnapshot = input.snapshot
         ? toPortfolioSnapshot(input.snapshot)
         : publishAdvancedCollections(current, {
             focusDefinitions: toFocusDefinitions(input.focusDefinitions),
+            focusPresets: toFocusPresets(input.focusPresets),
             profileHighlights: toProfileHighlights(input.profileHighlights),
             summaryTemplates: toSummaryTemplates(input.summaryTemplates),
           });
@@ -489,7 +504,7 @@ export const server = {
       label: z.string().min(1),
     }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       const ext = inferFileExtension(input.file.name, input.file.type);
       const timestamp = new Date().toISOString().replaceAll(":", "-");
@@ -534,7 +549,7 @@ export const server = {
   }),
   listRevisions: defineAction({
     handler: async (_input, context) => {
-      await requireAdmin(context.cookies);
+      await requireOwner(context.cookies);
       const revisions = await listContentRevisions();
       return { revisions };
     },

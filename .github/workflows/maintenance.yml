@@ -1,0 +1,29 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  purge-expired-rows:
+    name: Purge expired resume variants and JD requests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run purge
+        run: node scripts/maintenance-purge.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

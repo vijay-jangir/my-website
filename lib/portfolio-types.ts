@@ -146,6 +146,14 @@ export type SummaryTemplate = {
   summary: string;
 };
 
+export type FocusPreset = {
+  id: string;
+  label: string;
+  description: string;
+  focusIds: FocusId[];
+  sortOrder: number;
+};
+
 export type SiteProfile = {
   name: string;
   title: string;
@@ -159,6 +167,8 @@ export type SiteProfile = {
   linkedinUrl: string;
   profileImageUrl?: string;
   heroLabel: string;
+  heroTitleLines?: readonly string[];
+  heroSubtitle?: string;
   recruiterPitch: string;
   overview: string[];
 };
@@ -194,6 +204,7 @@ export type PortfolioSnapshot = {
   siteProfile: SiteProfile;
   portfolioLinks: readonly PortfolioLink[];
   focusDefinitions: readonly FocusDefinition[];
+  focusPresets: readonly FocusPreset[];
   skillDefinitions: readonly SkillDefinition[];
   projects: readonly ProjectDefinition[];
   experiences: readonly ExperienceDefinition[];
@@ -231,6 +242,13 @@ export type JdSection = {
   content: string;
 };
 
+export type JdGap = {
+  term: string;
+  section: string;
+  classification: "unmatched" | "weak";
+  count: number;
+};
+
 export type JobDescriptionAnalysis = {
   rawText: string;
   focusScores: readonly FocusScore[];
@@ -238,6 +256,7 @@ export type JobDescriptionAnalysis = {
   sections: readonly JdSection[];
   topFocusIds: readonly FocusId[];
   extractedHighlights: readonly string[];
+  gaps: readonly JdGap[];
 };
 
 export type ResumeVariant = {

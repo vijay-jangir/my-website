@@ -132,3 +132,21 @@
 - Wire a real logged-in admin flow locally with valid GitHub OAuth credentials.
 - Link the repo to Vercel with a valid token and rerun `npm run vercel:build`.
 - Decide whether to port or delete any remaining legacy Next.js-only assets after the Astro migration settles.
+
+## 2026-08-25 — Hardening, SEO, and content wave (`rebuild/hardening-seo-content`)
+
+### Changes
+
+- Removed dead modules (`lib/auth.ts`, `lib/hooks.ts`, `lib/utils.ts`, `lib/types.ts`, `lib/data.ts`, `lib/turnstile.ts`) and unused deps (`resend`, `clsx`, `@vercel/analytics`, `@vercel/speed-insights`); pruned ghost env vars.
+- Added `Cache-Control: s-maxage` + stale-while-revalidate to public SSR pages and the PDF endpoint; 8s timeouts on Wix and backup fetches; removed Next-only fetch cache options.
+- Replaced silent catches with warnings in content loader, backup loader, and resume store; reset poisoned astro:db module-promise cache on failure.
+- Focus URL params now validate against live content via `parseFocusIdsInContent`.
+- JD alias matching uses lookaround boundaries so `C++`/`C#`-style aliases match; regression tests added.
+- Removed fake blog category filter; homepage mobile pitch and featured lineup now derive from snapshot data.
+- SEO: `/rss.xml` + autodiscovery, sitemap lastmod for posts, Article/Breadcrumb/CreativeWork JSON-LD, `og:type=article`, dedicated 404 page, `favicon.ico/png` naming, apex-host consistency, security headers in `vercel.json`.
+- Content: expanded `governed-conversational-data-platform` with the text-to-SQL journey (RASL schema linking per arXiv:2507.23104, governed execution framing, MCP servers, evaluation loops); added MCP skill entry. A standalone text-to-SQL project draft was merged into this entry after owner review.
+- Docs: rewrote AGENTS.md for Astro reality; replaced stale site-review.md with findings + disposition.
+
+### Validation
+
+- `npm run check` green under Node 24 (lint, astro check, 24 unit tests, production build).

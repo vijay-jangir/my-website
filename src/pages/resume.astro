@@ -3,15 +3,22 @@ import { getPortfolioContent } from "@/lib/portfolio-content";
 import {
   buildResumeVariantFromContent,
   getSkillLabel,
-  parseFocusIds,
+  parseFocusIdsInContent,
 } from "@/lib/portfolio";
 import { getResumeVariantByToken } from "@/lib/resume-store";
 import type { FocusDefinition, FocusId } from "@/lib/portfolio-types";
 import FocusPills from "@/src/components/FocusPills.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
+import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
+
+Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
 const content = await getPortfolioContent();
-const focusIds = parseFocusIds(Astro.url.searchParams.get("focus"));
+const focusIds = parseFocusIdsInContent(
+  content,
+  Astro.url.searchParams.get("focus"),
+);
 const variantToken = Astro.url.searchParams.get("variant") ?? undefined;
 const storedVariant = variantToken
   ? await getResumeVariantByToken(variantToken)
@@ -49,27 +56,23 @@ const pdfLabel = storedVariant?.token
   : hasFocusedView
     ? `Download ${selectedFocusLabels} PDF`
     : "Download resume PDF";
+const docxLabel = storedVariant?.token
+  ? "Download tailored DOCX"
+  : hasFocusedView
+    ? `Download ${selectedFocusLabels} DOCX`
+    : "Download resume DOCX";
 const skillLabels = Object.fromEntries(
   content.skillDefinitions.map((skill) => [skill.id, skill.label]),
 ) as Record<string, string>;
-const focusPresetGroups = [
-  {
-    label: "Backend platform",
-    description: "Service ownership, data APIs, and production reliability.",
-    focusIds: ["backend-engineering", "platform-engineering"] as const,
-  },
-  {
-    label: "Data platform",
-    description: "Pipelines, mesh foundations, streaming, and governance.",
-    focusIds: ["data-platform", "kafka", "flink"] as const,
-  },
-  {
-    label: "AI data products",
-    description: "Governed agents, text-to-data, visualization, and Python.",
-    focusIds: ["ai", "agentic-development", "python"] as const,
-  },
-];
-
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Resume", path: "/resume" },
+    ],
+  }),
+);
 function buildResumeHref(focusIds: readonly FocusId[]) {
   if (focusIds.includes("general")) {
     return "/resume";
@@ -86,6 +89,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
   siteProfile={content.siteProfile}
   title="Resume | Vijay Jangir"
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
   <main class="space-y-12 pb-4">
     <section
       class="grid gap-8 px-1 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
@@ -117,6 +121,12 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
             href={`/api/resume/pdf?${pdfParams.toString()}`}
           >
             {pdfLabel}
+          </a>
+          <a
+            class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+            href={`/api/resume/docx?${pdfParams.toString()}`}
+          >
+            {docxLabel}
           </a>
           <a
             class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
@@ -182,7 +192,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
         </div>
         <div class="grid gap-3 sm:grid-cols-3">
           {
-            focusPresetGroups.map((preset) => {
+            content.focusPresets.map((preset) => {
               const isActive =
                 preset.focusIds.length === selectedFocusIds.length &&
                 preset.focusIds.every((focusId) =>

@@ -1,6 +1,7 @@
 import type {
   ExperienceDefinition,
   FocusDefinition,
+  FocusPreset,
   PortfolioLink,
   ProfileHighlight,
   ProjectDefinition,
@@ -9,31 +10,56 @@ import type {
   SummaryTemplate,
 } from "@/lib/portfolio-types";
 
+const CAREER_START_DATE = new Date("2014-09-01T00:00:00.000Z");
+const MILLISECONDS_PER_YEAR = 365.25 * 86_400_000;
+
+export function getExperienceYears(atTime = Date.now()) {
+  return Math.floor(
+    (atTime - CAREER_START_DATE.getTime()) / MILLISECONDS_PER_YEAR,
+  );
+}
+
+const experienceYearsLabel = `${getExperienceYears()}+ years`;
+
 export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
-  title: "Architect + hands-on developer for governed data platforms",
+  title:
+    "Platform engineer building governed data platforms, AI agents, and access governance systems",
   location: "India",
   timezone: "Asia/Kolkata",
-  lastUpdatedLabel: "May 2026",
+  lastUpdatedLabel: "September 2026",
   contentPromise:
     "Case studies describe the problem, my ownership, architecture, constraints, and decisions without exposing internal systems.",
   currentFocusLabels: [
-    "Governed data platforms",
-    "Enterprise AI",
-    "Platform engineering",
+    "Context Engineering",
+    "Multi-Agent Systems",
+    "LLM Orchestration",
+    "MCP",
+    "RAG",
+    "Agent Harness",
+    "AI Observability",
+    "Evals",
+    "Tool Use",
+    "Production AI",
   ],
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   profileImageUrl: "/profile-pic.jpeg",
-  heroLabel:
-    "I architect and build the systems between enterprise data and the people who need to use it.",
+  heroLabel: `${experienceYearsLabel} in platform engineering, AI agents and governance, and production AI systems.`,
+  heroTitleLines: [
+    "Platform Engineering.",
+    "AI Agents & Governance.",
+    "Production AI Systems.",
+  ],
+  heroSubtitle:
+    `${experienceYearsLabel} building multi-agent systems, context engineering, LLM orchestration, MCP integrations, RAG pipelines, AI observability, and governed data platforms for enterprise.`,
   recruiterPitch:
-    "I am an architect and hands-on developer for governed data platforms, text-to-data systems, workflow orchestration, access-governance integrations, in-house CI/CD onboarding, and network-scale analytics pipelines.",
+    "Platform engineer, data engineer, and AI engineer. I build multi-agent systems, agent harnesses, context engineering workflows, MCP-based tool integrations, RAG pipelines with evals, AI observability, access-governance platforms, and the orchestration and developer tooling that keep enterprise data infrastructure production-ready.",
   overview: [
-    "My work usually starts where data is already operationally important: ingestion, metadata, query execution, authorization, observability, orchestration, and the user workflows built on top.",
-    "The current chapter is a governed conversational data platform: multi-LLM graph workflows, knowledge retrieval, controlled query execution, answer reasoning, and charting with identity and authorization kept inside the platform.",
-    "The broader work includes Hive metastore synchronization, Ranger/RBAC extensions, custom Airflow operators, in-house YAML-based CI/CD onboarding, mobile tower network-event analytics, and browsing-log data products.",
+    "I build governed data platforms \u2014 the metadata, authorization, orchestration, and developer tooling that make enterprise data usable. Recently that\u2019s meant multi-LLM agent runtimes, MCP-based tool use, retrieval-grounded schema linking, and context engineering for text-to-SQL at enterprise scale.",
+    "The latest project is an access governance platform \u2014 centralized attribute store, policy authoring for multiple PDPs (OPA, Ranger, OpenFGA), signed bundle distribution, and enforcement that runs locally without calling home.",
+    "Before that: Hive metastore sync, Ranger RBAC extensions, DataHub metadata integrations, Airflow operators, Kafka/Flink pipelines for telecom network analytics, and a YAML-driven CI/CD onboarding framework.",
   ],
 };
 
@@ -330,6 +356,18 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     label: "JavaScript",
     category: "language",
     aliases: ["javascript", "js", "typescript", "ts"],
+    focusWeights: {
+      general: 0.35,
+      "backend-engineering": 0.55,
+      ai: 0.25,
+      "agentic-development": 0.25,
+    },
+  },
+  {
+    id: "typescript",
+    label: "TypeScript",
+    category: "language",
+    aliases: ["typescript", "ts"],
     focusWeights: {
       general: 0.35,
       "backend-engineering": 0.55,
@@ -656,13 +694,62 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     },
   },
   {
-    id: "llm-workflows",
-    label: "LLM Workflows",
+    id: "context-engineering",
+    label: "Context Engineering",
     category: "ai",
-    aliases: ["llm", "agent", "agentic", "prompt engineering", "evaluation"],
+    aliases: [
+      "context engineering",
+      "context window design",
+      "schema grounding",
+      "retrieval grounding",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.9,
+      python: 0.3,
+    },
+  },
+  {
+    id: "genai",
+    label: "Generative AI",
+    category: "ai",
+    aliases: ["genai", "generative ai", "generative-ai", "llm systems"],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.7,
+    },
+  },
+  {
+    id: "llm-workflows",
+    label: "LLM Orchestration",
+    category: "ai",
+    aliases: [
+      "llm",
+      "agent",
+      "agentic",
+      "llm orchestration",
+      "llm workflows",
+      "evaluation",
+    ],
     focusWeights: {
       ai: 1,
       "agentic-development": 1,
+    },
+  },
+  {
+    id: "agent-orchestration",
+    label: "Agent Orchestration",
+    category: "ai",
+    aliases: [
+      "agent orchestration",
+      "agent harness",
+      "agent runtime",
+      "agent workflow",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 1,
+      python: 0.3,
     },
   },
   {
@@ -674,6 +761,53 @@ export const skillDefinitions: readonly SkillDefinition[] = [
       ai: 1,
       "agentic-development": 1,
       python: 0.4,
+    },
+  },
+  {
+    id: "rag",
+    label: "RAG",
+    category: "ai",
+    aliases: [
+      "rag",
+      "retrieval augmented generation",
+      "retrieval-augmented generation",
+      "retrieval grounded",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.9,
+      python: 0.3,
+    },
+  },
+  {
+    id: "mcp",
+    label: "MCP (Model Context Protocol)",
+    category: "ai",
+    aliases: [
+      "mcp",
+      "model context protocol",
+      "mcp server",
+      "mcp servers",
+      "tool servers",
+    ],
+    focusWeights: {
+      ai: 0.8,
+      "agentic-development": 1,
+    },
+  },
+  {
+    id: "prompt-engineering",
+    label: "Prompt Engineering",
+    category: "ai",
+    aliases: [
+      "prompt engineering",
+      "prompt design",
+      "prompt management",
+      "prompt tuning",
+    ],
+    focusWeights: {
+      ai: 0.9,
+      "agentic-development": 0.8,
     },
   },
   {
@@ -694,6 +828,17 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     focusWeights: {
       ai: 0.5,
       "agentic-development": 0.7,
+    },
+  },
+  {
+    id: "opa",
+    label: "OPA (Open Policy Agent)",
+    category: "platform",
+    aliases: ["opa", "open policy agent", "rego", "policy engine", "opal", "cedar", "keycloak", "ldap", "data masking", "row-level security", "rls", "access governance"],
+    focusWeights: {
+      "backend-engineering": 0.6,
+      "platform-engineering": 1,
+      "data-platform": 0.7,
     },
   },
   {
@@ -814,6 +959,123 @@ export const skillDefinitions: readonly SkillDefinition[] = [
       kafka: 0.6,
     },
   },
+  {
+    id: "multi-agent-systems",
+    label: "Multi-Agent Systems",
+    category: "ai",
+    aliases: [
+      "multi-agent",
+      "multi agent",
+      "agent orchestration",
+      "agent systems",
+      "supervisor pattern",
+    ],
+    highlights: [
+      "Production multi-agent orchestration with supervisor and worker patterns",
+    ],
+    focusWeights: {
+      general: 0.8,
+      ai: 1,
+      "agentic-development": 1,
+      "platform-engineering": 0.5,
+    },
+  },
+  {
+    id: "agent-harness",
+    label: "Agent Harness",
+    category: "ai",
+    aliases: [
+      "agent harness",
+      "agent runtime",
+      "agent framework",
+      "agent infrastructure",
+    ],
+    highlights: [
+      "Custom agent runtime with tool routing, state management, and recovery",
+    ],
+    focusWeights: {
+      general: 0.7,
+      ai: 1,
+      "agentic-development": 1,
+      "backend-engineering": 0.6,
+    },
+  },
+  {
+    id: "evals",
+    label: "AI Evals",
+    category: "ai",
+    aliases: [
+      "evals",
+      "evaluation",
+      "ai evaluation",
+      "model evaluation",
+      "eval framework",
+      "RAGAS",
+    ],
+    highlights: [
+      "Evaluation framework design for production LLM systems",
+    ],
+    focusWeights: { general: 0.7, ai: 1, "agentic-development": 0.8 },
+  },
+  {
+    id: "ai-observability",
+    label: "AI Observability",
+    category: "ai",
+    aliases: [
+      "ai observability",
+      "llm observability",
+      "prompt tracing",
+      "inference monitoring",
+    ],
+    highlights: [
+      "Production observability with Langfuse for LLM pipelines",
+    ],
+    focusWeights: {
+      general: 0.6,
+      ai: 1,
+      "platform-engineering": 0.7,
+    },
+  },
+  {
+    id: "tool-use",
+    label: "Tool Use & Function Calling",
+    category: "ai",
+    aliases: [
+      "tool use",
+      "function calling",
+      "tool calling",
+      "structured outputs",
+    ],
+    highlights: [
+      "MCP-based tool integration and function calling for agent systems",
+    ],
+    focusWeights: {
+      general: 0.6,
+      ai: 1,
+      "agentic-development": 1,
+    },
+  },
+  {
+    id: "production-ai",
+    label: "Production AI",
+    category: "ai",
+    aliases: [
+      "production ai",
+      "production llm",
+      "ai infrastructure",
+      "ai systems",
+      "applied ai",
+    ],
+    highlights: [
+      "Shipping AI systems with guardrails, observability, and cost controls",
+    ],
+    focusWeights: {
+      general: 0.8,
+      ai: 1,
+      "platform-engineering": 0.8,
+      "backend-engineering": 0.6,
+    },
+  },
 ] as const;
 
 export const projects: readonly ProjectDefinition[] = [
@@ -826,18 +1088,30 @@ export const projects: readonly ProjectDefinition[] = [
     impact:
       "Moved analytics discovery toward self-service by connecting a multi-LLM graph runtime with knowledge retrieval, governed Trino execution, answer reasoning, chart generation, prompt tracing, and a richer Open WebUI experience. The natural-language analytics path reduced query time by about 40% for supported workflows.",
     detail:
-      "My role covered both architecture and hands-on implementation across the full service topology: custom Open WebUI experience, multi-LLM agent runtime, graph subflows, knowledge system, query engine, platform control plane, and supporting services for identity, metadata, query execution, reasoning, and visualization.",
+      "My role covered both architecture and hands-on implementation across the full service topology: custom Open WebUI experience, multi-LLM agent runtime, graph subflows, knowledge system, query engine, platform control plane, and supporting services for identity, metadata, query execution, reasoning, and visualization. The text-to-SQL path inside the platform was taken through the full journey - discovery of why naive prompting fails at enterprise scale, retrieval-grounded schema linking, graph orchestration, governed execution, tracing, delivery, and post-launch evaluation.",
     skillIds: [
+      "langgraph",
+      "mcp",
       "python",
       "fastapi",
-      "langgraph",
+      "context-engineering",
+      "rag",
+      "llm-workflows",
+      "agent-orchestration",
+      "prompt-engineering",
+      "genai",
       "langfuse",
       "trino",
       "datahub",
       "openwebui",
       "dbt",
       "vector-search",
-      "llm-workflows",
+      "multi-agent-systems",
+      "agent-harness",
+      "evals",
+      "ai-observability",
+      "tool-use",
+      "production-ai",
     ],
     focusWeights: {
       general: 1,
@@ -861,7 +1135,9 @@ export const projects: readonly ProjectDefinition[] = [
       architectureShape: [
         "Business users ask through a customized Open WebUI experience with richer controls for data, charts, and follow-up workflows.",
         "A multi-LLM graph runtime routes work through specialized subgraphs for knowledge retrieval, business question answering, query generation, execution, reasoning, and visualization.",
+        "Schema linking is retrieval-based rather than prompt-stuffed: schemas and metadata are decomposed into semantic units, indexed, and retrieved per question with relevance calibration, following the RASL approach (arXiv:2507.23104) - zero fine-tuning, resilient to catalog changes.",
         "Agents use metadata and knowledge services built from DataHub context, business definitions, SQL logs, schema relationships, and query patterns.",
+        "MCP servers expose metadata lookup, controlled query execution, and chart generation as discrete, auditable tools to the agent runtime.",
         "A governed query engine executes through Trino with user identity, Ranger authorization, cancellation, guardrails, and persisted result references.",
         "The product handles business questions such as top-performing managers by geography, month-over-month gross-addition trends, and quarter-level growth comparisons.",
         "Visualization and answer-reasoning flows work from governed result references rather than sending raw enterprise data into the language model.",
@@ -886,6 +1162,18 @@ export const projects: readonly ProjectDefinition[] = [
             "Language models reason over metadata, query plans, and bounded outputs. Enterprise data access remains behind governed execution paths.",
         },
         {
+          label: "Schema linking",
+          value: "Retrieval-grounded",
+          detail:
+            "Table selection follows the RASL design (arXiv:2507.23104): decomposed semantic units, indexed retrieval, and multi-stage relevance calibration instead of stuffing schemas into prompts.",
+        },
+        {
+          label: "Adaptation cost",
+          value: "Zero fine-tuning",
+          detail:
+            "New or changed tables require re-indexing metadata rather than retraining or rewriting prompts, keeping the system operable by the data platform team.",
+        },
+        {
           label: "User path",
           value: "Text to data + charts",
           detail:
@@ -905,8 +1193,11 @@ export const projects: readonly ProjectDefinition[] = [
         },
       ],
       responsibilities: [
+        "Ran the discovery phase for the text-to-SQL path: audited why naive prompting and earlier attempts fail at enterprise catalog scale, and defined production non-negotiables.",
         "Designed the platform architecture for governed conversational analytics.",
+        "Implemented retrieval-grounded schema linking for table selection, following the RASL design (arXiv:2507.23104).",
         "Built the multi-LLM agent runtime, specialized subgraphs, query execution path, knowledge system, control-plane integration, and service orchestration pieces.",
+        "Created MCP servers exposing metadata lookup, controlled query execution, and chart generation as auditable tools.",
         "Connected Trino, Apache Ranger-based authorization, DataHub metadata, Neo4j-backed knowledge context, Langfuse prompt management and tracing, and visualization workflows.",
         "Used structured data flow between graph nodes to keep behavior deterministic and reduce unnecessary token usage.",
         "Customized the Open WebUI experience with richer interaction patterns for business users working with data and charts.",
@@ -924,10 +1215,16 @@ export const projects: readonly ProjectDefinition[] = [
             "A shareable topology can show the custom conversation UI, multi-LLM graph runtime, specialized subgraphs, metadata and knowledge services, governed query engine, Trino/Ranger execution, persisted results, reasoning, and visualization outputs.",
         },
         {
+          label: "Research grounding",
+          type: "article",
+          detail:
+            "The schema-linking design follows RASL: Retrieval Augmented Schema Linking for Massive Database Text-to-SQL (arXiv:2507.23104), which decomposes database schemas into semantic entities, indexes them for retrieval, and narrows candidate tables through multi-stage relevance calibration without fine-tuning.",
+        },
+        {
           label: "Technology references",
           type: "open-source-reference",
           detail:
-            "The shareable technology context includes Trino, Apache Ranger-based authorization, DataHub, Neo4j, LangGraph-style orchestration, Langfuse prompt management and tracing, MCP-style tools, dbt, and Open WebUI customization.",
+            "The shareable technology context includes Trino, Apache Ranger-based authorization, DataHub, Neo4j, LangGraph-style orchestration with tool nodes, Langfuse prompt management and tracing, MCP servers, dbt, and Open WebUI customization.",
         },
       ],
       confidentialityNotes: [
@@ -938,7 +1235,7 @@ export const projects: readonly ProjectDefinition[] = [
       headline:
         "A multi-LLM conversational data agent that retrieves business knowledge, runs governed queries, reasons over answers, and builds charts.",
       context:
-        "Business users needed a safer way to ask data questions, understand business definitions, execute governed queries, inspect answers, and create charts without routing every request through analysts or treating the model as the authorization layer.",
+        "Business users needed a safer way to ask data questions, understand business definitions, execute governed queries, inspect answers, and create charts without routing every request through analysts or treating the model as the authorization layer. Text-to-SQL specifically tends to fail in one of two places: the model cannot find the right tables once a warehouse outgrows any prompt, or generated SQL has no safe path to execution. This platform treated both as architectural problems to solve, not prompt-quality problems to retry.",
       role: "Architect and developer across the core services and components.",
       timeframe: "Airtel Digital, 2026-present",
       organization: "Airtel Digital",
@@ -971,6 +1268,18 @@ export const projects: readonly ProjectDefinition[] = [
             "The product direction is natural-language analytics with governed query execution, answer reasoning, reusable result references, and visualization workflows.",
         },
         {
+          label: "Schema linking",
+          value: "Retrieval-grounded",
+          detail:
+            "Table selection uses RASL-style decomposition and multi-stage retrieval with relevance calibration (arXiv:2507.23104), replacing schema-stuffing approaches that break beyond a handful of tables.",
+        },
+        {
+          label: "Extension surface",
+          value: "Purpose-scoped MCP",
+          detail:
+            "Metadata lookup, controlled execution, and charting ship as MCP servers, giving the agent stable tools and giving the platform one place to audit each capability.",
+        },
+        {
           label: "Time-to-answer",
           value: "~40% lower",
           detail:
@@ -980,16 +1289,21 @@ export const projects: readonly ProjectDefinition[] = [
       architecture: [
         "A customized Open WebUI experience captures the user question and supports richer data and chart interactions.",
         "A multi-LLM graph runtime routes work through specialized subgraphs for knowledge retrieval, business question answering, query generation, execution, reasoning, and visualization.",
+        "Schema linking follows the RASL design: build-time decomposition of schemas and metadata into semantic units indexed in a vector store, then inference-time keyword-based multi-stage retrieval with relevance calibration to narrow candidate tables within a context budget.",
         "Structured state moves between graph nodes so the system remains deterministic, easier to trace, and less wasteful with tokens.",
+        "Drafted SQL is validated before submission: dialect checks, guardrails, and plan inspection happen outside the prompt rather than as model self-critique.",
         "A knowledge system grounds the agent using metadata, business definitions, schema relationships, query logs, joins, filters, and usage patterns.",
         "Business-question subgraphs map user intent such as geography, manager, time period, metric, and comparison type into grounded query plans.",
+        "MCP servers expose metadata lookup, controlled query execution, and chart generation to the agent runtime with explicit tool contracts.",
         "A governed query engine submits SQL through Trino with user identity, Ranger authorization, cancellation, guardrails, and Parquet-style result persistence.",
         "Answer-reasoning and visualization agents consume governed result references and produce explanations or charts without turning raw data into prompt context.",
         "Langfuse supports prompt management and tracing so prompts, graph behavior, and production flows can be inspected and improved.",
       ],
       responsibilities: [
         "Defined the architecture and service boundaries for the conversational data platform.",
+        "Ran discovery for the text-to-SQL path and implemented retrieval-grounded schema linking following the RASL design (arXiv:2507.23104).",
         "Implemented the core backend services around agents, subgraphs, query execution, knowledge context, reasoning, visualization, and platform integration.",
+        "Created MCP servers wrapping metadata access, governed execution, and visualization as auditable tools.",
         "Built structured graph-state flows between nodes to improve determinism and reduce avoidable token usage.",
         "Integrated Langfuse for prompt management and tracing across the conversational workflows.",
         "Customized Open WebUI with richer user-facing interactions for data exploration and chart workflows.",
@@ -1006,6 +1320,21 @@ export const projects: readonly ProjectDefinition[] = [
           label: "Use metadata before data",
           detail:
             "The system grounds responses with catalogs, business definitions, schema relationships, query history, and usage patterns before attempting execution.",
+        },
+        {
+          label: "Retrieve schemas instead of stuffing them",
+          detail:
+            "Table selection follows the RASL pattern (arXiv:2507.23104): decompose schemas into indexed semantic units and retrieve per question with relevance calibration. That makes catalog growth an indexing task rather than a modeling or prompt-length problem.",
+        },
+        {
+          label: "Give tools protocol boundaries",
+          detail:
+            "Exposing metadata lookup, execution, and charting as MCP servers keeps tool contracts explicit and versioned, separates platform concerns from prompt concerns, and gives security one review surface per capability.",
+        },
+        {
+          label: "Validate SQL outside the prompt",
+          detail:
+            "Dialect checks, guardrails, and plan inspection run as deterministic pre-execution steps rather than model self-critique, because self-review is not a safety boundary.",
         },
         {
           label: "Model business questions as structured intent",
@@ -1046,8 +1375,264 @@ export const projects: readonly ProjectDefinition[] = [
       lessons: [
         "Enterprise AI becomes useful when it respects existing data governance instead of bypassing it.",
         "Conversational analytics needs metadata, authorization, and observability as much as it needs prompt quality.",
+        "Text-to-SQL succeeds or fails at schema linking long before generation quality matters.",
+        "The execution path is the product: governed engines with real authorization turn a demo into something deployable.",
+        "Traces are evaluation data; without them, accuracy work is guesswork dressed up as engineering.",
+        "Most text-to-SQL projects fail for architectural reasons, not model-quality reasons - which means they are solvable.",
         "A production data agent is a graph, state, tracing, and UX problem as much as it is an LLM problem.",
         "The hard part is not generating SQL; it is making the full path explainable, cancellable, auditable, and safe for repeated use.",
+      ],
+    },
+  },
+  {
+    id: "access-governance-platform",
+    slug: "access-governance-platform",
+    title: "Access governance platform",
+    summary:
+      "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+    impact:
+      "Unified access control across a large telecom enterprise's data infrastructure: attributes from multiple systems of record under one roof, policies authored once and compiled for each enforcement engine, signed bundles shipped to local PDPs for sub-millisecond decisions. Full audit trail and approval workflows for every change.",
+    detail:
+      "Designed the entire system from first principles: a control plane with attribute, policy, approval, distribution, and audit services backed by PostgreSQL, plus an enforcement plane of OPA PDPs, Ranger PEP plugins, and OPAL-based bundle delivery. The architecture enforces a strict separation — the control plane is never in the authorization hot path, and enforcement points continue operating when the control plane is unavailable. Ports-and-adapters design means every external dependency (identity providers, data catalogs, approval tools, cloud services) sits behind an adapter interface. Multi-repository workspace with a manifest-driven orchestration CLI.",
+    skillIds: [
+      "opa",
+      "ranger",
+      "postgres",
+      "kubernetes",
+      "datahub",
+      "java",
+      "python",
+      "airflow",
+      "production-ai",
+    ],
+    focusWeights: {
+      general: 1,
+      "backend-engineering": 1,
+      "platform-engineering": 1,
+      "data-platform": 0.8,
+      ai: 0.3,
+    },
+    featured: true,
+    visibility: "public",
+    proofLinks: [],
+    publicProof: {
+      proofTypes: ["private-enterprise", "sanitized-diagram"],
+      architectureShape: [
+        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
+        "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
+        "Distribution service assembles signed bundles containing only the attributes each policy set references (referenced-attribute projection), publishes to a registry, and notifies subscribers.",
+        "Enforcement plane is customer-owned: OPA PDPs as node-local DaemonSets, OPAL clients for bundle delivery, PEP plugins for Trino/Kafka/API gateways/Ranger.",
+        "Human-originated changes go through draft → approval → commit. Machine-ingested attributes skip approval. Concurrent edits use optimistic concurrency control.",
+        "Multi-repository workspace orchestrated via manifest files, lockfile-based snapshot pinning, and a custom repoctl CLI for clone/sync/status/checkout across all component repos.",
+      ],
+      scaleSignals: [],
+      responsibilities: [
+        "Platform architecture across control plane, policy compilation, bundle distribution, and local enforcement boundaries.",
+        "Service implementation for attributes, approvals, distribution, and audit workflows.",
+        "Adapter design for external identity, metadata, and approval systems.",
+      ],
+      constraints: [
+        "Control plane could not sit in the live authorization path.",
+        "Architecture details had to remain sanitized for public sharing.",
+        "Policy artifacts needed to serve multiple enforcement engines without duplicating governance logic.",
+      ],
+      artifacts: [
+        {
+          label: "Sanitized system shape",
+          type: "sanitized-diagram",
+          detail:
+            "High-level control-plane and enforcement-plane architecture shared without internal identifiers or policy data.",
+        },
+      ],
+      confidentialityNotes: [
+        "Internal service names, policy data, and enterprise-specific identifiers stay private; the public writeup focuses on architecture, interfaces, and operating model.",
+      ],
+    },
+    caseStudy: {
+      headline:
+        "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+      context:
+        "Large enterprises usually accumulate access rules across catalogs, query engines, workflow tools, and custom services. The goal here was to give the organization one governed path for attributes, approvals, policy authoring, distribution, and audit — without making the control plane a runtime dependency for every authorization decision.",
+      role: "Sole architect and lead developer",
+      timeframe: "2026",
+      organization: "Large telecom enterprise",
+      team:
+        "Built directly while partnering with identity, data-platform, and security stakeholders for source-system and enforcement integration.",
+      confidentiality:
+        "This was an internal project for a large telecom enterprise. The writeup keeps internal service names, policy data, and system identifiers private while sharing the architecture and operating model in sanitized form.",
+      metrics: [],
+      architecture: [
+        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
+        "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
+        "Distribution service assembles signed bundles containing only the attributes each policy set references, publishes to a registry, and notifies subscribers.",
+        "Enforcement stays local: OPA PDPs, Ranger plugins, and OPAL clients continue making decisions even if the control plane is unavailable.",
+      ],
+      responsibilities: [
+        "Defined the control-plane and enforcement-plane split so policy authoring, approvals, and bundle generation never sat in the authorization hot path.",
+        "Designed the canonical policy IR and the compilation pipeline for OPA, OpenFGA, and Ranger targets.",
+        "Built the PostgreSQL-backed services for attributes, approvals, distribution, and audit, plus the adapter boundaries for external systems.",
+        "Created the multi-repository workspace workflow and orchestration CLI used to clone, sync, pin, and operate the platform consistently.",
+      ],
+      decisions: [
+        {
+          label: "Keep enforcement offline-capable",
+          detail:
+            "Authorization checks had to keep working during control-plane outages, so bundles were signed and delivered to local enforcement points instead of calling home on every decision.",
+        },
+        {
+          label: "Compile once, enforce many ways",
+          detail:
+            "A canonical policy representation made it possible to author once and emit target-specific artifacts for OPA, Ranger, and OpenFGA without duplicating governance logic.",
+        },
+        {
+          label: "Hide enterprise dependencies behind adapters",
+          detail:
+            "Identity sources, data catalogs, approval tooling, and cloud services all sat behind adapter interfaces so the core platform stayed testable and replaceable.",
+        },
+      ],
+      lessons: [
+        "Access governance works better when metadata, approvals, and policy compilation are treated as one platform instead of separate admin tools.",
+        "A control plane should improve authoring and auditability, not become a latency or availability dependency for authorization itself.",
+        "Bundle signing, projection, and offline enforcement are what turn central policy management into something production teams will trust.",
+      ],
+    },
+  },
+  {
+    id: "telecom-network-datalake",
+    slug: "telecom-network-datalake",
+    title: "Telecom network data lake",
+    summary:
+      "Designed and implemented data lake and warehouse foundations for mobile tower network events at petabyte scale and roughly five trillion events per day.",
+    impact:
+      "Created the analytics foundation for network data products, reporting, and large-scale downstream consumption.",
+    detail:
+      "Worked across ingestion, storage, multi-level aggregation, processing, and operational concerns for very large mobile tower network-event datasets.",
+    skillIds: [
+      "flink",
+      "kafka",
+      "java",
+      "elastic-stack",
+      "influx",
+      "airflow",
+      "iceberg",
+      "hudi",
+    ],
+    focusWeights: {
+      general: 1,
+      "backend-engineering": 0.4,
+      "platform-engineering": 0.8,
+      "data-platform": 1,
+      flink: 0.8,
+      kafka: 0.8,
+    },
+    featured: true,
+    visibility: "public",
+    proofLinks: [],
+    publicProof: {
+      proofTypes: ["private-enterprise", "sanitized-diagram", "metric"],
+      architectureShape: [
+        "Mobile tower network events enter ingestion paths through streaming and batch movement.",
+        "Flink and Java services process high-volume streams and derived datasets.",
+        "Multi-level aggregation paths reduce raw tower-event volume into analytical outputs before downstream consumers use the data.",
+        "Data lake table-format experience includes Iceberg/Hudi-style foundations for large analytical datasets.",
+        "Airflow, Elastic Stack, and Influx support orchestration and operational visibility.",
+      ],
+      scaleSignals: [
+        {
+          label: "Event scale",
+          value: "~5T events/day",
+          detail:
+            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
+        },
+        {
+          label: "Data scale",
+          value: "Petabyte-scale",
+          detail:
+            "Shareable description stays at scale category level and avoids internal capacity details.",
+        },
+      ],
+      responsibilities: [
+        "Designed and implemented ingestion, processing, storage, and reliability pieces.",
+        "Worked across pipeline boundaries needed for downstream reporting and data products.",
+        "Kept network topology and operational thresholds confidential.",
+      ],
+      constraints: [
+        "Network topology, tower identifiers, vendor details, and operational thresholds are confidential.",
+        "Site notes present scale as rounded signals only.",
+      ],
+      artifacts: [
+        {
+          label: "High-level telecom data lake shape",
+          type: "sanitized-diagram",
+          detail:
+            "Can be shown as ingestion, streaming, storage, orchestration, observability, and downstream consumption layers.",
+        },
+        {
+          label: "Scale signal",
+          type: "metric",
+          detail:
+            "About five trillion events per day and petabyte-scale are acceptable shareable indicators without internal topology.",
+        },
+      ],
+      confidentialityNotes: [
+        "Not shown here: network topology, dataset names, exact retention policies, service-level thresholds, and internal platform names.",
+      ],
+    },
+    caseStudy: {
+      headline:
+        "Petabyte-scale network data lake and multi-level analytics for mobile tower events.",
+      context:
+        "Network data from mobile towers needed an analytics foundation that could support reporting, downstream data products, and very high event volume.",
+      role: "Designed and implemented large-scale ingestion, storage, processing, and operational pieces.",
+      timeframe: "Airtel Digital, 2021-present",
+      organization: "Airtel Digital",
+      team: "Telecom data platform and analytics stakeholders",
+      confidentiality:
+        "This case study excludes network topology, internal platform names, and operational thresholds.",
+      metrics: [
+        {
+          label: "Event scale",
+          value: "~5T events/day",
+          detail:
+            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
+        },
+        {
+          label: "Data scale",
+          value: "Petabyte-scale",
+          detail:
+            "The system supported very large telecom datasets across ingestion, storage, and downstream consumption.",
+        },
+      ],
+      architecture: [
+        "Streaming and batch ingestion paths moved mobile tower network events across the platform.",
+        "Flink and Java supported streaming and processing workloads.",
+        "Multi-level aggregation paths reduced raw tower-event volume into analytical outputs.",
+        "Table-format experience around Iceberg and Hudi supported the broader data lake skill set.",
+        "Airflow, Elastic Stack, and Influx supported orchestration and operational visibility.",
+      ],
+      responsibilities: [
+        "Designed data flows for very high-volume mobile tower network events.",
+        "Worked on petabyte-scale tower-event data and multi-level aggregation paths.",
+        "Implemented platform pieces across ingestion, processing, and operational reliability.",
+        "Created a foundation for downstream reporting and data product consumption.",
+      ],
+      decisions: [
+        {
+          label: "Treat operations as a first-class requirement",
+          detail:
+            "At this scale, pipeline correctness and visibility mattered as much as raw throughput.",
+        },
+        {
+          label: "Separate ingestion, processing, and consumption concerns",
+          detail:
+            "Clear system boundaries helped the platform support downstream analytics and products.",
+        },
+      ],
+      lessons: [
+        "Large data systems fail at the boundaries unless ownership and observability are explicit.",
+        "Scale claims are only useful when tied to the operational systems that made them sustainable.",
       ],
     },
   },
@@ -2200,127 +2785,6 @@ export const projects: readonly ProjectDefinition[] = [
     },
   },
   {
-    id: "portfolio-website",
-    slug: "portfolio-website",
-    title: "Portfolio website",
-    summary:
-      "Built this portfolio as an Astro app with structured projects, focused resume views, and an on-domain blog sourced from Wix.",
-    impact:
-      "Brought projects, experience, resume, and blog content together in one place.",
-    detail:
-      "The site started as a Next.js portfolio and now runs as an Astro/Vercel app with structured content, resume variants, public project pages, and private admin tooling.",
-    skillIds: ["react", "nextjs", "mongodb", "tailwind", "prisma"],
-    focusWeights: {
-      general: 0.5,
-      "backend-engineering": 0.3,
-      "agentic-development": 0.3,
-    },
-    featured: false,
-    visibility: "public",
-    proofLinks: [
-      {
-        label: "GitHub repository",
-        href: "https://github.com/vijay-jangir/my-website",
-        kind: "repo",
-      },
-    ],
-    publicProof: {
-      proofTypes: ["public-repo", "article", "sanitized-diagram"],
-      architectureShape: [
-        "Astro serves static-first public pages and server endpoints.",
-        "Structured portfolio content can come from bundled content, Astro DB, or backup publishing flows.",
-        "React islands are reserved for interactive surfaces such as admin tooling and homepage motion.",
-      ],
-      scaleSignals: [
-        {
-          label: "Public route coverage",
-          value: "Portfolio + resume + blog",
-          detail:
-            "The repository and deployed site show the public content model and user-facing surfaces.",
-        },
-      ],
-      responsibilities: [
-        "Designed the content model, public routes, admin flows, and deployment shape.",
-        "Built structured project pages, resume variants, and the blog section.",
-        "Separated public content from private credentials and admin-only operations.",
-      ],
-      constraints: [
-        "Credentials, unpublished drafts, and admin-only configuration stay out of public pages.",
-        "This project can link to the repository because it is intentionally public.",
-      ],
-      artifacts: [
-        {
-          label: "GitHub repository",
-          type: "public-repo",
-          detail:
-            "Public repository provides inspectable implementation context for the portfolio system.",
-          href: "https://github.com/vijay-jangir/my-website",
-        },
-        {
-          label: "Public site content model",
-          type: "article",
-          detail:
-            "The site itself demonstrates the structured project, resume, and blog model.",
-        },
-      ],
-      confidentialityNotes: [
-        "Not shown here: environment variables, auth secrets, backup targets, and private admin data.",
-      ],
-    },
-    caseStudy: {
-      headline:
-        "Personal website rebuilt into a portfolio, resume, and blog system.",
-      context:
-        "The website needed to move beyond a simple portfolio and become a durable public source for projects, resume variants, technical writing, and future private tooling.",
-      role: "Designed and built the site architecture, content model, and public experience.",
-      timeframe: "Personal project, ongoing",
-      organization: "Personal",
-      team: "Solo project with iterative review",
-      confidentiality:
-        "Repository and public site are open-facing; private credentials and admin surfaces stay out of public content.",
-      metrics: [
-        {
-          label: "Public surfaces",
-          value: "4 core routes",
-          detail:
-            "Home, projects, resume, and blog form the main public reading path.",
-        },
-        {
-          label: "Primary site",
-          value: "Same-domain",
-          detail:
-            "Portfolio, resume, blog index, and local blog detail routes are designed to keep the public story on vijayjangir.com.",
-        },
-      ],
-      architecture: [
-        "Astro serves public pages and API endpoints with a Vercel deployment target.",
-        "Structured portfolio content flows through a bundled snapshot, optional Astro DB, and optional GitHub backup.",
-        "React islands are used only where interaction is useful, such as homepage motion and admin tooling.",
-      ],
-      responsibilities: [
-        "Migrated the active application direction from Next.js to Astro.",
-        "Built deterministic focus-based resume views and PDF generation.",
-        "Added sitemap, robots, metadata, JSON-LD, and llms.txt so people and crawlers can understand the site.",
-      ],
-      decisions: [
-        {
-          label: "Static-first public experience",
-          detail:
-            "The public site avoids making AI or paid services a dependency for normal browsing.",
-        },
-        {
-          label: "Keep Wix as authoring source for now",
-          detail:
-            "The blog integration keeps the existing authoring path while moving discovery toward the primary domain.",
-        },
-      ],
-      lessons: [
-        "A personal site should prove the work quickly, not just list technologies.",
-        "The content model needs to be as intentional as the UI because the site is mostly structured content.",
-      ],
-    },
-  },
-  {
     id: "point-of-interest-proximity-streaming",
     slug: "point-of-interest-proximity-streaming",
     title: "Point-of-interest proximity streaming pipeline",
@@ -2470,143 +2934,6 @@ export const projects: readonly ProjectDefinition[] = [
       lessons: [
         "Real-time location products are as much about signal quality and timing as they are about geospatial math.",
         "A useful proximity system needs clear event boundaries, reference data ownership, and operational visibility from the start.",
-      ],
-    },
-  },
-  {
-    id: "telecom-network-datalake",
-    slug: "telecom-network-datalake",
-    title: "Telecom network data lake",
-    summary:
-      "Designed and implemented data lake and warehouse foundations for mobile tower network events at petabyte scale and roughly five trillion events per day.",
-    impact:
-      "Created the analytics foundation for network data products, reporting, and large-scale downstream consumption.",
-    detail:
-      "Worked across ingestion, storage, multi-level aggregation, processing, and operational concerns for very large mobile tower network-event datasets.",
-    skillIds: [
-      "flink",
-      "kafka",
-      "java",
-      "elastic-stack",
-      "influx",
-      "airflow",
-      "iceberg",
-      "hudi",
-    ],
-    focusWeights: {
-      general: 1,
-      "backend-engineering": 0.4,
-      "platform-engineering": 0.8,
-      "data-platform": 1,
-      flink: 0.8,
-      kafka: 0.8,
-    },
-    featured: true,
-    visibility: "public",
-    proofLinks: [],
-    publicProof: {
-      proofTypes: ["private-enterprise", "sanitized-diagram", "metric"],
-      architectureShape: [
-        "Mobile tower network events enter ingestion paths through streaming and batch movement.",
-        "Flink and Java services process high-volume streams and derived datasets.",
-        "Multi-level aggregation paths reduce raw tower-event volume into analytical outputs before downstream consumers use the data.",
-        "Data lake table-format experience includes Iceberg/Hudi-style foundations for large analytical datasets.",
-        "Airflow, Elastic Stack, and Influx support orchestration and operational visibility.",
-      ],
-      scaleSignals: [
-        {
-          label: "Event scale",
-          value: "~5T events/day",
-          detail:
-            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
-        },
-        {
-          label: "Data scale",
-          value: "Petabyte-scale",
-          detail:
-            "Shareable description stays at scale category level and avoids internal capacity details.",
-        },
-      ],
-      responsibilities: [
-        "Designed and implemented ingestion, processing, storage, and reliability pieces.",
-        "Worked across pipeline boundaries needed for downstream reporting and data products.",
-        "Kept network topology and operational thresholds confidential.",
-      ],
-      constraints: [
-        "Network topology, tower identifiers, vendor details, and operational thresholds are confidential.",
-        "Site notes present scale as rounded signals only.",
-      ],
-      artifacts: [
-        {
-          label: "High-level telecom data lake shape",
-          type: "sanitized-diagram",
-          detail:
-            "Can be shown as ingestion, streaming, storage, orchestration, observability, and downstream consumption layers.",
-        },
-        {
-          label: "Scale signal",
-          type: "metric",
-          detail:
-            "About five trillion events per day and petabyte-scale are acceptable shareable indicators without internal topology.",
-        },
-      ],
-      confidentialityNotes: [
-        "Not shown here: network topology, dataset names, exact retention policies, service-level thresholds, and internal platform names.",
-      ],
-    },
-    caseStudy: {
-      headline:
-        "Petabyte-scale network data lake and multi-level analytics for mobile tower events.",
-      context:
-        "Network data from mobile towers needed an analytics foundation that could support reporting, downstream data products, and very high event volume.",
-      role: "Designed and implemented large-scale ingestion, storage, processing, and operational pieces.",
-      timeframe: "Airtel Digital, 2021-present",
-      organization: "Airtel Digital",
-      team: "Telecom data platform and analytics stakeholders",
-      confidentiality:
-        "This case study excludes network topology, internal platform names, and operational thresholds.",
-      metrics: [
-        {
-          label: "Event scale",
-          value: "~5T events/day",
-          detail:
-            "The mobile tower network-event platform handled petabyte-scale data and about five trillion events per day.",
-        },
-        {
-          label: "Data scale",
-          value: "Petabyte-scale",
-          detail:
-            "The system supported very large telecom datasets across ingestion, storage, and downstream consumption.",
-        },
-      ],
-      architecture: [
-        "Streaming and batch ingestion paths moved mobile tower network events across the platform.",
-        "Flink and Java supported streaming and processing workloads.",
-        "Multi-level aggregation paths reduced raw tower-event volume into analytical outputs.",
-        "Table-format experience around Iceberg and Hudi supported the broader data lake skill set.",
-        "Airflow, Elastic Stack, and Influx supported orchestration and operational visibility.",
-      ],
-      responsibilities: [
-        "Designed data flows for very high-volume mobile tower network events.",
-        "Worked on petabyte-scale tower-event data and multi-level aggregation paths.",
-        "Implemented platform pieces across ingestion, processing, and operational reliability.",
-        "Created a foundation for downstream reporting and data product consumption.",
-      ],
-      decisions: [
-        {
-          label: "Treat operations as a first-class requirement",
-          detail:
-            "At this scale, pipeline correctness and visibility mattered as much as raw throughput.",
-        },
-        {
-          label: "Separate ingestion, processing, and consumption concerns",
-          detail:
-            "Clear system boundaries helped the platform support downstream analytics and products.",
-        },
-      ],
-      lessons: [
-        "Large data systems fail at the boundaries unless ownership and observability are explicit.",
-        "Scale claims are only useful when tied to the operational systems that made them sustainable.",
       ],
     },
   },
@@ -3222,9 +3549,9 @@ export const profileHighlights: readonly ProfileHighlight[] = [
   {
     id: "experience-years",
     label: "Experience",
-    value: "10+ years",
+    value: experienceYearsLabel,
     detail:
-      "Hands-on work across telecom, retail, analytics, distributed systems, and platform engineering.",
+      "Hands-on work across AI systems, telecom, retail, analytics, distributed systems, and platform engineering.",
     focusWeights: {
       general: 1,
     },
@@ -3257,13 +3584,14 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     },
   },
   {
-    id: "systems",
-    label: "Core areas",
-    value: "AI, metadata, access governance, orchestration, and data products",
+    id: "ai-stack",
+    label: "AI stack",
+    value: "LangGraph, MCP, RAG, Prompt Engineering, FastAPI, OPA",
     detail:
-      "Strongest where data engineering, platform ownership, access control, orchestration, and user-facing analytics have to work together.",
+      "Daily work spans context engineering, LLM orchestration, agent orchestration, governed retrieval, MCP tool contracts, FastAPI services, and access-governance enforcement.",
     focusWeights: {
       general: 1,
+      ai: 1,
       "backend-engineering": 0.5,
       "platform-engineering": 1,
       "data-platform": 1,
@@ -3286,7 +3614,7 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
     focusIds: ["ai"],
     headline: "AI Engineer for Governed Text-to-Data Systems",
     summary:
-      "This view highlights my current governed conversational data platform work: multi-LLM graph runtime, specialized subgraphs, knowledge retrieval, prompt tracing, metadata grounding, query execution, answer reasoning, result references, and visualization workflows.",
+      "This view highlights my current governed conversational data platform work: context engineering, LLM orchestration, agent subgraphs, MCP-based tools, retrieval-grounded schema linking, prompt tracing, query execution, answer reasoning, and visualization workflows.",
   },
   {
     id: "backend",
@@ -3314,7 +3642,31 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
     focusIds: ["ai", "backend-engineering"],
     headline: "Backend Engineer for AI Data Products",
     summary:
-      "This view combines backend engineering with AI product infrastructure: Python services, graph state contracts, tool APIs, metadata context, prompt tracing, governed query execution, answer reasoning, and operational guardrails.",
+      "This view combines backend engineering with AI product infrastructure: Python services, context engineering, graph state contracts, MCP tool APIs, metadata context, prompt tracing, governed query execution, answer reasoning, and operational guardrails.",
+  },
+] as const;
+
+export const focusPresets: readonly FocusPreset[] = [
+  {
+    id: "backend-platform",
+    label: "Backend platform",
+    description: "Service ownership, data APIs, and production reliability.",
+    focusIds: ["backend-engineering", "platform-engineering"],
+    sortOrder: 0,
+  },
+  {
+    id: "data-platform",
+    label: "Data platform",
+    description: "Pipelines, mesh foundations, streaming, and governance.",
+    focusIds: ["data-platform", "kafka", "flink"],
+    sortOrder: 1,
+  },
+  {
+    id: "ai-data-products",
+    label: "AI data products",
+    description: "Governed agents, text-to-data, visualization, and Python.",
+    focusIds: ["ai", "agentic-development", "python"],
+    sortOrder: 2,
   },
 ] as const;
 
@@ -3322,6 +3674,7 @@ export const fallbackPortfolioSnapshot = {
   siteProfile,
   portfolioLinks,
   focusDefinitions,
+  focusPresets,
   skillDefinitions,
   projects,
   experiences,

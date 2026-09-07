@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { dbQuery } from "@/lib/db";
+import { dbQuery } from "@/lib/drizzle";
 import type {
   JobDescriptionAnalysis,
   ResumeVariant,
@@ -15,6 +15,8 @@ type StoredVariantRow = {
   created_at: string;
 };
 
+const VARIANT_EXPIRY_DAYS = 90;
+
 export async function saveResumeVariant(options: {
   focusIds: readonly string[];
   variant: ResumeVariant;
@@ -22,15 +24,19 @@ export async function saveResumeVariant(options: {
 }) {
   try {
     const token = crypto.randomBytes(12).toString("hex");
+    const expiresAt = new Date(
+      Date.now() + VARIANT_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+    );
     const result = await dbQuery<StoredVariantRow>(
       `
         insert into resume_variants (
           token,
           focus_ids,
           variant,
-          analysis
+          analysis,
+          expires_at
         )
-        values ($1, $2::text[], $3::jsonb, $4::jsonb)
+        values ($1, $2::text[], $3::jsonb, $4::jsonb, $5)
         returning token, focus_ids, variant, analysis, created_at
       `,
       [
@@ -38,11 +44,13 @@ export async function saveResumeVariant(options: {
         options.focusIds,
         JSON.stringify(options.variant),
         JSON.stringify(options.analysis ?? null),
+        expiresAt.toISOString(),
       ],
     );
 
     return result?.rows[0] ?? null;
-  } catch {
+  } catch (error) {
+    console.warn("[resume-store] failed to save resume variant:", error);
     return null;
   }
 }
@@ -55,7 +63,7 @@ export async function getResumeVariantByToken(
       `
         select token, focus_ids, variant, analysis, created_at
         from resume_variants
-        where token = $1
+        where token = $1 and expires_at > now()
         limit 1
       `,
       [token],
@@ -74,7 +82,8 @@ export async function getResumeVariantByToken(
       analysis: row.analysis ?? undefined,
       createdAt: row.created_at,
     };
-  } catch {
+  } catch (error) {
+    console.warn("[resume-store] failed to load resume variant:", error);
     return null;
   }
 }

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { dbQuery } from "@/lib/db";
+import { dbQuery } from "@/lib/drizzle";
 import { buildResumeVariantFromJobDescriptionWithContent } from "@/lib/jd";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import { isAuthConfigured } from "@/lib/env";
@@ -64,10 +64,13 @@ export const POST: APIRoute = async ({ cookies, request }) => {
   );
 
   try {
+    const jdExpiresAt = new Date(
+      Date.now() + 180 * 24 * 60 * 60 * 1000,
+    ).toISOString();
     await dbQuery(
       `
-        insert into jd_requests (focus_ids, raw_text, extraction)
-        values ($1::text[], $2, $3::jsonb)
+        insert into jd_requests (focus_ids, raw_text, extraction, expires_at)
+        values ($1::text[], $2, $3::jsonb, $4)
       `,
       [
         variant.focusIds,
@@ -75,12 +78,14 @@ export const POST: APIRoute = async ({ cookies, request }) => {
         JSON.stringify({
           extractedHighlights: analysis.extractedHighlights,
           focusScores: analysis.focusScores,
+          gaps: analysis.gaps,
           skillScores: analysis.skillScores,
         }),
+        jdExpiresAt,
       ],
     );
-  } catch {
-    // Keep the flow usable even when the DB is not ready.
+  } catch (error) {
+    console.warn("[jd-analyze] jd_requests insert failed:", error);
   }
 
   const savedVariant = await saveResumeVariant({
@@ -99,6 +104,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     analysis: {
       extractedHighlights: analysis.extractedHighlights,
       focusScores: analysis.focusScores.slice(0, 6),
+      gaps: analysis.gaps,
       skillScores: analysis.skillScores.slice(0, 10),
     },
     ok: true,

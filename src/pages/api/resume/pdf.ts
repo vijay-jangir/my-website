@@ -2,7 +2,10 @@ import React from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
 import type { APIRoute } from "astro";
 
-import { buildResumeVariantFromContent, parseFocusIds } from "@/lib/portfolio";
+import {
+  buildResumeVariantFromContent,
+  parseFocusIdsInContent,
+} from "@/lib/portfolio";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import { getResumeVariantByToken } from "@/lib/resume-store";
 import AtsResumeDocument from "@/src/components/resume/AtsResumeDocument";
@@ -11,7 +14,10 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
   const content = await getPortfolioContent();
-  const focusIds = parseFocusIds(url.searchParams.get("focus"));
+  const focusIds = parseFocusIdsInContent(
+    content,
+    url.searchParams.get("focus"),
+  );
   const variantToken = url.searchParams.get("variant") ?? undefined;
   const storedVariant = variantToken
     ? await getResumeVariantByToken(variantToken)
@@ -29,10 +35,15 @@ export const GET: APIRoute = async ({ url }) => {
     }) as React.ReactElement,
   );
 
+  const headers = new Headers({
+    "Content-Disposition": 'attachment; filename="Vijay_Jangir_Resume.pdf"',
+    "Content-Type": "application/pdf",
+    "Cache-Control": storedVariant
+      ? "private, no-store"
+      : "public, max-age=3600, s-maxage=86400",
+  });
+
   return new Response(new Uint8Array(pdfBuffer), {
-    headers: {
-      "Content-Disposition": 'attachment; filename="Vijay_Jangir_Resume.pdf"',
-      "Content-Type": "application/pdf",
-    },
+    headers,
   });
 };

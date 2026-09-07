@@ -4,17 +4,49 @@ export const prerender = true;
 
 const disallowedPaths = ["/admin", "/assistant", "/api"];
 
-export const GET: APIRoute = ({ site }) => {
-  const baseUrl = site ?? new URL("https://www.vijayjangir.com");
+const aiCrawlerUserAgents = [
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-User",
+  "Claude-SearchBot",
+  "PerplexityBot",
+  "Google-Extended",
+  "Applebot-Extended",
+  "CCBot",
+] as const;
+
+const policyComments = [
+  "# vijayjangir.com crawl policy",
+  "# Search and answer engines may crawl all public paths.",
+  "# Private app surfaces are disallowed below.",
+];
+
+export function buildRobotsTxt(baseUrl: URL): string {
   const sitemapUrl = new URL("/sitemap.xml", baseUrl).toString();
-  const body = [
+
+  return [
+    ...policyComments,
+    "",
     "User-agent: *",
     "Allow: /",
     ...disallowedPaths.map((path) => `Disallow: ${path}`),
+    "",
+    ...aiCrawlerUserAgents.flatMap((userAgent) => [
+      `User-agent: ${userAgent}`,
+      "Allow: /",
+      ...disallowedPaths.map((path) => `Disallow: ${path}`),
+      "",
+    ]),
     `Sitemap: ${sitemapUrl}`,
   ].join("\n");
+}
 
-  return new Response(body, {
+export const GET: APIRoute = ({ site }) => {
+  const baseUrl = site ?? new URL("https://vijayjangir.com");
+
+  return new Response(buildRobotsTxt(baseUrl), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
     },

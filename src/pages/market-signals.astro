@@ -1,0 +1,163 @@
+---
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { loadPublishedSnapshot } from "@/lib/intelligence/publish";
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
+
+Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
+
+const content = await getPortfolioContent();
+const snapshot = await loadPublishedSnapshot();
+---
+
+<BaseLayout
+  description="Aggregated market demand signals showing which technical skills and focus areas employers seek most, derived from real job description analysis."
+  siteProfile={content.siteProfile}
+  title="Market Signals | Vijay Jangir"
+>
+  <main class="space-y-10 pb-4">
+    <section class="px-1 py-8 sm:py-14">
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        Market intelligence
+      </p>
+      <h1
+        class="mt-4 max-w-4xl font-display text-6xl font-semibold leading-[0.96] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
+      >
+        What the market demands.
+      </h1>
+      <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-600">
+        Aggregated skill demand and focus-area trends drawn from real job
+        descriptions I have analyzed. No employer names, no raw text — just
+        the signal.
+      </p>
+    </section>
+
+    {
+      !snapshot ? (
+        <section class="rounded-[2rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl">
+          <p class="text-base leading-8 text-slate-600">
+            No market signals have been published yet. Check back later.
+          </p>
+        </section>
+      ) : (
+        <>
+          <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Job descriptions analyzed
+              </p>
+              <p class="mt-4 text-3xl font-semibold text-[#0e1528]">
+                {snapshot.totalRequests}
+              </p>
+            </div>
+            {snapshot.dateRange ? (
+              <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                  Analysis period
+                </p>
+                <p class="mt-4 text-sm leading-7 text-slate-600">
+                  {new Date(snapshot.dateRange.earliest).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                  {" — "}
+                  {new Date(snapshot.dateRange.latest).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                </p>
+              </div>
+            ) : null}
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Last published
+              </p>
+              <p class="mt-4 text-sm leading-7 text-slate-600">
+                {new Date(snapshot.publishedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              </p>
+            </div>
+          </section>
+
+          {snapshot.topSkills.length > 0 ? (
+            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-8">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Most demanded skills
+              </p>
+              <div class="mt-6 flex flex-wrap gap-2">
+                {snapshot.topSkills.map((skill) => (
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-2 text-sm font-semibold text-[#0e1528]">
+                    {skill.label}
+                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[0.65rem] font-semibold text-slate-500">
+                      {skill.count}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {snapshot.topFocusAreas.length > 0 ? (
+            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-8">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Focus areas in demand
+              </p>
+              <div class="mt-6 flex flex-wrap gap-2">
+                {snapshot.topFocusAreas.map((focus) => (
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-[#1f3b73]/20 bg-[#1f3b73]/5 px-3.5 py-2 text-sm font-semibold text-[#1f3b73]">
+                    {focus.label}
+                    <span class="rounded-full bg-[#1f3b73]/10 px-2 py-0.5 text-[0.65rem] font-semibold text-[#1f3b73]/70">
+                      {focus.count}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {snapshot.recurringGaps.length > 0 ? (
+            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-8">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Emerging skill gaps
+              </p>
+              <p class="mt-2 text-sm leading-7 text-slate-500">
+                Terms recurring across job descriptions where current portfolio
+                coverage is thin.
+              </p>
+              <div class="mt-6 flex flex-wrap gap-2">
+                {snapshot.recurringGaps.map((gap) => (
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-2 text-sm font-semibold text-amber-800">
+                    {gap.term}
+                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[0.65rem] font-semibold text-amber-600">
+                      {gap.count}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {snapshot.monthlyTrend.length > 1 ? (
+            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-8">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">
+                Monthly analysis volume
+              </p>
+              <div class="mt-6 flex items-end gap-1" style="height: 120px;">
+                {snapshot.monthlyTrend.map((point) => {
+                  const maxCount = Math.max(...snapshot.monthlyTrend.map((p) => p.count));
+                  const height = maxCount > 0 ? Math.max((point.count / maxCount) * 100, 4) : 4;
+                  return (
+                    <div class="group relative flex flex-1 flex-col items-center">
+                      <div
+                        class="w-full rounded-t-lg bg-[#1f3b73]/20 transition group-hover:bg-[#1f3b73]/40"
+                        style={`height: ${height}px;`}
+                      />
+                      <span class="mt-1 text-[0.6rem] text-slate-400">
+                        {point.month.slice(5)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+        </>
+      )
+    }
+  </main>
+</BaseLayout>

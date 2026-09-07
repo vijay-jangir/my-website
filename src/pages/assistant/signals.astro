@@ -1,0 +1,234 @@
+---
+import BaseLayout, { setRobotsHeader } from "@/src/layouts/BaseLayout.astro";
+import { getSessionUser } from "@/src/lib/auth";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { isAuthConfigured } from "@/lib/env";
+
+const content = await getPortfolioContent();
+const session = await getSessionUser(Astro.cookies);
+
+setRobotsHeader(Astro.response.headers);
+---
+
+<BaseLayout
+  description="Private market demand signals aggregated from analyzed job descriptions."
+  nonPublic={true}
+  showAdminNav={true}
+  siteProfile={content.siteProfile}
+  title="Market Signals | Vijay Jangir"
+>
+  <main class="space-y-8 pb-4">
+    <section
+      class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
+    >
+      <p
+        class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+      >
+        Private intelligence
+      </p>
+      <h1
+        class="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[#0e1528]"
+      >
+        Market demand signals
+      </h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+        Aggregated signals from analyzed job descriptions. Skill demand,
+        focus-area trends, recurring gaps, and deterministic recommendations for
+        portfolio updates.
+      </p>
+      {
+        session ? (
+          <p class="mt-3 text-sm text-slate-500">
+            Signed in as {session.login}.
+          </p>
+        ) : null
+      }
+    </section>
+
+    {
+      !isAuthConfigured() ? (
+        <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+          <p class="text-sm leading-7 text-slate-600">
+            Private access is not enabled for this deployment.
+          </p>
+        </section>
+      ) : !session ? (
+        <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+          <p class="text-sm leading-7 text-slate-600">
+            This route is restricted to manually allowlisted GitHub accounts.
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              class="inline-flex items-center rounded-full bg-[#11192c] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
+              href="/api/auth/github"
+            >
+              Sign in with GitHub
+            </a>
+          </div>
+        </section>
+      ) : (
+        <>
+          <section id="signals-container" class="space-y-6">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="text-sm leading-7 text-slate-600">Loading signals…</p>
+            </div>
+          </section>
+
+          <section class="flex flex-wrap gap-3">
+            <button
+              class="inline-flex items-center rounded-full bg-[#11192c] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222] disabled:opacity-50"
+              id="publish-btn"
+              type="button"
+            >
+              Publish to public page
+            </button>
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              href="/market-signals"
+              target="_blank"
+            >
+              View public page
+            </a>
+            <a
+              class="inline-flex items-center rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              href="/assistant"
+            >
+              Back to tools
+            </a>
+          </section>
+        </>
+      )
+    }
+  </main>
+
+  <script>
+    async function loadSignals() {
+      const container = document.getElementById("signals-container");
+      if (!container) return;
+
+      try {
+        const response = await fetch("/api/intelligence/signals");
+        const data = await response.json();
+
+        if (!data.ok) {
+          container.innerHTML = `<div class="rounded-[2rem] border border-red-200 bg-red-50 p-6"><p class="text-sm text-red-700">${data.message ?? "Failed to load signals."}</p></div>`;
+          return;
+        }
+
+        const s = data.signals;
+        const sections = [];
+
+        sections.push(`
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Total JDs</p>
+              <p class="mt-4 text-3xl font-semibold text-[#0e1528]">${s.totalRequests}</p>
+            </div>
+            ${
+              s.dateRange
+                ? `
+              <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+                <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Date range</p>
+                <p class="mt-4 text-sm leading-7 text-slate-600">${new Date(s.dateRange.earliest).toLocaleDateString()} — ${new Date(s.dateRange.latest).toLocaleDateString()}</p>
+              </div>
+            `
+                : ""
+            }
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Unique skills</p>
+              <p class="mt-4 text-3xl font-semibold text-[#0e1528]">${s.topSkills.length}</p>
+            </div>
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Gap terms</p>
+              <p class="mt-4 text-3xl font-semibold text-[#0e1528]">${s.recurringGaps.length}</p>
+            </div>
+          </div>
+        `);
+
+        if (s.topSkills.length > 0) {
+          const skillRows = s.topSkills
+            .map(
+              // @ts-expect-error — signal response objects are untyped in client script
+              (sk) =>
+                `<tr class="border-t border-slate-100"><td class="py-2 pr-4 text-sm text-[#0e1528]">${sk.label}</td><td class="py-2 pr-4 text-sm text-slate-600 text-right">${sk.count}</td><td class="py-2 text-sm text-slate-600 text-right">${sk.avgScore}</td></tr>`,
+            )
+            .join("");
+          sections.push(`
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Top skills</p>
+              <table class="mt-4 w-full"><thead><tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500"><th class="pb-2">Skill</th><th class="pb-2 text-right">Count</th><th class="pb-2 text-right">Avg score</th></tr></thead><tbody>${skillRows}</tbody></table>
+            </div>
+          `);
+        }
+
+        if (s.recurringGaps.length > 0) {
+          const gapRows = s.recurringGaps
+            .map(
+              // @ts-expect-error — signal response objects are untyped in client script
+              (g) =>
+                `<tr class="border-t border-slate-100"><td class="py-2 pr-4 text-sm text-[#0e1528]">${g.term}</td><td class="py-2 text-sm text-slate-600 text-right">${g.count}</td></tr>`,
+            )
+            .join("");
+          sections.push(`
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Recurring gaps</p>
+              <table class="mt-4 w-full"><thead><tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500"><th class="pb-2">Term</th><th class="pb-2 text-right">Count</th></tr></thead><tbody>${gapRows}</tbody></table>
+            </div>
+          `);
+        }
+
+        if (s.recommendations.length > 0) {
+          const recItems = s.recommendations
+            .map(
+              // @ts-expect-error — signal response objects are untyped in client script
+              (r) => `<li class="text-sm leading-7 text-slate-600">${r}</li>`,
+            )
+            .join("");
+          sections.push(`
+            <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
+              <p class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]">Recommendations</p>
+              <ul class="mt-4 list-disc space-y-2 pl-5">${recItems}</ul>
+            </div>
+          `);
+        }
+
+        container.innerHTML = sections.join("");
+      } catch {
+        container.innerHTML = `<div class="rounded-[2rem] border border-red-200 bg-red-50 p-6"><p class="text-sm text-red-700">Failed to load signals.</p></div>`;
+      }
+    }
+
+    async function publishSignals() {
+      const btn = document.getElementById("publish-btn");
+      if (!btn) return;
+
+      // @ts-expect-error — btn is a button element with disabled property
+      btn.disabled = true;
+      btn.textContent = "Publishing…";
+
+      try {
+        const response = await fetch("/api/intelligence/publish", {
+          method: "POST",
+        });
+        const data = await response.json();
+
+        if (data.ok) {
+          btn.textContent = "Published ✓";
+        } else {
+          btn.textContent = data.message ?? "Publish failed";
+          // @ts-expect-error — btn is a button element
+          btn.disabled = false;
+        }
+      } catch {
+        btn.textContent = "Publish failed";
+        // @ts-expect-error — btn is a button element
+        btn.disabled = false;
+      }
+    }
+
+    document
+      .getElementById("publish-btn")
+      ?.addEventListener("click", publishSignals);
+    loadSignals();
+  </script>
+</BaseLayout>

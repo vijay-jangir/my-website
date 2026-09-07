@@ -1,12 +1,11 @@
 import { fileURLToPath } from "node:url";
 
+import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-import db from "@astrojs/db";
 
 export default defineConfig({
   site: "https://vijayjangir.com",
@@ -15,7 +14,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react(), db()],
+  integrations: [mdx(), react()],
   vite: {
     plugins: [tailwindcss(), tsconfigPaths()],
     resolve: {

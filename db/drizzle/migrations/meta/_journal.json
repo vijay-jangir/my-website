@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788761958808,
+      "tag": "0000_swift_mordo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788764428166,
+      "tag": "0001_add-expires-at",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788765784179,
+      "tag": "0002_sturdy_junta",
+      "breakpoints": true
+    }
+  ]
+}

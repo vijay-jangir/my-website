@@ -8,6 +8,7 @@ import ProjectPager from "@/src/components/projects/ProjectPager.astro";
 import PublicProof from "@/src/components/projects/PublicProof.astro";
 import RelatedProjects from "@/src/components/projects/RelatedProjects.astro";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 
 export const prerender = false;
 
@@ -98,6 +99,38 @@ function getRelatedProjects(sourceProject?: ProjectDefinition) {
 const relatedProjects = getRelatedProjects(project);
 const publicProof = project?.publicProof;
 const publicScopeText = caseStudy?.confidentiality;
+const projectPageUrl = project
+  ? new URL(`/projects/${project.slug}`, Astro.site ?? Astro.url).toString()
+  : null;
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Projects", path: "/projects" },
+      ...(project
+        ? [{ name: project.title, path: `/projects/${project.slug}` }]
+        : []),
+    ],
+  }),
+);
+
+const projectJsonLd =
+  project && projectPageUrl
+    ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        abstract: description,
+        author: {
+          "@type": "Person",
+          name: content.siteProfile.name,
+          url: new URL("/", Astro.site ?? Astro.url).toString(),
+        },
+        headline: project.title,
+        mainEntityOfPage: projectPageUrl,
+        ...(caseStudy?.timeframe ? { dateCreated: caseStudy.timeframe } : {}),
+      })
+    : null;
 ---
 
 <BaseLayout
@@ -105,6 +138,12 @@ const publicScopeText = caseStudy?.confidentiality;
   siteProfile={content.siteProfile}
   title={project ? `${project.title} | Vijay Jangir` : "Project | Vijay Jangir"}
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
+  {
+    projectJsonLd ? (
+      <script is:inline set:html={projectJsonLd} type="application/ld+json" />
+    ) : null
+  }
   <main class="space-y-10 pb-4">
     {
       project ? (

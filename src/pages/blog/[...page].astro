@@ -1,0 +1,120 @@
+---
+import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import BlogCard from "@/src/components/BlogCard.astro";
+import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
+import { getPortfolioContent } from "@/lib/portfolio-content";
+import { getUnifiedBlogPosts, paginateBlogPosts } from "@/lib/blog";
+
+export const prerender = false;
+
+const rawPage = Astro.params.page;
+
+if (rawPage === "1") {
+  return Astro.redirect("/blog", 301);
+}
+
+const pageNum = rawPage ? Number.parseInt(rawPage, 10) : 1;
+
+if (Number.isNaN(pageNum) || pageNum < 1) {
+  return new Response(null, { status: 404 });
+}
+
+Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
+
+const allPosts = await getUnifiedBlogPosts();
+const paginated = paginateBlogPosts(allPosts, pageNum);
+
+if (pageNum > paginated.totalPages) {
+  return new Response(null, { status: 404 });
+}
+
+const content = await getPortfolioContent();
+const prevHref = paginated.hasPrev
+  ? paginated.page === 2
+    ? "/blog"
+    : `/blog/${paginated.page - 1}`
+  : null;
+const nextHref = paginated.hasNext ? `/blog/${paginated.page + 1}` : null;
+---
+
+<BaseLayout
+  description={`Blog posts from Vijay Jangir — page ${paginated.page} of ${paginated.totalPages}.`}
+  siteProfile={content.siteProfile}
+  title={`Blog — Page ${paginated.page} | Vijay Jangir`}
+>
+  <Fragment slot="head">
+    {prevHref && <link rel="prev" href={prevHref} />}
+    {nextHref && <link rel="next" href={nextHref} />}
+  </Fragment>
+
+  <main class="space-y-10 pb-4">
+    <section
+      class="rounded-[2.6rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-10 sm:py-10"
+    >
+      <div>
+        <p
+          class="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[#1f3b73]"
+        >
+          Technical notes
+        </p>
+        <h1
+          class="mt-4 font-display text-5xl font-semibold leading-[0.96] tracking-[-0.05em] text-[#0e1528] sm:text-6xl"
+        >
+          Blog
+        </h1>
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+          Page {paginated.page} of {paginated.totalPages}
+        </p>
+      </div>
+    </section>
+
+    <section class="space-y-5">
+      <div class="grid gap-4 md:grid-cols-2" data-blog-list>
+        {paginated.posts.map((post) => (
+          <BlogCard post={post} />
+        ))}
+      </div>
+
+      {
+        paginated.totalPages > 1 && (
+          <nav
+            aria-label="Blog pagination"
+            class="flex items-center justify-center gap-4 pt-4"
+          >
+            {prevHref ? (
+              <a
+                class="rounded-full border border-slate-200 bg-white/80 px-5 py-2.5 text-sm font-semibold text-[#1f3b73] transition hover:bg-white"
+                href={prevHref}
+                rel="prev"
+              >
+                &larr; Previous
+              </a>
+            ) : (
+              <span class="rounded-full border border-slate-100 bg-white/40 px-5 py-2.5 text-sm font-semibold text-slate-300">
+                &larr; Previous
+              </span>
+            )}
+
+            <span class="text-sm font-semibold text-slate-500">
+              {paginated.page} / {paginated.totalPages}
+            </span>
+
+            {nextHref ? (
+              <a
+                class="rounded-full border border-slate-200 bg-white/80 px-5 py-2.5 text-sm font-semibold text-[#1f3b73] transition hover:bg-white"
+                href={nextHref}
+                rel="next"
+              >
+                Next &rarr;
+              </a>
+            ) : (
+              <span class="rounded-full border border-slate-100 bg-white/40 px-5 py-2.5 text-sm font-semibold text-slate-300">
+                Next &rarr;
+              </span>
+            )}
+          </nav>
+        )
+      }
+    </section>
+  </main>
+</BaseLayout>

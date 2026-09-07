@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import {
   buildResumeVariant,
+  getExperienceYears,
   parseFocusIds,
+  parseFocusIdsInContent,
   searchProjects,
 } from "@/lib/portfolio";
+import type { FocusDefinition } from "@/lib/portfolio-types";
 
 describe("portfolio focus utilities", () => {
   it("parses focus ids, deduplicates them, and caps the selection", () => {
@@ -35,9 +39,7 @@ describe("portfolio focus utilities", () => {
       query: "portfolio nextjs wix",
     });
 
-    expect(projects.map((project) => project.id)).toEqual([
-      "portfolio-website",
-    ]);
+    expect(projects).toEqual([]);
   });
 
   it("returns no projects for a query with no lexical matches", () => {
@@ -61,5 +63,136 @@ describe("portfolio focus utilities", () => {
       "telecom-network-datalake",
       "observability",
     ]);
+  });
+});
+
+describe("content-aware focus parsing", () => {
+  const extraFocus: FocusDefinition = {
+    id: "custom-focus",
+    label: "Custom",
+    shortLabel: "Custom",
+    category: "domain",
+    headline: "h",
+    summary: "s",
+    description: "d",
+    aliases: [],
+    relatedSkillIds: [],
+  };
+
+  it("accepts focuses that exist in live content beyond the fallback set", () => {
+    const content = {
+      ...fallbackPortfolioSnapshot,
+      focusDefinitions: [
+        ...fallbackPortfolioSnapshot.focusDefinitions,
+        extraFocus,
+      ],
+    };
+
+    expect(parseFocusIdsInContent(content, "ai,custom-focus,bogus")).toEqual([
+      "ai",
+      "custom-focus",
+    ]);
+  });
+
+  it("dedupes, trims, and caps at three like the fallback parser", () => {
+    expect(
+      parseFocusIdsInContent(
+        fallbackPortfolioSnapshot,
+        " ai, ai,flink,kafka,x ",
+      ),
+    ).toEqual(["ai", "flink", "kafka"]);
+  });
+
+  it("seeds resume focus presets in bundled content", () => {
+    expect(fallbackPortfolioSnapshot.focusPresets).toEqual([
+      {
+        id: "backend-platform",
+        label: "Backend platform",
+        description:
+          "Service ownership, data APIs, and production reliability.",
+        focusIds: ["backend-engineering", "platform-engineering"],
+        sortOrder: 0,
+      },
+      {
+        id: "data-platform",
+        label: "Data platform",
+        description: "Pipelines, mesh foundations, streaming, and governance.",
+        focusIds: ["data-platform", "kafka", "flink"],
+        sortOrder: 1,
+      },
+      {
+        id: "ai-data-products",
+        label: "AI data products",
+        description:
+          "Governed agents, text-to-data, visualization, and Python.",
+        focusIds: ["ai", "agentic-development", "python"],
+        sortOrder: 2,
+      },
+    ]);
+  });
+
+  it("computes experience years from the September 2014 career start", () => {
+    expect(getExperienceYears(new Date("2026-09-07T00:00:00.000Z").getTime())).toBe(
+      12,
+    );
+    expect(
+      fallbackPortfolioSnapshot.profileHighlights.find(
+        (highlight) => highlight.id === "experience-years",
+      )?.value,
+    ).toBe(`${getExperienceYears()}+ years`);
+  });
+
+  it("ships explicit AI and governance skill definitions in bundled content", () => {
+    expect(
+      fallbackPortfolioSnapshot.skillDefinitions
+        .filter((skill) =>
+          [
+            "context-engineering",
+            "agent-orchestration",
+            "rag",
+            "prompt-engineering",
+            "genai",
+            "opa",
+          ].includes(skill.id),
+        )
+        .map((skill) => skill.label),
+    ).toEqual([
+      "Context Engineering",
+      "Generative AI",
+      "Agent Orchestration",
+      "RAG",
+      "Prompt Engineering",
+      "OPA (Open Policy Agent)",
+    ]);
+  });
+
+  it("keeps the homepage project list focused on client work instead of the site itself", () => {
+    expect(
+      fallbackPortfolioSnapshot.projects.some(
+        (project) => project.id === "portfolio-website",
+      ),
+    ).toBe(false);
+  });
+
+  it("ships a real case study for the access governance platform project", () => {
+    const accessGovernancePlatform = fallbackPortfolioSnapshot.projects.find(
+      (project) => project.id === "access-governance-platform",
+    );
+
+    expect(accessGovernancePlatform?.title).toBe("Access governance platform");
+    expect(accessGovernancePlatform?.caseStudy).toMatchObject({
+      organization: "Large telecom enterprise",
+      role: "Sole architect and lead developer",
+      timeframe: "2026",
+    });
+    expect(accessGovernancePlatform?.caseStudy?.confidentiality).toContain(
+      "internal project",
+    );
+    expect(accessGovernancePlatform?.publicProof).toMatchObject({
+      artifacts: expect.any(Array),
+      confidentialityNotes: expect.any(Array),
+      constraints: expect.any(Array),
+      responsibilities: expect.any(Array),
+    });
   });
 });

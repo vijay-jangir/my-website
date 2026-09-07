@@ -3,11 +3,14 @@ import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import BlogCard from "@/src/components/BlogCard.astro";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 import { getPortfolioContent } from "@/lib/portfolio-content";
-import { getUnifiedBlogPosts } from "@/lib/blog";
+import { getUnifiedBlogPosts, paginateBlogPosts } from "@/lib/blog";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
-const posts = await getUnifiedBlogPosts();
+const allPosts = await getUnifiedBlogPosts();
+const paginated = paginateBlogPosts(allPosts, 1);
+const posts = paginated.posts;
+const nextHref = paginated.hasNext ? "/blog/2" : null;
 const content = await getPortfolioContent();
 const fallbackReading = [
   {
@@ -145,6 +148,24 @@ const emptyStateCopy =
           >
             No matching posts found.
           </div>
+
+          {nextHref && (
+            <nav aria-label="Blog pagination" class="flex items-center justify-center gap-4 pt-4">
+              <span class="rounded-full border border-slate-100 bg-white/40 px-5 py-2.5 text-sm font-semibold text-slate-300">
+                &larr; Previous
+              </span>
+              <span class="text-sm font-semibold text-slate-500">
+                {paginated.page} / {paginated.totalPages}
+              </span>
+              <a
+                class="rounded-full border border-slate-200 bg-white/80 px-5 py-2.5 text-sm font-semibold text-[#1f3b73] transition hover:bg-white"
+                href={nextHref}
+                rel="next"
+              >
+                Next &rarr;
+              </a>
+            </nav>
+          )}
         </section>
       )
     }

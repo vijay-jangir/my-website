@@ -75,3 +75,34 @@ export async function getUnifiedBlogPosts(): Promise<BlogPost[]> {
 
   return mergeBlogPosts(local, wix);
 }
+
+export type PaginatedBlogPosts = {
+  readonly posts: readonly BlogPost[];
+  readonly page: number;
+  readonly totalPages: number;
+  readonly hasPrev: boolean;
+  readonly hasNext: boolean;
+};
+
+const DEFAULT_PER_PAGE = 12;
+
+/** Pure pagination over a pre-sorted post list. Page is 1-indexed. */
+export function paginateBlogPosts(
+  allPosts: readonly BlogPost[],
+  page: number,
+  perPage: number = DEFAULT_PER_PAGE,
+): PaginatedBlogPosts {
+  const safePage = Math.max(1, Math.floor(page));
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / perPage));
+  const clampedPage = Math.min(safePage, totalPages);
+  const start = (clampedPage - 1) * perPage;
+  const posts = allPosts.slice(start, start + perPage);
+
+  return {
+    posts,
+    page: clampedPage,
+    totalPages,
+    hasPrev: clampedPage > 1,
+    hasNext: clampedPage < totalPages,
+  };
+}

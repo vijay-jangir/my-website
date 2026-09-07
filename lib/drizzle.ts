@@ -45,7 +45,10 @@ export async function dbQuery<
 >(text: string, values: unknown[] = []): Promise<{ rows: T[] } | null> {
   const sql = getSql();
   if (!sql) return null;
-  const rows = (await sql(text, values)) as T[];
+  const rows = (await sql(
+    text as unknown as TemplateStringsArray,
+    values,
+  )) as T[];
   return { rows };
 }
 

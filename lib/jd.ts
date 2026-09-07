@@ -262,7 +262,8 @@ function collectEvidence(content: string, alias: string, limit = 2) {
 
 function tokenizeSignificantTerms(content: string) {
   return (content.toLowerCase().match(SIGNIFICANT_TERM_PATTERN) ?? []).filter(
-    (term) => term.length >= 2 && /[a-z]/.test(term) && !GAP_STOPWORDS.has(term),
+    (term) =>
+      term.length >= 2 && /[a-z]/.test(term) && !GAP_STOPWORDS.has(term),
   );
 }
 
@@ -400,13 +401,17 @@ function normalizeSkillScores(scores: SkillScore[]): SkillScore[] {
 function buildAliasTermSet(content: TaxonomyContent) {
   const aliasTerms = new Set<string>();
 
-  for (const alias of content.focusDefinitions.flatMap((focus) => focus.aliases)) {
+  for (const alias of content.focusDefinitions.flatMap(
+    (focus) => focus.aliases,
+  )) {
     for (const term of tokenizeSignificantTerms(alias)) {
       aliasTerms.add(term);
     }
   }
 
-  for (const alias of content.skillDefinitions.flatMap((skill) => skill.aliases)) {
+  for (const alias of content.skillDefinitions.flatMap(
+    (skill) => skill.aliases,
+  )) {
     for (const term of tokenizeSignificantTerms(alias)) {
       aliasTerms.add(term);
     }
@@ -446,7 +451,9 @@ function buildMatchedTermScores(
 }
 
 function getSectionRank(sectionId: string) {
-  const rank = SECTION_DEFINITIONS.findIndex((section) => section.id === sectionId);
+  const rank = SECTION_DEFINITIONS.findIndex(
+    (section) => section.id === sectionId,
+  );
   return rank === -1 ? SECTION_DEFINITIONS.length : rank;
 }
 
@@ -463,7 +470,11 @@ function extractGaps(options: {
   );
   const termStats = new Map<
     string,
-    { dominantSection: string; sectionWeights: Map<string, number>; totalWeight: number }
+    {
+      dominantSection: string;
+      sectionWeights: Map<string, number>;
+      totalWeight: number;
+    }
   >();
 
   for (const section of options.sections) {
@@ -473,11 +484,13 @@ function extractGaps(options: {
         sectionWeights: new Map<string, number>(),
         totalWeight: 0,
       };
-      const nextWeight = (current.sectionWeights.get(section.id) ?? 0) + section.weight;
+      const nextWeight =
+        (current.sectionWeights.get(section.id) ?? 0) + section.weight;
       current.sectionWeights.set(section.id, nextWeight);
       current.totalWeight += section.weight;
 
-      const dominantWeight = current.sectionWeights.get(current.dominantSection) ?? 0;
+      const dominantWeight =
+        current.sectionWeights.get(current.dominantSection) ?? 0;
       if (
         nextWeight > dominantWeight ||
         (nextWeight === dominantWeight &&
@@ -492,7 +505,7 @@ function extractGaps(options: {
 
   return Array.from(termStats.entries())
     .filter(([, stats]) => stats.totalWeight >= MIN_GAP_WEIGHT)
-    .flatMap(([term, stats]) => {
+    .flatMap(([term, stats]): JdGap[] => {
       if (!aliasTerms.has(term)) {
         return [
           {
@@ -518,12 +531,13 @@ function extractGaps(options: {
 
       return [];
     })
-    .sort((left, right) => {
+    .sort((left: JdGap, right: JdGap) => {
       if (right.count !== left.count) {
         return right.count - left.count;
       }
 
-      const sectionDelta = getSectionRank(left.section) - getSectionRank(right.section);
+      const sectionDelta =
+        getSectionRank(left.section) - getSectionRank(right.section);
       if (sectionDelta !== 0) {
         return sectionDelta;
       }

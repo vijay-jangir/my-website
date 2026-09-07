@@ -3,6 +3,7 @@ import { actions } from "astro:actions";
 
 import type {
   ExperienceDefinition,
+  FocusId,
   FocusPreset,
   MediaAsset,
   PortfolioSnapshot,
@@ -401,10 +402,15 @@ export default function ContentManager({
     const nextFocusPresets = [...focusPresetsState];
 
     if (existingIndex === -1) {
-      nextFocusPresets.push({ ...parsed, sortOrder: nextFocusPresets.length });
+      nextFocusPresets.push({
+        ...parsed,
+        focusIds: (parsed.focusIds ?? []) as FocusId[],
+        sortOrder: nextFocusPresets.length,
+      });
     } else {
       nextFocusPresets[existingIndex] = {
         ...parsed,
+        focusIds: (parsed.focusIds ?? []) as FocusId[],
         sortOrder: nextFocusPresets[existingIndex]?.sortOrder ?? existingIndex,
       };
     }

@@ -55,184 +55,221 @@ const suggestions = recommendTopics(input);
         Blog Topics & Drafting
       </h1>
       <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">
-        Topic suggestions are generated deterministically from your focus areas, skills,
-        and published content. Pick a topic, supply your notes, and the AI drafts a
-        structured post for your review.
+        Topic suggestions are generated deterministically from your focus areas,
+        skills, and published content. Pick a topic, supply your notes, and the
+        AI drafts a structured post for your review.
       </p>
-      {session ? (
-        <p class="mt-3 text-sm text-slate-500">
-          Signed in as {session.login}.
-        </p>
-      ) : null}
+      {
+        session ? (
+          <p class="mt-3 text-sm text-slate-500">
+            Signed in as {session.login}.
+          </p>
+        ) : null
+      }
 
-      {!llmAvailable ? (
-        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <strong>AI enrichment unavailable.</strong> No LLM provider is configured.
-          Topic recommendations are available (deterministic). Blog drafting requires an LLM.
-        </div>
-      ) : null}
+      {
+        !llmAvailable ? (
+          <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <strong>AI enrichment unavailable.</strong> No LLM provider is
+            configured. Topic recommendations are available (deterministic).
+            Blog drafting requires an LLM.
+          </div>
+        ) : null
+      }
     </section>
 
     <!-- Topic Recommendations -->
     <section
       class="rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
     >
-      <h2 class="font-display text-2xl font-semibold tracking-[-0.03em] text-[#0e1528]">
+      <h2
+        class="font-display text-2xl font-semibold tracking-[-0.03em] text-[#0e1528]"
+      >
         Recommended Topics
       </h2>
       <p class="mt-2 text-sm text-slate-500">
         {suggestions.length} suggestions ranked by visibility signal.
       </p>
 
-      {suggestions.length === 0 ? (
-        <p class="mt-6 text-slate-500">
-          No topic gaps found — all focus areas and skills have published coverage.
-        </p>
-      ) : (
-        <div class="mt-6 space-y-4">
-          {suggestions.map((topic) => (
-            <div
-              class="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-md"
-              data-topic-card
-              data-topic-id={topic.id}
-              data-topic-title={topic.workingTitle}
-              data-topic-keywords={topic.targetKeywords.join(",")}
-            >
-              <div class="flex items-start justify-between gap-4">
-                <div class="min-w-0 flex-1">
-                  <h3 class="font-semibold text-[#0e1528]">{topic.workingTitle}</h3>
-                  <p class="mt-1 text-sm leading-6 text-slate-600">{topic.rationale}</p>
-                  <p class="mt-2 text-sm italic text-slate-500">{topic.suggestedAngle}</p>
-                  <div class="mt-3 flex flex-wrap gap-1.5">
-                    {topic.targetKeywords.map((kw) => (
-                      <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[0.7rem] font-medium text-slate-600">
-                        {kw}
-                      </span>
-                    ))}
+      {
+        suggestions.length === 0 ? (
+          <p class="mt-6 text-slate-500">
+            No topic gaps found — all focus areas and skills have published
+            coverage.
+          </p>
+        ) : (
+          <div class="mt-6 space-y-4">
+            {suggestions.map((topic) => (
+              <div
+                class="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-md"
+                data-topic-card
+                data-topic-id={topic.id}
+                data-topic-title={topic.workingTitle}
+                data-topic-keywords={topic.targetKeywords.join(",")}
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="font-semibold text-[#0e1528]">
+                      {topic.workingTitle}
+                    </h3>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                      {topic.rationale}
+                    </p>
+                    <p class="mt-2 text-sm italic text-slate-500">
+                      {topic.suggestedAngle}
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                      {topic.targetKeywords.map((kw) => (
+                        <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[0.7rem] font-medium text-slate-600">
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 flex-col items-end gap-2">
+                    <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-blue-700">
+                      {topic.signal}
+                    </span>
+                    <span class="text-xs font-semibold text-slate-400">
+                      score {topic.score}
+                    </span>
                   </div>
                 </div>
-                <div class="flex shrink-0 flex-col items-end gap-2">
-                  <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-blue-700">
-                    {topic.signal}
-                  </span>
-                  <span class="text-xs font-semibold text-slate-400">
-                    score {topic.score}
-                  </span>
-                </div>
+                {llmAvailable ? (
+                  <button
+                    class="mt-4 rounded-lg bg-[#1f3b73] px-4 py-2 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100 hover:bg-[#162b56]"
+                    data-draft-trigger
+                    data-topic-title={topic.workingTitle}
+                    data-topic-keywords={topic.targetKeywords.join(",")}
+                    data-topic-focus={
+                      topic.signal === "focus-gap"
+                        ? topic.id.replace("focus-gap-", "")
+                        : ""
+                    }
+                    type="button"
+                  >
+                    Draft this topic
+                  </button>
+                ) : null}
               </div>
-              {llmAvailable ? (
-                <button
-                  class="mt-4 rounded-lg bg-[#1f3b73] px-4 py-2 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100 hover:bg-[#162b56]"
-                  data-draft-trigger
-                  data-topic-title={topic.workingTitle}
-                  data-topic-keywords={topic.targetKeywords.join(",")}
-                  data-topic-focus={topic.signal === "focus-gap" ? topic.id.replace("focus-gap-", "") : ""}
-                  type="button"
-                >
-                  Draft this topic
-                </button>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )
+      }
     </section>
 
     <!-- Drafting Panel (hidden until topic selected) -->
-    {llmAvailable ? (
-      <section
-        class="hidden rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
-        id="draft-panel"
-      >
-        <h2 class="font-display text-2xl font-semibold tracking-[-0.03em] text-[#0e1528]">
-          Draft a Post
-        </h2>
-        <p class="mt-2 text-sm text-slate-500" id="draft-topic-label">
-          Select a topic above or enter your own.
-        </p>
-
-        <form class="mt-6 space-y-5" id="draft-form">
-          <div>
-            <label class="block text-sm font-semibold text-slate-700" for="draft-title">
-              Title
-            </label>
-            <input
-              class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
-              id="draft-title"
-              name="title"
-              placeholder="Working title for the post"
-              required
-              type="text"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-700" for="draft-notes">
-              Your Notes
-            </label>
-            <p class="mt-0.5 text-xs text-slate-500">
-              Bullet points, facts, links, code snippets — the AI will draft from these only.
-            </p>
-            <textarea
-              class="mt-1.5 h-48 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
-              id="draft-notes"
-              name="ownerNotes"
-              placeholder="- Key point 1&#10;- Technical detail&#10;- Link to reference"
-              required
-            ></textarea>
-          </div>
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700" for="draft-keywords">
-                Keywords (comma-separated)
-              </label>
-              <input
-                class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
-                id="draft-keywords"
-                name="keywords"
-                placeholder="keyword1, keyword2"
-                type="text"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700" for="draft-focus">
-                Focus Area
-              </label>
-              <input
-                class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
-                id="draft-focus"
-                name="focusArea"
-                placeholder="e.g. backend-engineering"
-                type="text"
-              />
-            </div>
-          </div>
-          <div class="flex items-center gap-4">
-            <button
-              class="rounded-lg bg-[#1f3b73] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#162b56] disabled:cursor-not-allowed disabled:opacity-50"
-              id="draft-submit"
-              type="submit"
-            >
-              Generate Draft
-            </button>
-            <span class="hidden text-sm text-slate-500" id="draft-status">
-              Generating...
-            </span>
-          </div>
-        </form>
-
-        <div class="mt-6 hidden rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" id="draft-result">
-          <p class="font-semibold">Draft created!</p>
-          <p class="mt-1" id="draft-result-path"></p>
-          <p class="mt-1 text-xs text-emerald-600">
-            The file is saved with <code>draft: true</code>. Edit it and flip to
-            <code>draft: false</code> when ready to publish. Nothing auto-publishes.
+    {
+      llmAvailable ? (
+        <section
+          class="hidden rounded-[2.5rem] border border-white/70 bg-white/80 p-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-10"
+          id="draft-panel"
+        >
+          <h2 class="font-display text-2xl font-semibold tracking-[-0.03em] text-[#0e1528]">
+            Draft a Post
+          </h2>
+          <p class="mt-2 text-sm text-slate-500" id="draft-topic-label">
+            Select a topic above or enter your own.
           </p>
-        </div>
 
-        <div class="mt-6 hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" id="draft-error">
-        </div>
-      </section>
-    ) : null}
+          <form class="mt-6 space-y-5" id="draft-form">
+            <div>
+              <label
+                class="block text-sm font-semibold text-slate-700"
+                for="draft-title"
+              >
+                Title
+              </label>
+              <input
+                class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
+                id="draft-title"
+                name="title"
+                placeholder="Working title for the post"
+                required
+                type="text"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-semibold text-slate-700"
+                for="draft-notes"
+              >
+                Your Notes
+              </label>
+              <p class="mt-0.5 text-xs text-slate-500">
+                Bullet points, facts, links, code snippets — the AI will draft
+                from these only.
+              </p>
+              {/* prettier-ignore */}
+              <textarea class="mt-1.5 h-48 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]" id="draft-notes" name="ownerNotes" placeholder={"- Key point 1\n- Technical detail\n- Link to reference"} required />
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  class="block text-sm font-semibold text-slate-700"
+                  for="draft-keywords"
+                >
+                  Keywords (comma-separated)
+                </label>
+                <input
+                  class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
+                  id="draft-keywords"
+                  name="keywords"
+                  placeholder="keyword1, keyword2"
+                  type="text"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-semibold text-slate-700"
+                  for="draft-focus"
+                >
+                  Focus Area
+                </label>
+                <input
+                  class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-[#0e1528] placeholder-slate-400 focus:border-[#1f3b73] focus:outline-none focus:ring-1 focus:ring-[#1f3b73]"
+                  id="draft-focus"
+                  name="focusArea"
+                  placeholder="e.g. backend-engineering"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <button
+                class="rounded-lg bg-[#1f3b73] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#162b56] disabled:cursor-not-allowed disabled:opacity-50"
+                id="draft-submit"
+                type="submit"
+              >
+                Generate Draft
+              </button>
+              <span class="hidden text-sm text-slate-500" id="draft-status">
+                Generating...
+              </span>
+            </div>
+          </form>
+
+          <div
+            class="mt-6 hidden rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+            id="draft-result"
+          >
+            <p class="font-semibold">Draft created!</p>
+            <p class="mt-1" id="draft-result-path" />
+            <p class="mt-1 text-xs text-emerald-600">
+              The file is saved with <code>draft: true</code>. Edit it and flip
+              to
+              <code>draft: false</code> when ready to publish. Nothing
+              auto-publishes.
+            </p>
+          </div>
+
+          <div
+            class="mt-6 hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            id="draft-error"
+          />
+        </section>
+      ) : null
+    }
   </main>
 </BaseLayout>
 
@@ -252,15 +289,25 @@ const suggestions = recommendTopics(input);
 
   for (const trigger of triggers) {
     trigger.addEventListener("click", () => {
-      if (!draftPanel || !draftTitle || !draftKeywords || !draftFocus || !draftTopicLabel) return;
+      if (
+        !draftPanel ||
+        !draftTitle ||
+        !draftKeywords ||
+        !draftFocus ||
+        !draftTopicLabel
+      )
+        return;
 
       const title = trigger.getAttribute("data-topic-title") ?? "";
       const keywords = trigger.getAttribute("data-topic-keywords") ?? "";
       const focus = trigger.getAttribute("data-topic-focus") ?? "";
 
       draftPanel.classList.remove("hidden");
+      // @ts-expect-error — input elements have .value
       draftTitle.value = title;
+      // @ts-expect-error — input elements have .value
       draftKeywords.value = keywords;
+      // @ts-expect-error — input elements have .value
       draftFocus.value = focus;
       draftTopicLabel.textContent = `Drafting: ${title}`;
 
@@ -270,20 +317,32 @@ const suggestions = recommendTopics(input);
 
   draftForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!draftSubmit || !draftStatus || !draftResult || !draftError || !draftTitle) return;
+    if (
+      !draftSubmit ||
+      !draftStatus ||
+      !draftResult ||
+      !draftError ||
+      !draftTitle
+    )
+      return;
 
+    // @ts-expect-error — button elements have .disabled
     draftSubmit.disabled = true;
     draftStatus.classList.remove("hidden");
     draftResult.classList.add("hidden");
     draftError.classList.add("hidden");
 
+    // @ts-expect-error — draftForm is a form element
     const formData = new FormData(draftForm);
     const keywordsRaw = String(formData.get("keywords") ?? "");
 
     const payload = {
       title: String(formData.get("title") ?? ""),
       ownerNotes: String(formData.get("ownerNotes") ?? ""),
-      keywords: keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean),
+      keywords: keywordsRaw
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean),
       focusArea: String(formData.get("focusArea") ?? "") || undefined,
     };
 
@@ -307,8 +366,10 @@ const suggestions = recommendTopics(input);
       }
     } catch (err) {
       draftError.classList.remove("hidden");
-      draftError.textContent = "Network error — could not reach the drafting endpoint.";
+      draftError.textContent =
+        "Network error — could not reach the drafting endpoint.";
     } finally {
+      // @ts-expect-error — button elements have .disabled
       draftSubmit.disabled = false;
       draftStatus.classList.add("hidden");
     }

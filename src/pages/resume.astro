@@ -169,7 +169,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
       class="rounded-[1.8rem] border border-slate-200/80 bg-white/78 px-6 py-8 shadow-[0_18px_48px_rgba(31,44,75,0.06)] backdrop-blur-xl sm:px-8"
     >
       <div
-        class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,1.05fr)] lg:items-start"
+        class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1.2fr)] lg:items-start"
       >
         <div>
           <p
@@ -274,7 +274,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
     </section>
 
     <section
-      class="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(17rem,0.92fr)]"
+      class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]"
     >
       <div class="space-y-6">
         <article
@@ -308,7 +308,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
                         {project.summary}
                       </p>
                     </div>
-                    <div class="flex flex-wrap gap-2 lg:max-w-[14rem] lg:justify-end">
+                    <div class="flex flex-wrap gap-2 lg:max-w-[18rem] lg:justify-end">
                       {project.skillIds.slice(0, 4).map((skillId) => (
                         <span class="rounded-full border border-slate-200/80 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600">
                           {skillLabels[skillId] ?? getSkillLabel(skillId)}

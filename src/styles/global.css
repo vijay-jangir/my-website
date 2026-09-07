@@ -69,6 +69,12 @@
   animation-delay: calc(90ms + var(--nav-index, 0) * 42ms);
 }
 
+.full-bleed-breakout {
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+}
+
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;

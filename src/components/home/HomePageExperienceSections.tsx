@@ -130,7 +130,7 @@ export function WhyVijaySection() {
 export function ContactSection({ siteProfile }: ContactSectionProps) {
   return (
     <motion.section
-      className="mt-24 bg-[#101827] px-6 py-16 text-center text-white sm:px-10"
+      className="full-bleed-breakout mt-24 bg-[#101827] px-6 py-16 text-center text-white sm:px-10"
       id="contact"
       initial={{ opacity: 0, y: 34 }}
       transition={{ duration: 0.6, ease: entranceEase }}

@@ -42,7 +42,7 @@ export default function HomeSection({
 
   if (fullBleed) {
     return (
-      <section className={`py-20 ${fullBleed}`} id={id}>
+      <section className={`full-bleed-breakout py-20 ${fullBleed}`} id={id}>
         {inner}
       </section>
     );

@@ -4,9 +4,8 @@ import { z } from "zod";
 import { dbQuery } from "@/lib/drizzle";
 import { buildResumeVariantFromJobDescriptionWithContent } from "@/lib/jd";
 import { getPortfolioContent } from "@/lib/portfolio-content";
-import { isAuthConfigured } from "@/lib/env";
 import { saveResumeVariant } from "@/lib/resume-store";
-import { getSessionUser } from "@/src/lib/auth";
+import { ApiAuthError, requireAuthenticatedOwner } from "@/src/lib/api-helpers";
 
 const requestSchema = z.object({
   jobDescription: z.string().min(80).max(10000),
@@ -16,26 +15,16 @@ const requestSchema = z.object({
 export const prerender = false;
 
 export const POST: APIRoute = async ({ cookies, request }) => {
-  if (!isAuthConfigured()) {
-    return Response.json(
-      {
-        message: "Admin auth is not configured yet.",
-        ok: false,
-      },
-      { status: 503 },
-    );
-  }
-
-  const session = await getSessionUser(cookies);
-
-  if (!session) {
-    return Response.json(
-      {
-        message: "Authentication required.",
-        ok: false,
-      },
-      { status: 401 },
-    );
+  try {
+    await requireAuthenticatedOwner(cookies);
+  } catch (err) {
+    if (err instanceof ApiAuthError) {
+      const message = err.status === 503
+        ? "Admin auth is not configured yet."
+        : err.message;
+      return Response.json({ message, ok: false }, { status: err.status });
+    }
+    throw err;
   }
 
   const formData = await request.formData();

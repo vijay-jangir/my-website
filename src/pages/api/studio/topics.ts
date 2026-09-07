@@ -1,31 +1,26 @@
 import type { APIRoute } from "astro";
 
-import { isAuthConfigured } from "@/lib/env";
 import { getPortfolioContent } from "@/lib/portfolio-content";
-import { getSessionUser } from "@/src/lib/auth";
 import {
   recommendTopics,
   type PublishedPost,
   type TopicEngineInput,
 } from "@/lib/studio/topics";
+import { ApiAuthError, requireAuthenticatedOwner } from "@/src/lib/api-helpers";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ cookies }) => {
-  if (!isAuthConfigured()) {
-    return new Response(
-      JSON.stringify({ ok: false, message: "Auth is not configured." }),
-      { status: 503, headers: { "Content-Type": "application/json" } },
-    );
-  }
-
-  const session = await getSessionUser(cookies);
-
-  if (!session) {
-    return new Response(
-      JSON.stringify({ ok: false, message: "Authentication required." }),
-      { status: 401, headers: { "Content-Type": "application/json" } },
-    );
+  try {
+    await requireAuthenticatedOwner(cookies);
+  } catch (err) {
+    if (err instanceof ApiAuthError) {
+      return new Response(
+        JSON.stringify({ ok: false, message: err.message }),
+        { status: err.status, headers: { "Content-Type": "application/json" } },
+      );
+    }
+    throw err;
   }
 
   const content = await getPortfolioContent();

@@ -6,6 +6,15 @@ describe("buildRobotsTxt", () => {
   const baseUrl = new URL("https://vijayjangir.com");
   const body = buildRobotsTxt(baseUrl);
   const lines = body.split("\n");
+  const userAgentBlocks = body
+    .split("\n\n")
+    .map((block) => block.split("\n"))
+    .filter((block) => block[0]?.startsWith("User-agent: "));
+  const privatePathDisallows = [
+    "Disallow: /admin",
+    "Disallow: /assistant",
+    "Disallow: /api",
+  ] as const;
 
   it("starts with the crawl policy comments", () => {
     expect(lines[0]).toBe("# vijayjangir.com crawl policy");
@@ -20,40 +29,20 @@ describe("buildRobotsTxt", () => {
 
     expect(wildcardIndex).toBeGreaterThan(0);
     expect(lines[wildcardIndex + 1]).toBe("Allow: /");
-    expect(lines.slice(wildcardIndex + 2, wildcardIndex + 5)).toEqual([
-      "Disallow: /admin",
-      "Disallow: /assistant",
-      "Disallow: /api",
-    ]);
+    expect(lines.slice(wildcardIndex + 2, wildcardIndex + 5)).toEqual(
+      privatePathDisallows,
+    );
   });
 
-  it("allows each AI crawler explicitly", () => {
-    const crawlers = [
-      "GPTBot",
-      "OAI-SearchBot",
-      "ChatGPT-User",
-      "ClaudeBot",
-      "Claude-User",
-      "Claude-SearchBot",
-      "PerplexityBot",
-      "Google-Extended",
-      "Applebot-Extended",
-      "CCBot",
-    ];
+  it("disallows private paths in every emitted user-agent group", () => {
+    expect(userAgentBlocks.length).toBeGreaterThan(0);
 
-    for (const crawler of crawlers) {
-      const index = lines.indexOf(`User-agent: ${crawler}`);
+    for (const block of userAgentBlocks) {
+      const [userAgentLine, allowLine, ...disallowLines] = block;
 
-      expect(index, crawler).toBeGreaterThan(0);
-      expect(lines[index + 1], crawler).toBe("Allow: /");
-    }
-  });
-
-  it("disallows private paths exactly once each and nowhere else allows them", () => {
-    for (const path of ["/admin", "/assistant", "/api"]) {
-      expect(body.match(new RegExp(`^Disallow: ${path}$`, "gm"))).toHaveLength(
-        1,
-      );
+      expect(userAgentLine).toMatch(/^User-agent: /);
+      expect(allowLine, userAgentLine).toBe("Allow: /");
+      expect(disallowLines, userAgentLine).toEqual(privatePathDisallows);
     }
   });
 

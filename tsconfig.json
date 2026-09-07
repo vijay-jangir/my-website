@@ -21,6 +21,7 @@
     "lib/jd.ts",
     "lib/portfolio-types.ts",
     "lib/portfolio.ts",
+    "lib/blog.ts",
     "lib/resume-store.ts",
     "lib/turnstile.ts",
     "db/drizzle/**/*",

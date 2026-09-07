@@ -1,13 +1,13 @@
 ---
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
 import BlogCard from "@/src/components/BlogCard.astro";
-import { getWixBlogsResult, PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
+import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 import { getPortfolioContent } from "@/lib/portfolio-content";
+import { getUnifiedBlogPosts } from "@/lib/blog";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
-const blogResult = await getWixBlogsResult();
-const posts = blogResult.posts;
+const posts = await getUnifiedBlogPosts();
 const content = await getPortfolioContent();
 const fallbackReading = [
   {
@@ -31,11 +31,7 @@ const fallbackReading = [
 ] as const;
 
 const emptyStateCopy =
-  blogResult.status === "missing_credentials"
-    ? "Blog posts are not connected in this environment yet. The project writeups below are available now."
-    : blogResult.status === "error"
-      ? "Blog posts could not be loaded right now. The project writeups below are available now."
-      : "Long-form posts will appear here when published. The project writeups below are available now.";
+  "Long-form posts will appear here when published. The project writeups below are available now.";
 ---
 
 <BaseLayout

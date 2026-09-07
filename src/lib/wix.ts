@@ -134,7 +134,8 @@ async function wixFetch<T>(
       status: "ok",
       data: (await response.json()) as T,
     };
-  } catch {
+  } catch (error) {
+    console.warn("[wix] Fetch failed:", error);
     return { status: "error" };
   }
 }

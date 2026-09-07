@@ -69,8 +69,8 @@ export async function getUnifiedBlogPosts(): Promise<BlogPost[]> {
   let wix: readonly BlogPost[] = [];
   try {
     wix = await getWixBlogPostsAsUnified();
-  } catch {
-    // Wix failure degrades to local-only — never 500.
+  } catch (error) {
+    console.warn("[blog] Wix fetch failed, degrading to local-only:", error);
   }
 
   return mergeBlogPosts(local, wix);

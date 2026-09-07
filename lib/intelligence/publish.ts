@@ -94,7 +94,8 @@ export async function loadPublishedSnapshot(): Promise<MarketSignalSnapshot | nu
     if (!result || result.rows.length === 0) return null;
 
     return result.rows[0].snapshot;
-  } catch {
+  } catch (error) {
+    console.warn("[intelligence] Failed to load published snapshot:", error);
     return null;
   }
 }

@@ -83,7 +83,8 @@ export function createProtectedLlmRoute<T>(
 
     try {
       body = await request.json();
-    } catch {
+    } catch (error) {
+      console.warn("[api] Invalid JSON body:", error);
       return jsonError({ ok: false, message: "Invalid JSON body." }, 400);
     }
 

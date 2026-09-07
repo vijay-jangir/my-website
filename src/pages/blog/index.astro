@@ -4,6 +4,7 @@ import BlogCard from "@/src/components/BlogCard.astro";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import { getUnifiedBlogPosts, paginateBlogPosts } from "@/lib/blog";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
@@ -35,6 +36,35 @@ const fallbackReading = [
 
 const emptyStateCopy =
   "Long-form posts will appear here when published. The project writeups below are available now.";
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Blog" },
+    ],
+  }),
+);
+const collectionPageJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  description:
+    "Technical blog: platform engineering, AI agents, multi-agent systems, data governance, and architecture notes by Vijay Jangir.",
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: posts.map((post, index) => ({
+      "@type": "ListItem",
+      name: post.title,
+      position: index + 1,
+      url: new URL(
+        `/blog/${encodeURIComponent(post.slug)}`,
+        Astro.site ?? Astro.url,
+      ).toString(),
+    })),
+  },
+  name: "Blog | Vijay Jangir",
+  url: new URL("/blog", Astro.site ?? Astro.url).toString(),
+});
 ---
 
 <BaseLayout
@@ -42,6 +72,8 @@ const emptyStateCopy =
   siteProfile={content.siteProfile}
   title="Blog | Vijay Jangir"
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
+  <script is:inline set:html={collectionPageJsonLd} type="application/ld+json" />
   <main class="space-y-10 pb-4">
     <section
       class="rounded-[2.6rem] border border-white/70 bg-white/80 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:px-10 sm:py-10"

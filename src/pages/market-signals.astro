@@ -2,12 +2,22 @@
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import { loadPublishedSnapshot } from "@/lib/intelligence/publish";
 import BaseLayout from "@/src/layouts/BaseLayout.astro";
+import { buildBreadcrumbJsonLd } from "@/src/lib/jsonld";
 import { PORTFOLIO_PAGE_CACHE_CONTROL } from "@/src/lib/wix";
 
 Astro.response.headers.set("Cache-Control", PORTFOLIO_PAGE_CACHE_CONTROL);
 
 const content = await getPortfolioContent();
 const snapshot = await loadPublishedSnapshot();
+const breadcrumbJsonLd = JSON.stringify(
+  buildBreadcrumbJsonLd({
+    baseUrl: Astro.site ?? Astro.url,
+    items: [
+      { name: "Home", path: "/" },
+      { name: "Market Signals" },
+    ],
+  }),
+);
 ---
 
 <BaseLayout
@@ -15,6 +25,7 @@ const snapshot = await loadPublishedSnapshot();
   siteProfile={content.siteProfile}
   title="Market Signals | Vijay Jangir"
 >
+  <script is:inline set:html={breadcrumbJsonLd} type="application/ld+json" />
   <main class="space-y-10 pb-4">
     <section class="px-1 py-8 sm:py-14">
       <p

@@ -355,7 +355,7 @@ function defineCrudActions<T extends z.ZodType>(config: {
   function upsertAction(verb: string) {
     return defineAction({
       input: schema,
-      handler: async (input, context) => {
+      handler: (async (input: z.infer<T>, context: { cookies: import("astro").AstroCookies }) => {
         const session = await requireOwner(context.cookies);
         const snapshot = await getPortfolioContent();
         return finalizeSnapshot({
@@ -363,7 +363,10 @@ function defineCrudActions<T extends z.ZodType>(config: {
           snapshot: upsertFn(snapshot, input),
           summary: `${verb} ${entityName} ${getLabel(input)}`,
         });
-      },
+        // Zod v4: ActionHandler conditional on $ZodType can't resolve for
+        // generic z.ZodType. Handler logic is fully typed above; cast bridges
+        // the defineAction inference gap only.
+      }) as never,
     });
   }
 

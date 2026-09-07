@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 const originalWixApiKey = process.env.WIX_API_KEY;
 const originalWixSiteId = process.env.WIX_SITE_ID;
@@ -65,7 +65,7 @@ describe("wix blog helpers", () => {
       "https://www.wixapis.com/v3/posts/slugs/missing%20post?",
     );
     const requestParams = new URL(requestUrl).searchParams;
-    expect(requestParams.getAll("fieldsets")).toEqual(["URL", "CONTENT_TEXT"]);
+    expect(requestParams.getAll("fieldsets")).toEqual(["URL", "CONTENT_TEXT", "CONTENT"]);
     // Astro/Vercel functions ignore Next.js fetch cache options; caching is
     // handled by response headers instead. Requests must carry a timeout.
     expect(
@@ -234,5 +234,186 @@ describe("wix blog helpers", () => {
         },
       }),
     ).toBe("https://example.com/blog");
+  });
+});
+
+describe("renderRichContent", () => {
+  it("renders code blocks, images, and links to proper HTML elements", async () => {
+    const { renderRichContent } = await import("@/src/lib/wix");
+
+    const richContent = {
+      nodes: [
+        {
+          type: "PARAGRAPH",
+          nodes: [
+            {
+              type: "TEXT",
+              textData: {
+                text: "Hello ",
+                decorations: [],
+              },
+            },
+            {
+              type: "TEXT",
+              textData: {
+                text: "world",
+                decorations: [
+                  { type: "BOLD" },
+                  {
+                    type: "LINK",
+                    linkData: { link: { url: "https://example.com" } },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          type: "HEADING",
+          headingData: { level: 3 },
+          nodes: [
+            { type: "TEXT", textData: { text: "Code Example" } },
+          ],
+        },
+        {
+          type: "CODE_BLOCK",
+          codeBlockData: { language: "typescript" },
+          nodes: [
+            { type: "TEXT", textData: { text: "const x = 1;" } },
+          ],
+        },
+        {
+          type: "IMAGE",
+          imageData: {
+            image: { src: { url: "https://static.example.com/photo.jpg" } },
+            altText: "A photo",
+          },
+        },
+        {
+          type: "BULLETED_LIST",
+          nodes: [
+            {
+              type: "LIST_ITEM",
+              nodes: [
+                {
+                  type: "PARAGRAPH",
+                  nodes: [
+                    { type: "TEXT", textData: { text: "Item one" } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "BLOCKQUOTE",
+          nodes: [
+            {
+              type: "PARAGRAPH",
+              nodes: [
+                {
+                  type: "TEXT",
+                  textData: {
+                    text: "Quoted text",
+                    decorations: [{ type: "ITALIC" }],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const html = renderRichContent(richContent);
+
+    expect(html).toContain("<p>Hello ");
+    expect(html).toContain(
+      '<a href="https://example.com" rel="noopener noreferrer"><strong>world</strong></a>',
+    );
+    expect(html).toContain("<h3>Code Example</h3>");
+    expect(html).toContain(
+      '<pre><code class="language-typescript">const x = 1;</code></pre>',
+    );
+    expect(html).toContain(
+      '<img src="https://static.example.com/photo.jpg" alt="A photo" loading="lazy" />',
+    );
+    expect(html).toContain("<ul><li><p>Item one</p></li></ul>");
+    expect(html).toContain(
+      "<blockquote><p><em>Quoted text</em></p></blockquote>",
+    );
+  });
+
+  it("renders unknown node types with extracted text and logs a warning", async () => {
+    const { renderRichContent } = await import("@/src/lib/wix");
+    const warnSpy: MockInstance = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const richContent = {
+      nodes: [
+        {
+          type: "FANCY_WIDGET",
+          nodes: [
+            { type: "TEXT", textData: { text: "Widget fallback" } },
+          ],
+        },
+      ],
+    };
+
+    const html = renderRichContent(richContent);
+
+    expect(html).toContain("Widget fallback");
+    expect(html).toContain("<p>");
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[wix] Unknown rich-content node type: FANCY_WIDGET",
+    );
+
+    warnSpy.mockRestore();
+  });
+
+  it("HTML-escapes text content to prevent injection", async () => {
+    const { renderRichContent } = await import("@/src/lib/wix");
+
+    const richContent = {
+      nodes: [
+        {
+          type: "PARAGRAPH",
+          nodes: [
+            {
+              type: "TEXT",
+              textData: { text: '<script>alert("xss")</script>' },
+            },
+          ],
+        },
+      ],
+    };
+
+    const html = renderRichContent(richContent);
+
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&lt;script&gt;");
+    expect(html).toContain("&lt;/script&gt;");
+  });
+
+  it("returns empty string when richContent is absent or invalid", async () => {
+    const { renderRichContent } = await import("@/src/lib/wix");
+
+    expect(renderRichContent(undefined)).toBe("");
+    expect(renderRichContent(null)).toBe("");
+    expect(renderRichContent({})).toBe("");
+    expect(renderRichContent({ nodes: "not-array" })).toBe("");
+  });
+
+  it("falls back to paragraph split when richContent is unavailable", async () => {
+    const { getWixBlogParagraphs, renderRichContent } = await import(
+      "@/src/lib/wix"
+    );
+
+    const richHtml = renderRichContent(undefined);
+    const paragraphs = getWixBlogParagraphs(
+      "First paragraph.\n\nSecond paragraph.",
+    );
+
+    expect(richHtml).toBe("");
+    expect(paragraphs).toEqual(["First paragraph.", "Second paragraph."]);
   });
 });

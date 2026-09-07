@@ -13,6 +13,11 @@ const ENV_KEYS = [
   "CONTENT_BACKUP_BRANCH",
   "CONTENT_BACKUP_PAT",
   "CONTENT_HISTORY_LIMIT",
+  "LLM_PROVIDER",
+  "GEMINI_API_KEY",
+  "GROQ_API_KEY",
+  "LLM_DAILY_LIMIT",
+  "LLM_MAX_TOKENS",
 ] as const;
 
 type EnvKey = (typeof ENV_KEYS)[number];
@@ -85,8 +90,13 @@ describe("lib/env", () => {
       contentBackupRepo: "owner/repo",
       contentHistoryLimit: 25,
       databaseUrl: "postgres://user:pass@example.com:5432/app",
+      geminiApiKey: undefined,
       githubId: "github-client-id",
       githubSecret: "github-client-secret",
+      groqApiKey: undefined,
+      llmDailyLimit: 50,
+      llmMaxTokens: 1024,
+      llmProvider: "gemini",
       nextAuthSecret: "nextauth-secret",
       sessionSecret: "session-secret",
       wixApiKey: "wix-key",

@@ -17,6 +17,7 @@
     "lib/db.ts",
     "lib/drizzle.ts",
     "lib/env.ts",
+    "lib/llm/**/*",
     "lib/jd.ts",
     "lib/portfolio-types.ts",
     "lib/portfolio.ts",

@@ -24,6 +24,11 @@ export const env = {
     readEnv("CONTENT_HISTORY_LIMIT") ?? "10",
     10,
   ),
+  llmProvider: readEnv("LLM_PROVIDER") ?? "gemini",
+  geminiApiKey: readEnv("GEMINI_API_KEY"),
+  groqApiKey: readEnv("GROQ_API_KEY"),
+  llmDailyLimit: Number.parseInt(readEnv("LLM_DAILY_LIMIT") ?? "50", 10),
+  llmMaxTokens: Number.parseInt(readEnv("LLM_MAX_TOKENS") ?? "1024", 10),
 };
 
 if (env.adminGithubLogins.length > 1) {

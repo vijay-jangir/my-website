@@ -365,6 +365,9 @@ export const resumeVariant = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true })
+      .notNull()
+      .$defaultFn(() => new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)),
   },
   (t) => [index("resume_variants_focus_ids_idx").using("gin", t.focusIds)],
 );
@@ -382,6 +385,9 @@ export const jdRequest = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true })
+      .notNull()
+      .$defaultFn(() => new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)),
   },
   (t) => [index("jd_requests_focus_ids_idx").using("gin", t.focusIds)],
 );

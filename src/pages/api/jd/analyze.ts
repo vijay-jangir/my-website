@@ -64,10 +64,13 @@ export const POST: APIRoute = async ({ cookies, request }) => {
   );
 
   try {
+    const jdExpiresAt = new Date(
+      Date.now() + 180 * 24 * 60 * 60 * 1000,
+    ).toISOString();
     await dbQuery(
       `
-        insert into jd_requests (focus_ids, raw_text, extraction)
-        values ($1::text[], $2, $3::jsonb)
+        insert into jd_requests (focus_ids, raw_text, extraction, expires_at)
+        values ($1::text[], $2, $3::jsonb, $4)
       `,
       [
         variant.focusIds,
@@ -77,6 +80,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
           focusScores: analysis.focusScores,
           skillScores: analysis.skillScores,
         }),
+        jdExpiresAt,
       ],
     );
   } catch (error) {

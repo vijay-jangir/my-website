@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 
+import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
@@ -13,7 +14,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react()],
+  integrations: [mdx(), react()],
   vite: {
     plugins: [tailwindcss(), tsconfigPaths()],
     resolve: {

@@ -1,6 +1,10 @@
 import crypto from "node:crypto";
 
+import { asc, desc } from "drizzle-orm";
+
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
+import * as schema from "@/db/drizzle/schema";
+import { getDrizzleDb } from "@/lib/drizzle";
 import { getContentHistoryLimit, isAstroContentDbConfigured } from "@/lib/env";
 import {
   loadBackupSnapshot,
@@ -173,39 +177,17 @@ function sanitizeSnapshot(snapshot: PortfolioSnapshot): PortfolioSnapshot {
 }
 
 async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
-  const astroDb = await loadAstroDbModule();
+  const db = getDrizzleDb();
 
-  if (!astroDb) {
+  if (!db) {
     return null;
   }
 
-  const {
-    ContentRevisionTable,
-    ExperienceBulletFocusWeightTable,
-    ExperienceBulletSkillLinkTable,
-    ExperienceBulletTable,
-    ExperienceFocusWeightTable,
-    ExperienceTable,
-    FocusDefinitionTable,
-    MediaAssetTable,
-    PortfolioLinkTable,
-    ProfileHighlightFocusWeightTable,
-    ProfileHighlightTable,
-    ProjectFocusWeightTable,
-    ProjectLinkTable,
-    ProjectSkillLinkTable,
-    ProjectTable,
-    SiteProfileTable,
-    SkillFocusWeightTable,
-    SkillTable,
-    SummaryTemplateTable,
-    asc,
-    db,
-    desc,
-  } = astroDb;
-
   try {
-    const [siteProfileRow] = await db.select().from(SiteProfileTable).limit(1);
+    const [siteProfileRow] = await db
+      .select()
+      .from(schema.siteProfile)
+      .limit(1);
 
     if (!siteProfileRow) {
       return null;
@@ -233,52 +215,55 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
     ] = await Promise.all([
       db
         .select()
-        .from(PortfolioLinkTable)
-        .orderBy(asc(PortfolioLinkTable.sortOrder)),
+        .from(schema.portfolioLink)
+        .orderBy(asc(schema.portfolioLink.sortOrder)),
       db
         .select()
-        .from(FocusDefinitionTable)
-        .orderBy(asc(FocusDefinitionTable.sortOrder)),
-      db.select().from(SkillTable).orderBy(asc(SkillTable.sortOrder)),
-      db.select().from(SkillFocusWeightTable),
-      db.select().from(ProjectTable).orderBy(asc(ProjectTable.sortOrder)),
+        .from(schema.focusDefinition)
+        .orderBy(asc(schema.focusDefinition.sortOrder)),
+      db.select().from(schema.skill).orderBy(asc(schema.skill.sortOrder)),
+      db.select().from(schema.skillFocusWeight),
+      db.select().from(schema.project).orderBy(asc(schema.project.sortOrder)),
       db
         .select()
-        .from(ProjectLinkTable)
-        .orderBy(asc(ProjectLinkTable.sortOrder)),
+        .from(schema.projectLink)
+        .orderBy(asc(schema.projectLink.sortOrder)),
       db
         .select()
-        .from(ProjectSkillLinkTable)
-        .orderBy(asc(ProjectSkillLinkTable.sortOrder)),
-      db.select().from(ProjectFocusWeightTable),
-      db.select().from(ExperienceTable).orderBy(asc(ExperienceTable.sortOrder)),
-      db.select().from(ExperienceFocusWeightTable),
+        .from(schema.projectSkillLink)
+        .orderBy(asc(schema.projectSkillLink.sortOrder)),
+      db.select().from(schema.projectFocusWeight),
       db
         .select()
-        .from(ExperienceBulletTable)
-        .orderBy(asc(ExperienceBulletTable.sortOrder)),
+        .from(schema.experience)
+        .orderBy(asc(schema.experience.sortOrder)),
+      db.select().from(schema.experienceFocusWeight),
       db
         .select()
-        .from(ExperienceBulletSkillLinkTable)
-        .orderBy(asc(ExperienceBulletSkillLinkTable.sortOrder)),
-      db.select().from(ExperienceBulletFocusWeightTable),
+        .from(schema.experienceBullet)
+        .orderBy(asc(schema.experienceBullet.sortOrder)),
       db
         .select()
-        .from(ProfileHighlightTable)
-        .orderBy(asc(ProfileHighlightTable.sortOrder)),
-      db.select().from(ProfileHighlightFocusWeightTable),
+        .from(schema.experienceBulletSkillLink)
+        .orderBy(asc(schema.experienceBulletSkillLink.sortOrder)),
+      db.select().from(schema.experienceBulletFocusWeight),
       db
         .select()
-        .from(SummaryTemplateTable)
-        .orderBy(asc(SummaryTemplateTable.sortOrder)),
+        .from(schema.profileHighlight)
+        .orderBy(asc(schema.profileHighlight.sortOrder)),
+      db.select().from(schema.profileHighlightFocusWeight),
       db
         .select()
-        .from(MediaAssetTable)
-        .orderBy(desc(MediaAssetTable.updatedAt)),
+        .from(schema.summaryTemplate)
+        .orderBy(asc(schema.summaryTemplate.sortOrder)),
       db
         .select()
-        .from(ContentRevisionTable)
-        .orderBy(desc(ContentRevisionTable.publishedAt))
+        .from(schema.mediaAsset)
+        .orderBy(desc(schema.mediaAsset.updatedAt)),
+      db
+        .select()
+        .from(schema.contentRevision)
+        .orderBy(desc(schema.contentRevision.publishedAt))
         .limit(getContentHistoryLimit()),
     ]);
 
@@ -503,7 +488,7 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
 
     return snapshot;
   } catch (error) {
-    console.warn("[portfolio-content] Astro DB load failed:", error);
+    console.warn("[portfolio-content] Drizzle DB load failed:", error);
     return null;
   }
 }

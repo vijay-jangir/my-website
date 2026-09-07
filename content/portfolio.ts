@@ -12,15 +12,16 @@ import type {
 
 export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
-  title: "Architect + hands-on developer for governed data platforms",
+   title: "Platform engineer building governed data platforms, AI agents, and access governance systems",
   location: "India",
   timezone: "Asia/Kolkata",
-  lastUpdatedLabel: "May 2026",
+  lastUpdatedLabel: "September 2026",
   contentPromise:
     "Case studies describe the problem, my ownership, architecture, constraints, and decisions without exposing internal systems.",
   currentFocusLabels: [
+    "AI agents and LLM orchestration",
     "Governed data platforms",
-    "Enterprise AI",
+    "Access governance",
     "Platform engineering",
   ],
   email: "contact@vijayjangir.com",
@@ -28,13 +29,13 @@ export const siteProfile: SiteProfile = {
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   profileImageUrl: "/profile-pic.jpeg",
   heroLabel:
-    "I architect and build the systems between enterprise data and the people who need to use it.",
+    "12 years of platform engineering. Currently building AI agents, LLM orchestration, and access governance systems for enterprise data.",
   recruiterPitch:
-    "I am an architect and hands-on developer for governed data platforms, text-to-data systems, workflow orchestration, access-governance integrations, in-house CI/CD onboarding, and network-scale analytics pipelines.",
+    "Platform engineer, data engineer, AI engineer \u2014 I wear multiple hats because governed data platforms demand it. I build multi-LLM agent runtimes, MCP-based tool integrations, access governance systems, metadata platforms, and the orchestration and developer tooling that hold enterprise data infrastructure together.",
   overview: [
-    "My work usually starts where data is already operationally important: ingestion, metadata, query execution, authorization, observability, orchestration, and the user workflows built on top.",
-    "The current chapter is a governed conversational data platform: multi-LLM graph workflows, knowledge retrieval, controlled query execution, answer reasoning, and charting with identity and authorization kept inside the platform.",
-    "The broader work includes Hive metastore synchronization, Ranger/RBAC extensions, custom Airflow operators, in-house YAML-based CI/CD onboarding, mobile tower network-event analytics, and browsing-log data products.",
+    "I build governed data platforms \u2014 the metadata, authorization, orchestration, and developer tooling that make enterprise data usable. Recently that\u2019s meant multi-LLM agent runtimes, MCP-based tool use, retrieval-grounded schema linking, and context engineering for text-to-SQL at enterprise scale.",
+    "The latest project is an access governance platform \u2014 centralized attribute store, policy authoring for multiple PDPs (OPA, Ranger, OpenFGA), signed bundle distribution, and enforcement that runs locally without calling home.",
+    "Before that: Hive metastore sync, Ranger RBAC extensions, DataHub metadata integrations, Airflow operators, Kafka/Flink pipelines for telecom network analytics, and a YAML-driven CI/CD onboarding framework.",
   ],
 };
 
@@ -1127,6 +1128,50 @@ export const projects: readonly ProjectDefinition[] = [
         "The hard part is not generating SQL; it is making the full path explainable, cancellable, auditable, and safe for repeated use.",
       ],
     },
+  },
+  {
+    id: "access-governance-platform",
+    slug: "access-governance-platform",
+    title: "Access governance platform (AGP)",
+    summary:
+      "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+    impact:
+      "Unified access control across a large telecom enterprise's data infrastructure: attributes from multiple systems of record under one roof, policies authored once and compiled for each enforcement engine, signed bundles shipped to local PDPs for sub-millisecond decisions. Full audit trail and approval workflows for every change.",
+    detail:
+      "Designed the entire system from first principles: a control plane with attribute, policy, approval, distribution, and audit services backed by PostgreSQL, plus an enforcement plane of OPA PDPs, Ranger PEP plugins, and OPAL-based bundle delivery. The architecture enforces a strict separation — the control plane is never in the authorization hot path, and enforcement points continue operating when the control plane is unavailable. Ports-and-adapters design means every external dependency (identity providers, data catalogs, approval tools, cloud services) sits behind an adapter interface. Multi-repository workspace with a manifest-driven orchestration CLI.",
+    skillIds: [
+      "java",
+      "python",
+      "postgres",
+      "kubernetes",
+      "opa",
+      "datahub",
+      "airflow",
+    ],
+    focusWeights: {
+      general: 1,
+      "backend-engineering": 1,
+      "platform-engineering": 1,
+      "data-platform": 0.8,
+      ai: 0.3,
+    },
+    featured: true,
+    visibility: "public",
+    proofLinks: [],
+    publicProof: {
+      proofTypes: ["private-enterprise", "sanitized-diagram"],
+      architectureShape: [
+        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
+        "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
+        "Distribution service assembles signed bundles containing only the attributes each policy set references (referenced-attribute projection), publishes to a registry, and notifies subscribers.",
+        "Enforcement plane is customer-owned: OPA PDPs as node-local DaemonSets, OPAL clients for bundle delivery, PEP plugins for Trino/Kafka/API gateways/Ranger.",
+        "Human-originated changes go through draft → approval → commit. Machine-ingested attributes skip approval. Concurrent edits use optimistic concurrency control.",
+        "Multi-repository workspace orchestrated via manifest files, lockfile-based snapshot pinning, and a custom repoctl CLI for clone/sync/status/checkout across all component repos.",
+      ],
+      scaleSignals: [],
+    },
+    caseStudy: null,
   },
   {
     id: "telecom-network-datalake",

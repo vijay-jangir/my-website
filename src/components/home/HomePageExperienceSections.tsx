@@ -141,10 +141,10 @@ export function ContactSection({ siteProfile }: ContactSectionProps) {
         Contact
       </p>
       <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
-        Let’s build data infrastructure that works.
+        Have a platform, AI, or governance challenge?
       </h2>
       <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
-        Have a data platform, AI, or governance challenge? Let&apos;s talk.
+        Let&apos;s talk.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a

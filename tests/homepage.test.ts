@@ -40,7 +40,9 @@ describe("HomePage", () => {
   it("uses inviting contact copy instead of the limiting version", () => {
     const markup = renderHomePage();
 
-    expect(markup).toContain("Let’s build data infrastructure that works.");
+    expect(markup).toContain(
+      "Have a platform, AI, or governance challenge?",
+    );
     expect(markup).not.toContain(
       "I am most useful where data systems need clearer ownership",
     );

@@ -46,10 +46,10 @@ export const siteProfile: SiteProfile = {
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   profileImageUrl: "/profile-pic.jpeg",
-  heroLabel: `${experienceYearsLabel} in platform engineering, AI agents, and access governance.`,
+  heroLabel: `${experienceYearsLabel} in platform engineering, AI agents and governance, and production AI systems.`,
   heroTitleLines: [
     "Platform Engineering.",
-    "AI Agents.",
+    "AI Agents & Governance.",
     "Production AI Systems.",
   ],
   heroSubtitle:
@@ -834,7 +834,7 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     id: "opa",
     label: "OPA (Open Policy Agent)",
     category: "platform",
-    aliases: ["opa", "open policy agent", "rego", "policy engine"],
+    aliases: ["opa", "open policy agent", "rego", "policy engine", "opal", "cedar", "keycloak", "ldap", "data masking", "row-level security", "rls", "access governance"],
     focusWeights: {
       "backend-engineering": 0.6,
       "platform-engineering": 1,

@@ -405,3 +405,15 @@ export const jdRequest = pgTable(
   },
   (t) => [index("jd_requests_focus_ids_idx").using("gin", t.focusIds)],
 );
+
+// ---------------------------------------------------------------------------
+// 23. MarketSignalSnapshot (pre-computed public market signals)
+// ---------------------------------------------------------------------------
+export const marketSignalSnapshot = pgTable("market_signal_snapshots", {
+  id: uuid().primaryKey().defaultRandom(),
+  snapshot: jsonb().notNull(),
+  publishedAt: timestamp("published_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  publishedBy: text("published_by").notNull(),
+});

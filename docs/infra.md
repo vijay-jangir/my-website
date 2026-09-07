@@ -9,14 +9,11 @@
 - `Wix` API key and site ID for blog fetches
 - `GitHub OAuth app` for admin-only resume tooling
 
-## Optional
+## Optional (private-only LLM features)
 
-- `Resend` for direct contact-form delivery
-- `Cloudflare Turnstile`
-- `Vercel Analytics`
-- `Vercel Speed Insights`
-- `Vercel Cron`
-- `OpenAI`, `Ollama`, or `OpenClaw`
+- `GROQ_API_KEY` — Groq provider for private resume rephrase and blog studio
+- `GEMINI_API_KEY` — Gemini provider (alternative to Groq)
+- `Vercel Analytics` / `Vercel Speed Insights` (no code dependency; added in project settings)
 
 ## Setup order
 
@@ -26,8 +23,7 @@
 4. Create a dedicated public GitHub backup repo and a fine-grained PAT scoped only to that repo.
 5. Create a GitHub OAuth app and allow only your GitHub login.
 6. Add Wix keys for the blog integration.
-7. Add Resend only if you want the form to send email directly.
-8. Add Turnstile only if or when a public form or public query surface is exposed.
+7. Optionally add `GROQ_API_KEY` or `GEMINI_API_KEY` for private LLM features (resume rephrase, blog studio, market intelligence).
 
 Schema changes go through Drizzle: edit `db/drizzle/schema.ts`, then `npm run db:generate` to create a migration, then `npm run db:migrate` to apply it.
 

@@ -1,6 +1,7 @@
 import type {
   ExperienceDefinition,
   FocusDefinition,
+  FocusPreset,
   MediaAsset,
   PortfolioSnapshot,
   ProfileHighlight,
@@ -141,6 +142,7 @@ export function publishAdvancedCollections(
   snapshot: PortfolioSnapshot,
   updates: Partial<{
     focusDefinitions: readonly FocusDefinition[];
+    focusPresets: readonly FocusPreset[];
     profileHighlights: readonly ProfileHighlight[];
     summaryTemplates: readonly SummaryTemplate[];
   }>,
@@ -149,6 +151,9 @@ export function publishAdvancedCollections(
     ...snapshot,
     ...(updates.focusDefinitions
       ? { focusDefinitions: [...updates.focusDefinitions] }
+      : {}),
+    ...(updates.focusPresets
+      ? { focusPresets: [...updates.focusPresets] }
       : {}),
     ...(updates.profileHighlights
       ? { profileHighlights: [...updates.profileHighlights] }

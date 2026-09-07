@@ -313,7 +313,21 @@ export const summaryTemplate = pgTable("summary_template", {
 });
 
 // ---------------------------------------------------------------------------
-// 18. MediaAsset
+// 18. FocusPreset
+// ---------------------------------------------------------------------------
+export const focusPreset = pgTable("focus_preset", {
+  id: text().primaryKey(),
+  label: text().notNull(),
+  description: text().notNull(),
+  focusIds: jsonb("focus_ids").notNull(),
+  sortOrder: integer("sort_order").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// 19. MediaAsset
 // ---------------------------------------------------------------------------
 export const mediaAsset = pgTable("media_asset", {
   id: text().primaryKey(),
@@ -334,7 +348,7 @@ export const mediaAsset = pgTable("media_asset", {
 });
 
 // ---------------------------------------------------------------------------
-// 19. ContentRevision
+// 20. ContentRevision
 // ---------------------------------------------------------------------------
 export const contentRevision = pgTable("content_revision", {
   id: text().primaryKey(),
@@ -352,7 +366,7 @@ export const contentRevision = pgTable("content_revision", {
 });
 
 // ---------------------------------------------------------------------------
-// 20. ResumeVariant (from db/schema.sql)
+// 21. ResumeVariant (from db/schema.sql)
 // ---------------------------------------------------------------------------
 export const resumeVariant = pgTable(
   "resume_variants",
@@ -373,7 +387,7 @@ export const resumeVariant = pgTable(
 );
 
 // ---------------------------------------------------------------------------
-// 21. JdRequest (from db/schema.sql)
+// 22. JdRequest (from db/schema.sql)
 // ---------------------------------------------------------------------------
 export const jdRequest = pgTable(
   "jd_requests",

@@ -103,4 +103,32 @@ describe("content-aware focus parsing", () => {
       ),
     ).toEqual(["ai", "flink", "kafka"]);
   });
+
+  it("seeds resume focus presets in bundled content", () => {
+    expect(fallbackPortfolioSnapshot.focusPresets).toEqual([
+      {
+        id: "backend-platform",
+        label: "Backend platform",
+        description:
+          "Service ownership, data APIs, and production reliability.",
+        focusIds: ["backend-engineering", "platform-engineering"],
+        sortOrder: 0,
+      },
+      {
+        id: "data-platform",
+        label: "Data platform",
+        description: "Pipelines, mesh foundations, streaming, and governance.",
+        focusIds: ["data-platform", "kafka", "flink"],
+        sortOrder: 1,
+      },
+      {
+        id: "ai-data-products",
+        label: "AI data products",
+        description:
+          "Governed agents, text-to-data, visualization, and Python.",
+        focusIds: ["ai", "agentic-development", "python"],
+        sortOrder: 2,
+      },
+    ]);
+  });
 });

@@ -56,6 +56,11 @@ const pdfLabel = storedVariant?.token
   : hasFocusedView
     ? `Download ${selectedFocusLabels} PDF`
     : "Download resume PDF";
+const docxLabel = storedVariant?.token
+  ? "Download tailored DOCX"
+  : hasFocusedView
+    ? `Download ${selectedFocusLabels} DOCX`
+    : "Download resume DOCX";
 const skillLabels = Object.fromEntries(
   content.skillDefinitions.map((skill) => [skill.id, skill.label]),
 ) as Record<string, string>;
@@ -68,24 +73,6 @@ const breadcrumbJsonLd = JSON.stringify(
     ],
   }),
 );
-const focusPresetGroups = [
-  {
-    label: "Backend platform",
-    description: "Service ownership, data APIs, and production reliability.",
-    focusIds: ["backend-engineering", "platform-engineering"] as const,
-  },
-  {
-    label: "Data platform",
-    description: "Pipelines, mesh foundations, streaming, and governance.",
-    focusIds: ["data-platform", "kafka", "flink"] as const,
-  },
-  {
-    label: "AI data products",
-    description: "Governed agents, text-to-data, visualization, and Python.",
-    focusIds: ["ai", "agentic-development", "python"] as const,
-  },
-];
-
 function buildResumeHref(focusIds: readonly FocusId[]) {
   if (focusIds.includes("general")) {
     return "/resume";
@@ -134,6 +121,12 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
             href={`/api/resume/pdf?${pdfParams.toString()}`}
           >
             {pdfLabel}
+          </a>
+          <a
+            class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
+            href={`/api/resume/docx?${pdfParams.toString()}`}
+          >
+            {docxLabel}
           </a>
           <a
             class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-[#0e1528] transition hover:-translate-y-0.5 hover:bg-white"
@@ -199,7 +192,7 @@ function buildResumeHref(focusIds: readonly FocusId[]) {
         </div>
         <div class="grid gap-3 sm:grid-cols-3">
           {
-            focusPresetGroups.map((preset) => {
+            content.focusPresets.map((preset) => {
               const isActive =
                 preset.focusIds.length === selectedFocusIds.length &&
                 preset.focusIds.every((focusId) =>

@@ -1,6 +1,7 @@
 import type {
   ExperienceDefinition,
   FocusDefinition,
+  FocusPreset,
   PortfolioLink,
   ProfileHighlight,
   ProjectDefinition,
@@ -3394,10 +3395,35 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
   },
 ] as const;
 
+export const focusPresets: readonly FocusPreset[] = [
+  {
+    id: "backend-platform",
+    label: "Backend platform",
+    description: "Service ownership, data APIs, and production reliability.",
+    focusIds: ["backend-engineering", "platform-engineering"],
+    sortOrder: 0,
+  },
+  {
+    id: "data-platform",
+    label: "Data platform",
+    description: "Pipelines, mesh foundations, streaming, and governance.",
+    focusIds: ["data-platform", "kafka", "flink"],
+    sortOrder: 1,
+  },
+  {
+    id: "ai-data-products",
+    label: "AI data products",
+    description: "Governed agents, text-to-data, visualization, and Python.",
+    focusIds: ["ai", "agentic-development", "python"],
+    sortOrder: 2,
+  },
+] as const;
+
 export const fallbackPortfolioSnapshot = {
   siteProfile,
   portfolioLinks,
   focusDefinitions,
+  focusPresets,
   skillDefinitions,
   projects,
   experiences,

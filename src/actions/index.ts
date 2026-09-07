@@ -23,6 +23,7 @@ import {
 import { isDatabaseConfigured, isContentBackupConfigured } from "@/lib/env";
 import type {
   FocusDefinition,
+  FocusPreset,
   PortfolioSnapshot,
   ProfileHighlight,
   SummaryTemplate,
@@ -191,9 +192,18 @@ const summaryTemplateSchema = z.object({
   summary: z.string().min(1),
 });
 
+const focusPresetSchema = z.object({
+  description: z.string().min(1),
+  focusIds: z.array(z.string()).default([]),
+  id: z.string().min(1),
+  label: z.string().min(1),
+  sortOrder: z.number().int().min(0),
+});
+
 const portfolioSnapshotSchema = z.object({
   experiences: z.array(experienceSchema),
   focusDefinitions: z.array(focusDefinitionSchema),
+  focusPresets: z.array(focusPresetSchema),
   mediaAssets: z
     .array(
       z.object({
@@ -299,6 +309,12 @@ function toSummaryTemplates(
   summaryTemplates?: z.infer<typeof summaryTemplateSchema>[],
 ): readonly SummaryTemplate[] | undefined {
   return summaryTemplates as unknown as readonly SummaryTemplate[] | undefined;
+}
+
+function toFocusPresets(
+  focusPresets?: z.infer<typeof focusPresetSchema>[],
+): readonly FocusPreset[] | undefined {
+  return focusPresets as unknown as readonly FocusPreset[] | undefined;
 }
 
 function inferFileExtension(fileName: string, mimeType: string) {
@@ -445,6 +461,7 @@ export const server = {
   publishContentSnapshot: defineAction({
     input: z.object({
       focusDefinitions: z.array(focusDefinitionSchema).optional(),
+      focusPresets: z.array(focusPresetSchema).optional(),
       profileHighlights: z.array(profileHighlightSchema).optional(),
       snapshot: portfolioSnapshotSchema.optional(),
       summary: z.string().max(200).optional(),
@@ -457,6 +474,7 @@ export const server = {
         ? toPortfolioSnapshot(input.snapshot)
         : publishAdvancedCollections(current, {
             focusDefinitions: toFocusDefinitions(input.focusDefinitions),
+            focusPresets: toFocusPresets(input.focusPresets),
             profileHighlights: toProfileHighlights(input.profileHighlights),
             summaryTemplates: toSummaryTemplates(input.summaryTemplates),
           });

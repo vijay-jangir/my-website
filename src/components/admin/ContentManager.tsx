@@ -3,6 +3,7 @@ import { actions } from "astro:actions";
 
 import type {
   ExperienceDefinition,
+  FocusPreset,
   MediaAsset,
   PortfolioSnapshot,
   ProjectDefinition,
@@ -48,6 +49,14 @@ const EMPTY_EXPERIENCE: ExperienceDefinition = {
   type: "employment",
 };
 
+const EMPTY_FOCUS_PRESET: FocusPreset = {
+  description: "",
+  focusIds: [],
+  id: "",
+  label: "",
+  sortOrder: 0,
+};
+
 type Props = {
   backupConfigured: boolean;
   initialContent: PortfolioSnapshot;
@@ -57,6 +66,9 @@ type UpsertProfileInput = Parameters<typeof actions.upsertProfile>[0];
 type SkillActionInput = Parameters<typeof actions.createSkill>[0];
 type ProjectActionInput = Parameters<typeof actions.createProject>[0];
 type ExperienceActionInput = Parameters<typeof actions.createExperience>[0];
+type FocusPresetActionInput = NonNullable<
+  Parameters<typeof actions.publishContentSnapshot>[0]["focusPresets"]
+>[number];
 type PublishSnapshotInput = Parameters<
   typeof actions.publishContentSnapshot
 >[0];
@@ -171,6 +183,15 @@ export default function ContentManager({
   const [focusDefinitionsDraft, setFocusDefinitionsDraft] = useState(
     formatJson(initialContent.focusDefinitions),
   );
+  const [focusPresetsState, setFocusPresetsState] = useState<FocusPreset[]>([
+    ...initialContent.focusPresets,
+  ]);
+  const [selectedFocusPresetId, setSelectedFocusPresetId] = useState<string>(
+    initialContent.focusPresets[0]?.id ?? NEW_RECORD_ID,
+  );
+  const [focusPresetDraft, setFocusPresetDraft] = useState(
+    formatJson(initialContent.focusPresets[0] ?? EMPTY_FOCUS_PRESET),
+  );
   const [profileHighlightsDraft, setProfileHighlightsDraft] = useState(
     formatJson(initialContent.profileHighlights),
   );
@@ -201,8 +222,24 @@ export default function ContentManager({
     setContent(nextContent);
     setProfileDraft(nextContent.siteProfile);
     setFocusDefinitionsDraft(formatJson(nextContent.focusDefinitions));
+    setFocusPresetsState([...nextContent.focusPresets]);
     setProfileHighlightsDraft(formatJson(nextContent.profileHighlights));
     setSummaryTemplatesDraft(formatJson(nextContent.summaryTemplates));
+
+    const nextFocusPresetId =
+      nextContent.focusPresets.find(
+        (preset) => preset.id === selectedFocusPresetId,
+      )?.id ??
+      nextContent.focusPresets[0]?.id ??
+      NEW_RECORD_ID;
+    setSelectedFocusPresetId(nextFocusPresetId);
+    setFocusPresetDraft(
+      formatJson(
+        nextContent.focusPresets.find(
+          (preset) => preset.id === nextFocusPresetId,
+        ) ?? EMPTY_FOCUS_PRESET,
+      ),
+    );
 
     const nextSkillId =
       overrides?.skillId ??
@@ -336,6 +373,116 @@ export default function ContentManager({
     );
   }
 
+  function normalizeFocusPresets(nextFocusPresets: readonly FocusPreset[]) {
+    return nextFocusPresets.map((preset, index) => ({
+      ...preset,
+      sortOrder: index,
+    }));
+  }
+
+  function selectFocusPreset(focusPresetId: string) {
+    setSelectedFocusPresetId(focusPresetId);
+    setFocusPresetDraft(
+      formatJson(
+        focusPresetsState.find((preset) => preset.id === focusPresetId) ??
+          EMPTY_FOCUS_PRESET,
+      ),
+    );
+  }
+
+  function stageFocusPreset() {
+    const parsed = parseJsonValue<FocusPresetActionInput>(
+      focusPresetDraft,
+      "focus preset",
+    );
+    const existingIndex = focusPresetsState.findIndex(
+      (preset) => preset.id === parsed.id,
+    );
+    const nextFocusPresets = [...focusPresetsState];
+
+    if (existingIndex === -1) {
+      nextFocusPresets.push({ ...parsed, sortOrder: nextFocusPresets.length });
+    } else {
+      nextFocusPresets[existingIndex] = {
+        ...parsed,
+        sortOrder: nextFocusPresets[existingIndex]?.sortOrder ?? existingIndex,
+      };
+    }
+
+    const normalized = normalizeFocusPresets(nextFocusPresets);
+    setFocusPresetsState(normalized);
+    setSelectedFocusPresetId(parsed.id);
+    setFocusPresetDraft(
+      formatJson(
+        normalized.find((preset) => preset.id === parsed.id) ?? parsed,
+      ),
+    );
+    setStatus(`Focus preset ${parsed.label} staged for publish.`);
+    setError(null);
+  }
+
+  function removeFocusPreset() {
+    if (!selectedFocusPresetId || selectedFocusPresetId === NEW_RECORD_ID) {
+      return;
+    }
+
+    const normalized = normalizeFocusPresets(
+      focusPresetsState.filter((preset) => preset.id !== selectedFocusPresetId),
+    );
+    const nextFocusPresetId = normalized[0]?.id ?? NEW_RECORD_ID;
+    setFocusPresetsState(normalized);
+    setSelectedFocusPresetId(nextFocusPresetId);
+    setFocusPresetDraft(
+      formatJson(
+        normalized.find((preset) => preset.id === nextFocusPresetId) ??
+          EMPTY_FOCUS_PRESET,
+      ),
+    );
+    setStatus(`Focus preset ${selectedFocusPresetId} removed from draft.`);
+    setError(null);
+  }
+
+  function moveFocusPreset(direction: -1 | 1) {
+    if (!selectedFocusPresetId || selectedFocusPresetId === NEW_RECORD_ID) {
+      return;
+    }
+
+    const currentIndex = focusPresetsState.findIndex(
+      (preset) => preset.id === selectedFocusPresetId,
+    );
+    const nextIndex = currentIndex + direction;
+
+    if (
+      currentIndex === -1 ||
+      nextIndex < 0 ||
+      nextIndex >= focusPresetsState.length
+    ) {
+      return;
+    }
+
+    const reordered = [...focusPresetsState];
+    const current = reordered[currentIndex];
+    const next = reordered[nextIndex];
+
+    if (!current || !next) {
+      return;
+    }
+
+    reordered[currentIndex] = next;
+    reordered[nextIndex] = current;
+
+    const normalized = normalizeFocusPresets(reordered);
+    setFocusPresetsState(normalized);
+    setFocusPresetDraft(
+      formatJson(
+        normalized.find((preset) => preset.id === selectedFocusPresetId) ??
+          EMPTY_FOCUS_PRESET,
+      ),
+    );
+    setStatus(`Focus presets reordered.`);
+    setError(null);
+  }
+
   async function saveProfile() {
     const payload = await runAction("profile", () =>
       actions.upsertProfile(profileDraft as UpsertProfileInput),
@@ -444,6 +591,7 @@ export default function ContentManager({
         focusDefinitionsDraft,
         "focus definitions",
       ) ?? [];
+    const focusPresets = normalizeFocusPresets(focusPresetsState);
     const profileHighlights =
       parseJsonValue<PublishSnapshotInput["profileHighlights"]>(
         profileHighlightsDraft,
@@ -458,15 +606,17 @@ export default function ContentManager({
     const payload = await runAction("collections", () =>
       actions.publishContentSnapshot({
         focusDefinitions,
+        focusPresets,
         profileHighlights,
-        summary: "Updated focus definitions, highlights, and summaries",
+        summary:
+          "Updated focus definitions, presets, highlights, and summaries",
         summaryTemplates,
       }),
     );
 
     applyPublishResult(
       payload,
-      "Focus definitions, highlights, and summaries published.",
+      "Focus definitions, presets, highlights, and summaries published.",
     );
   }
 
@@ -899,11 +1049,11 @@ export default function ContentManager({
 
       <section className="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl sm:p-8">
         <SectionTitle
-          body="These collections drive focus chips, summary selection, and homepage metrics. They publish together."
+          body="These collections drive focus chips, resume preset cards, summary selection, and homepage metrics. They publish together."
           eyebrow="Advanced collections"
-          title="Focuses, highlights, and summaries"
+          title="Focuses, presets, highlights, and summaries"
         />
-        <div className="mt-6 grid gap-6 xl:grid-cols-3">
+        <div className="mt-6 grid gap-6 xl:grid-cols-2">
           <label className="text-sm font-medium text-[#0e1528]">
             Focus definitions JSON
             <textarea
@@ -913,6 +1063,91 @@ export default function ContentManager({
               value={focusDefinitionsDraft}
             />
           </label>
+          <div className="text-sm font-medium text-[#0e1528]">
+            Resume focus presets
+            <div className="mt-2 grid gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]">
+              <div className="space-y-2">
+                {focusPresetsState.map((preset) => (
+                  <RecordButton
+                    active={selectedFocusPresetId === preset.id}
+                    key={preset.id}
+                    label={preset.label}
+                    onClick={() => selectFocusPreset(preset.id)}
+                    secondary={preset.description}
+                  />
+                ))}
+                <button
+                  className="w-full rounded-[1.35rem] border border-dashed border-slate-300 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                  onClick={() => {
+                    setSelectedFocusPresetId(NEW_RECORD_ID);
+                    setFocusPresetDraft(
+                      formatJson({
+                        ...EMPTY_FOCUS_PRESET,
+                        sortOrder: focusPresetsState.length,
+                      }),
+                    );
+                  }}
+                  type="button"
+                >
+                  New preset draft
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className="rounded-full border border-slate-200/80 bg-white px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={
+                      selectedFocusPresetId === NEW_RECORD_ID ||
+                      focusPresetsState.findIndex(
+                        (preset) => preset.id === selectedFocusPresetId,
+                      ) <= 0
+                    }
+                    onClick={() => moveFocusPreset(-1)}
+                    type="button"
+                  >
+                    Move up
+                  </button>
+                  <button
+                    className="rounded-full border border-slate-200/80 bg-white px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={
+                      selectedFocusPresetId === NEW_RECORD_ID ||
+                      focusPresetsState.findIndex(
+                        (preset) => preset.id === selectedFocusPresetId,
+                      ) ===
+                        focusPresetsState.length - 1
+                    }
+                    onClick={() => moveFocusPreset(1)}
+                    type="button"
+                  >
+                    Move down
+                  </button>
+                </div>
+              </div>
+              <div>
+                <textarea
+                  className="h-[28rem] w-full rounded-[1.35rem] border border-slate-200/80 bg-slate-950 px-4 py-4 font-mono text-xs leading-6 text-slate-100 outline-none transition focus:border-slate-300"
+                  onChange={(event) => setFocusPresetDraft(event.target.value)}
+                  spellCheck={false}
+                  value={focusPresetDraft}
+                />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    className="rounded-full bg-[#11192c] px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(17,25,44,0.16)] transition hover:-translate-y-0.5 hover:bg-[#0b1222]"
+                    onClick={stageFocusPreset}
+                    type="button"
+                  >
+                    Stage preset
+                  </button>
+                  <button
+                    className="rounded-full border border-slate-200/80 bg-white px-4 py-2 text-sm font-semibold text-[#0e1528] transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={selectedFocusPresetId === NEW_RECORD_ID}
+                    onClick={removeFocusPreset}
+                    type="button"
+                  >
+                    Remove preset
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <label className="text-sm font-medium text-[#0e1528]">
             Profile highlights JSON
             <textarea

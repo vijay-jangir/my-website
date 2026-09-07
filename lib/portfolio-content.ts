@@ -15,6 +15,7 @@ import type {
   ExperienceDefinition,
   FocusDefinition,
   FocusId,
+  FocusPreset,
   FocusWeights,
   MediaAsset,
   PortfolioLink,
@@ -107,6 +108,7 @@ function sanitizeSnapshot(snapshot: PortfolioSnapshot): PortfolioSnapshot {
     portfolioLinks: [...snapshot.portfolioLinks],
     experiences: [...snapshot.experiences],
     focusDefinitions: [...snapshot.focusDefinitions],
+    focusPresets: [...snapshot.focusPresets],
     profileHighlights: [...snapshot.profileHighlights],
     projects: [...snapshot.projects],
     revisions: undefined,
@@ -136,6 +138,7 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
     const [
       portfolioLinks,
       focusDefinitions,
+      focusPresets,
       skills,
       skillFocusWeights,
       projects,
@@ -161,6 +164,10 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
         .select()
         .from(schema.focusDefinition)
         .orderBy(asc(schema.focusDefinition.sortOrder)),
+      db
+        .select()
+        .from(schema.focusPreset)
+        .orderBy(asc(schema.focusPreset.sortOrder)),
       db.select().from(schema.skill).orderBy(asc(schema.skill.sortOrder)),
       db.select().from(schema.skillFocusWeight),
       db.select().from(schema.project).orderBy(asc(schema.project.sortOrder)),
@@ -308,6 +315,15 @@ async function loadPortfolioContentFromDb(): Promise<PortfolioSnapshot | null> {
           relatedSkillIds: (row.relatedSkillIds ?? []) as string[],
           shortLabel: row.shortLabel,
           summary: row.summary,
+        }),
+      ),
+      focusPresets: focusPresets.map(
+        (row): FocusPreset => ({
+          description: row.description,
+          focusIds: (row.focusIds ?? []) as FocusId[],
+          id: row.id,
+          label: row.label,
+          sortOrder: row.sortOrder,
         }),
       ),
       skillDefinitions: skills.map(
@@ -500,6 +516,7 @@ async function applyPortfolioContentSnapshot(
     await tx.delete(schema.mediaAsset);
     await tx.delete(schema.contentRevision);
     await tx.delete(schema.portfolioLink);
+    await tx.delete(schema.focusPreset);
     await tx.delete(schema.focusDefinition);
     await tx.delete(schema.siteProfile);
 
@@ -550,6 +567,18 @@ async function applyPortfolioContentSnapshot(
         shortLabel: focus.shortLabel,
         sortOrder: index,
         summary: focus.summary,
+        updatedAt: timestamp,
+      })),
+    );
+
+    await insert(
+      schema.focusPreset,
+      sanitized.focusPresets.map((preset, index) => ({
+        description: preset.description,
+        focusIds: [...preset.focusIds],
+        id: preset.id,
+        label: preset.label,
+        sortOrder: index,
         updatedAt: timestamp,
       })),
     );

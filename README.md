@@ -10,7 +10,6 @@ Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backe
 - DB-backed portfolio content loader and backup publisher under [`lib/portfolio-content.ts`](./lib/portfolio-content.ts) and [`lib/content-backup.ts`](./lib/content-backup.ts)
 - GitHub allowlist auth flow for private admin surfaces under [`src/lib/auth.ts`](./src/lib/auth.ts)
 - ATS-safe PDF generation under [`src/pages/api/resume/pdf.ts`](./src/pages/api/resume/pdf.ts)
-- Legacy Next.js code quarantined under [`legacy-next/`](./legacy-next/)
 
 ## Working Docs
 

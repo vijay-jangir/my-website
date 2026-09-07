@@ -28,5 +28,5 @@
     "drizzle.config.ts",
     "vitest.config.ts"
   ],
-  "exclude": ["node_modules", "dist", ".next", "legacy-next"]
+  "exclude": ["node_modules", "dist", ".next"]
 }

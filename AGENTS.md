@@ -12,7 +12,7 @@ Keep vijayjangir.com a fast, honest, SEO-strong portfolio and resume generator w
 
 ## Current Architecture
 
-This is an **Astro 6** app deployed to Vercel in server mode. The legacy Next.js app is quarantined under `legacy-next/` and must not be imported.
+This is an **Astro 6** app deployed to Vercel in server mode.
 
 - Public routes: `/`, `/projects`, `/projects/[slug]`, `/resume`, `/blog`, `/blog/[slug]`, plus `/rss.xml`, `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/404`.
 - Private routes: `/admin`, `/admin/content`, `/assistant` (noindex; GitHub allowlist auth via `src/lib/auth.ts`, arctic OAuth + jose JWT session cookies).

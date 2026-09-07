@@ -95,7 +95,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 0 — Safety net
 
-- [ ] 1. Create backup branches and tag capturing the pre-change state
+- [x] 1. Create backup branches and tag capturing the pre-change state
   - Files: none (git only)
   - Do:
     - Record current state: `git rev-parse --abbrev-ref HEAD` and `git status --short`.
@@ -121,7 +121,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 1 — Lock critical paths with tests (TDD; these tests are the deliverable)
 
-- [ ] 2. Enable vitest coverage reporting and thresholds
+- [x] 2. Enable vitest coverage reporting and thresholds
   - Files: `vitest.config.ts`, `package.json`, `.gitignore`
   - Do: add `@vitest/coverage-v8` devDep; configure `coverage` with `provider: "v8"`,
     `reporter: ["text","json-summary"]`, `include: ["lib/**","src/lib/**","src/actions/**","src/pages/api/**"]`,
@@ -136,7 +136,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       exits non-zero, then restore.
   - Commit: `test: add coverage reporting with baseline thresholds`
 
-- [ ] 3. Test `lib/env.ts` and `lib/db.ts`
+- [x] 3. Test `lib/env.ts` and `lib/db.ts`
   - Files: `tests/env.test.ts` (new), `tests/db.test.ts` (new)
   - Do: cover every `readEnv` key; `SESSION_SECRET` -> `NEXTAUTH_SECRET` fallback;
     `WIX_SITE_ID` default; `CONTENT_HISTORY_LIMIT` default 10 and invalid/non-positive
@@ -149,7 +149,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: invert the `CONTENT_HISTORY_LIMIT` default in source, confirm a test fails, revert.
   - Commit: `test: cover env parsing and db pool fallbacks`
 
-- [ ] 4. Test `src/lib/auth.ts`
+- [x] 4. Test `src/lib/auth.ts`
   - Files: `tests/auth.test.ts` (new)
   - Do: cover `resolveRole` allowlist normalization (trim/lowercase, admin precedence,
     rejection of unlisted); session JWT sign/verify round-trip; expired token -> null;
@@ -164,7 +164,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: change `SameSite` to `None` in source, confirm the flag test fails, revert.
   - Commit: `test: cover GitHub OAuth session and allowlist logic`
 
-- [ ] 5. Test `lib/resume-store.ts`
+- [x] 5. Test `lib/resume-store.ts`
   - Files: `tests/resume-store.test.ts` (new)
   - Do: mock `dbQuery`. Assert `saveResumeVariant` generates a 24-char hex token, passes
     correct params, returns row; on DB throw returns null and logs a warning (never throws).
@@ -176,7 +176,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: make `saveResumeVariant` rethrow, confirm the resilience test fails, revert.
   - Commit: `test: cover resume variant persistence and fallbacks`
 
-- [ ] 6. Test `lib/content-backup.ts`
+- [x] 6. Test `lib/content-backup.ts`
   - Files: `tests/content-backup.test.ts` (new)
   - Do: mock `fetch`. Assert repo parsing `owner/repo`; branch default `content-backup`;
     Bearer PAT header; branch-create-from-default when absent (`:69-114`); snapshot path
@@ -189,7 +189,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: remove the timeout signal in source, confirm the timeout test fails, revert.
   - Commit: `test: cover GitHub content backup publishing and reads`
 
-- [ ] 7. Test `src/actions/index.ts` authorization
+- [x] 7. Test `src/actions/index.ts` authorization
   - Files: `tests/actions-auth.test.ts` (new)
   - Do: assert `requireAdmin` rejects: no session; non-admin role; missing backup repo;
     missing backup PAT; and in production only, missing remote DB config (`:235-262`).
@@ -204,7 +204,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: add a temporary unguarded export, confirm the enumeration test fails, remove it.
   - Commit: `test: pin admin authorization on every content action`
 
-- [ ] 8. Test `/api/jd/analyze`
+- [x] 8. Test `/api/jd/analyze`
   - Files: `tests/api-jd-analyze.test.ts` (new)
   - Do: 503 when auth unconfigured; 401 when no session; 400 when `jobDescription` < 80 or
     > 10000 chars; happy path returns `ok`, `saved`, `resumeUrl`, `pdfUrl`, trimmed analysis
@@ -217,7 +217,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: lower the min length to 10 in source, confirm the 400 boundary test fails, revert.
   - Commit: `test: cover JD analyze endpoint contract and fallbacks`
 
-- [ ] 9. Test `/api/resume/pdf` and `AtsResumeDocument`
+- [x] 9. Test `/api/resume/pdf` and `AtsResumeDocument`
   - Files: `tests/api-resume-pdf.test.ts` (new)
   - Do: stored `variant` token takes precedence over `focus`; invalid token falls back to
     focus-built variant; cache headers — `private, no-store` for stored,
@@ -234,7 +234,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 2 — Consolidate onto Neon Postgres + Drizzle
 
-- [ ] 10. Add Drizzle tooling and the Neon client
+- [x] 10. Add Drizzle tooling and the Neon client
   - Files: `package.json`, `drizzle.config.ts` (new), `lib/drizzle.ts` (new), `.env.example`
   - Do: add `drizzle-orm`, `drizzle-kit`, `@neondatabase/serverless`. Create a single
     exported Drizzle client in `lib/drizzle.ts` reading `DATABASE_URL`, returning null when
@@ -248,7 +248,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       warning rather than crashing the process.
   - Commit: `feat: add drizzle orm and neon serverless client`
 
-- [ ] 11. Author the Drizzle schema for all content and resume tables
+- [x] 11. Author the Drizzle schema for all content and resume tables
   - Files: `db/drizzle/schema.ts` (new)
   - Do: port ALL 19 tables from `db/config.ts:8-249` — `SiteProfile`, `PortfolioLink`,
     `FocusDefinition`, `Skill`, `SkillFocusWeight`, `Project`, `ProjectLink`,
@@ -267,7 +267,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: `grep -c 'project_fragments\|CREATE EXTENSION.*vector'` on the generated SQL returns 0.
   - Commit: `feat: drizzle schema for consolidated content and resume tables`
 
-- [ ] 12. Build the one-time Astro DB -> Neon migration script
+- [x] 12. Build the one-time Astro DB -> Neon migration script
   - Files: `scripts/migrate-to-neon.mjs` (new), `docs/infra.md`
   - Do: read the current snapshot via the EXISTING chain (Astro DB, else GitHub backup
     `state/current.json`, else bundled fallback) and insert into Neon via Drizzle inside a
@@ -284,7 +284,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       writes nothing (verify counts unchanged).
   - Commit: `feat: one-time astro db to neon migration script`
 
-- [ ] 13. Move the content READ path onto Drizzle
+- [x] 13. Move the content READ path onto Drizzle
   - Files: `lib/portfolio-content.ts`
   - Do: replace `loadPortfolioContentFromDb` (`:175-509`) with a Drizzle implementation
     producing a BYTE-IDENTICAL `PortfolioSnapshot`. Preserve: the parallel table fetch, all
@@ -302,7 +302,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       returns the backup/fallback snapshot, and does NOT throw.
   - Commit: `refactor: read portfolio content via drizzle`
 
-- [ ] 14. Move the content WRITE/publish path onto Drizzle
+- [x] 14. Move the content WRITE/publish path onto Drizzle
   - Files: `lib/portfolio-content.ts`, `lib/portfolio-admin.ts`, `src/actions/index.ts`
   - Do: port `applyPortfolioContentSnapshot`, `clearContentTables`, `insertMany`, and the
     publish flow (`:873-912`) to Drizzle. Preserve backup-FIRST ordering (GitHub snapshot
@@ -319,7 +319,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       content is intact, and the error identifies `db-apply-failed`.
   - Commit: `refactor: transactional content publish via drizzle`
 
-- [ ] 15. Move `resume-store` and the `jd_requests` write onto Drizzle
+- [x] 15. Move `resume-store` and the `jd_requests` write onto Drizzle
   - Files: `lib/resume-store.ts`, `src/pages/api/jd/analyze.ts`
   - Do: replace raw `dbQuery` SQL with Drizzle queries. Preserve every behavior pinned by
     task 5: 24-hex token, null-on-failure, warn-not-throw, field mapping. Replace the silent
@@ -331,7 +331,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: `grep -rn 'catch {}' src/ lib/` returns zero matches.
   - Commit: `refactor: resume store and jd requests via drizzle`
 
-- [ ] 16. Remove `@astrojs/db` and the `pg` client entirely
+- [x] 16. Remove `@astrojs/db` and the `pg` client entirely
   - Files: `package.json`, `astro.config.mjs`, `db/config.ts` (delete), `db/seed.ts`
     (rewrite or delete), `lib/db.ts` (delete), `scripts/astro-build.mjs`, `.env.example`
   - Do: remove `@astrojs/db` and `pg`/`@types/pg` from deps; remove `db()` from
@@ -346,7 +346,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: `npm ls @astrojs/db pg` reports both absent.
   - Commit: `chore: remove @astrojs/db and pg in favor of drizzle on neon`
 
-- [ ] 17. Retire the dead speculative schema
+- [x] 17. Retire the dead speculative schema
   - Files: `db/schema.sql` (delete or replace with a Drizzle-generated baseline), `docs/infra.md`
   - Do: `project_fragments`, its three indexes, and the `vector`/`pg_trgm` extensions
     (`db/schema.sql:1-3,28-53`) are referenced nowhere in application code — verified by grep.
@@ -360,7 +360,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       tables and no extensions. Save `\dt` output to `.omo/evidence/17-tables.txt`.
   - Commit: `chore: drop unused project_fragments table and pgvector extension`
 
-- [ ] 18. Simplify the build wrapper
+- [x] 18. Simplify the build wrapper
   - Files: `scripts/astro-build.mjs`, `package.json`, `README.md`
   - Do: the local-file-vs-`--remote` switch (`:14-21`) existed only for Astro DB. With Drizzle
     the build no longer needs a database. Reduce the script to a plain `astro build`, or delete
@@ -374,7 +374,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 3 — Harden the private surface
 
-- [ ] 19. Add a central route guard in middleware
+- [x] 19. Add a central route guard in middleware
   - Files: `src/middleware.ts` (new), `tests/middleware.test.ts` (new)
   - Do: create Astro middleware protecting `/admin/*`, `/assistant/*`, and every private API
     route. Unauthenticated HTML requests REDIRECT to `/admin` with a sign-in prompt (do not
@@ -390,7 +390,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       blocks it. This is the regression this task exists to prevent.
   - Commit: `feat: central middleware guard for private routes`
 
-- [ ] 20. Close the `/assistant` auth hole and make it the private tools home
+- [x] 20. Close the `/assistant` auth hole and make it the private tools home
   - Files: `src/pages/assistant/index.astro`
   - Do: `/assistant` currently performs NO session check (`:1-10`) — it is a public page
     labelled private. Bring it under the task-19 guard and convert the placeholder into the
@@ -404,7 +404,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: assert an unauthenticated response body contains NO tool links (no shell leakage).
   - Commit: `fix: require authentication on /assistant and add tools dashboard`
 
-- [ ] 21. Collapse roles to a single owner
+- [x] 21. Collapse roles to a single owner
   - Files: `src/lib/auth.ts`, `lib/env.ts`, `.env.example`, `src/pages/admin/index.astro`,
     `src/pages/admin/content.astro`, `src/actions/index.ts`, `tests/auth.test.ts`, `README.md`
   - Do: per owner decision, only the owner's login is permitted. Remove the `editor` role and
@@ -420,7 +420,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       set and the redirect carries an error.
   - Commit: `refactor: single owner role, drop editor allowlist`
 
-- [ ] 22. Add expiry to resume tokens and retention to stored JD text
+- [x] 22. Add expiry to resume tokens and retention to stored JD text
   - Files: `db/drizzle/schema.ts`, `lib/resume-store.ts`, `src/pages/api/jd/analyze.ts`,
     `src/pages/resume.astro`, `src/pages/api/resume/pdf.ts`, `tests/resume-store.test.ts`
   - Do: resume variant tokens are currently unauthenticated AND never expire, so a resume
@@ -437,7 +437,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: run purge with only live rows present; assert zero rows deleted.
   - Commit: `feat: expire resume variant tokens and stored job description text`
 
-- [ ] 23. Fix the robots.txt AI-crawler override
+- [x] 23. Fix the robots.txt AI-crawler override
   - Files: `src/pages/robots.txt.ts`, `tests/robots.test.ts`
   - Do: named AI-crawler groups currently receive `Allow: /` (`:7-18,36-40`), which in
     group-scoped robots semantics OVERRIDES the wildcard disallow of `/admin`, `/assistant`,
@@ -452,7 +452,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 4 — Finish the resume engine
 
-- [ ] 24. Move hardcoded focus presets into content
+- [x] 24. Move hardcoded focus presets into content
   - Files: `db/drizzle/schema.ts`, `content/portfolio.ts`, `lib/portfolio-types.ts`,
     `src/pages/resume.astro`, `lib/portfolio-content.ts`, `src/components/admin/ContentManager.tsx`
   - Do: the three preset groups are hardcoded at `src/pages/resume.astro:71-87` — the same
@@ -468,7 +468,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: `grep -n "focusPresetGroups" src/pages/resume.astro` returns zero.
   - Commit: `refactor: drive resume focus presets from content`
 
-- [ ] 25. Add a deterministic JD gap report
+- [x] 25. Add a deterministic JD gap report
   - Files: `lib/jd.ts`, `lib/portfolio-types.ts`, `src/components/admin/ResumeLab.tsx`,
     `src/pages/api/jd/analyze.ts`, `tests/jd.test.ts`
   - Do: highest-value non-LLM feature currently missing. Extend `JobDescriptionAnalysis` with
@@ -485,7 +485,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: run the same JD twice, assert byte-identical output (determinism guard).
   - Commit: `feat: deterministic job description coverage gap report`
 
-- [ ] 26. Add ATS-safe DOCX export
+- [x] 26. Add ATS-safe DOCX export
   - Files: `package.json`, `src/pages/api/resume/docx.ts` (new),
     `src/components/resume/AtsResumeDocx.ts` (new), `src/pages/resume.astro`,
     `tests/api-resume-docx.test.ts` (new)
@@ -503,7 +503,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       bundle stays under 250MB.
   - Commit: `feat: ATS-safe DOCX resume export`
 
-- [ ] 27. Add an optional provider-agnostic LLM adapter
+- [x] 27. Add an optional provider-agnostic LLM adapter
   - Files: `lib/llm/index.ts` (new), `lib/llm/providers/gemini.ts` (new),
     `lib/llm/providers/groq.ts` (new), `lib/env.ts`, `.env.example`, `tests/llm.test.ts` (new)
   - Do: a thin adapter with ONE interface: `complete({system, prompt, maxTokens})`. Gemini
@@ -522,7 +522,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       crash. Assert exceeding the daily cap returns `LlmQuotaExceeded`.
   - Commit: `feat: optional provider-agnostic llm adapter with quota caps`
 
-- [ ] 28. Add LLM bullet rephrasing behind explicit owner diff-approval
+- [x] 28. Add LLM bullet rephrasing behind explicit owner diff-approval
   - Files: `src/pages/api/resume/rephrase.ts` (new), `src/components/admin/ResumeLab.tsx`,
     `lib/llm/prompts/bullet-rephrase.ts` (new), `tests/api-resume-rephrase.test.ts` (new)
   - Do: owner-only endpoint. Input: an EXISTING approved bullet plus the JD analysis. Output:
@@ -544,7 +544,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
 
 ### Phase 5 — Dual-source blog
 
-- [ ] 29. Add a local Markdown/MDX content collection
+- [x] 29. Add a local Markdown/MDX content collection
   - Files: `astro.config.mjs`, `src/content.config.ts` (new), `src/content/blog/` (new),
     `package.json`, `tests/blog-collection.test.ts` (new)
   - Do: add `@astrojs/mdx`. Define a `blog` collection with a Zod schema: `title`, `description`,
@@ -559,7 +559,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
     - Failure: a `draft: true` post is absent from the collection query, RSS, and sitemap.
   - Commit: `feat: local markdown blog collection with draft support`
 
-- [ ] 30. Merge Wix and Markdown into one unified blog index
+- [x] 30. Merge Wix and Markdown into one unified blog index
   - Files: `src/pages/blog/index.astro`, `lib/blog.ts` (new), `tests/blog-merge.test.ts` (new)
   - Do: create `lib/blog.ts` exposing a normalized `BlogPost` union over both sources, each
     tagged with `source: "wix" | "local"`. Merge, dedupe by slug (local wins on collision),
@@ -573,7 +573,7 @@ Phases 4 and 5 may run in parallel after 3. Phases 6 and 7 may run in parallel a
       with HTTP 200.
   - Commit: `feat: unified blog index across wix and local markdown`
 
-- [ ] 31. Render Wix posts as rich content instead of flattened text
+- [x] 31. Render Wix posts as rich content instead of flattened text
   - Files: `src/lib/wix.ts`, `src/pages/blog/[slug].astro`, `tests/wix.test.ts`
   - Do: current code requests `CONTENT_TEXT` and splits on blank lines into `<p>`
     (`wix.ts:176-185`, `[slug].astro:200-216`), destroying code blocks, images, links, headings,

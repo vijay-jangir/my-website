@@ -1,8 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import type { SiteProfile } from "@/lib/portfolio-types";
-import { buildLlmsTxt, clampSummary } from "@/src/pages/llms.txt";
+
+vi.mock("astro:content", () => ({ getCollection: vi.fn() }));
+
+const { buildLlmsTxt, clampSummary } = await import("@/src/pages/llms.txt");
 
 const baseUrl = new URL("https://vijayjangir.com");
 
@@ -42,6 +45,19 @@ const projects = [
   },
 ];
 
+const blogPosts = [
+  {
+    slug: "hello-world",
+    title: "Hello World",
+    description: "My first blog post.",
+  },
+  {
+    slug: "architecture-notes",
+    title: "Architecture Notes",
+    description: "Notes on platform architecture.",
+  },
+];
+
 describe("buildLlmsTxt", () => {
   const body = buildLlmsTxt({ baseUrl, profile, projects });
 
@@ -66,6 +82,28 @@ describe("buildLlmsTxt", () => {
     expect(body).toContain("- Short project: Short summary stays intact.");
     expect(body).not.toContain("draft-project");
     expect(body).not.toContain("No-slug project");
+  });
+
+  it("omits blog posts section when none are provided", () => {
+    expect(body).not.toContain("Blog posts:");
+  });
+});
+
+describe("buildLlmsTxt with blog posts", () => {
+  const body = buildLlmsTxt({ baseUrl, profile, projects, blogPosts });
+
+  it("includes a blog posts section with each post", () => {
+    expect(body).toContain("Blog posts:");
+    expect(body).toContain("- Hello World: My first blog post.");
+    expect(body).toContain("https://vijayjangir.com/blog/hello-world");
+    expect(body).toContain("- Architecture Notes: Notes on platform architecture.");
+    expect(body).toContain(
+      "https://vijayjangir.com/blog/architecture-notes",
+    );
+  });
+
+  it("does not duplicate blog posts in case studies section", () => {
+    expect(body).not.toContain("/projects/hello-world");
   });
 });
 

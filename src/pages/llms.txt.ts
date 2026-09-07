@@ -1,9 +1,11 @@
 import type { APIRoute } from "astro";
 
+import type { BlogPost } from "@/lib/blog";
+import { getUnifiedBlogPosts } from "@/lib/blog";
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import type { SiteProfile } from "@/lib/portfolio-types";
 
-export const prerender = true;
+export const prerender = false;
 
 type LlmsProject = {
   title: string;
@@ -11,6 +13,8 @@ type LlmsProject = {
   visibility: string;
   summary: string;
 };
+
+type LlmsBlogPost = Pick<BlogPost, "title" | "slug" | "description">;
 
 const SUMMARY_MAX_CHARS = 160;
 
@@ -28,9 +32,10 @@ export function clampSummary(summary: string): string {
 export function buildLlmsTxt(input: {
   profile: SiteProfile;
   projects: readonly LlmsProject[];
+  blogPosts?: readonly LlmsBlogPost[];
   baseUrl: URL;
 }): string {
-  const { profile, projects, baseUrl } = input;
+  const { profile, projects, blogPosts = [], baseUrl } = input;
   const focusLabels = profile.currentFocusLabels.join(", ");
   const caseStudyLines = projects
     .filter((project) => project.visibility === "public" && project.slug)
@@ -41,6 +46,21 @@ export function buildLlmsTxt(input: {
           baseUrl,
         ).toString()}`,
     );
+
+  const blogLines =
+    blogPosts.length > 0
+      ? [
+          "",
+          "Blog posts:",
+          ...blogPosts.map(
+            (post) =>
+              `- ${post.title}: ${clampSummary(post.description)} ${new URL(
+                `/blog/${encodeURIComponent(post.slug)}`,
+                baseUrl,
+              ).toString()}`,
+          ),
+        ]
+      : [];
 
   return [
     `# ${profile.name}`,
@@ -60,12 +80,13 @@ export function buildLlmsTxt(input: {
     `- ${profile.name} architects and builds governed data platforms: metadata services, access governance, workflow orchestration, and enterprise AI systems.`,
     "- Project pages describe the problem, ownership, architecture, constraints, and decisions without exposing internal systems.",
     "- The resume page renders role-focused views (backend, platform, data, AI) from the same underlying evidence.",
-    "- Blog posts are published on vijayjangir.com; the publishing source remains Wix.",
+    "- Blog posts are published on vijayjangir.com from local markdown and Wix sources.",
     "",
     `Last updated: ${profile.lastUpdatedLabel}.`,
     "",
     "Case studies:",
     ...caseStudyLines,
+    ...blogLines,
     "",
     "Profiles:",
     `- GitHub: ${profile.githubUrl}`,
@@ -74,17 +95,20 @@ export function buildLlmsTxt(input: {
   ].join("\n");
 }
 
-export const GET: APIRoute = ({ site }) => {
+export const GET: APIRoute = async ({ site }) => {
   const baseUrl = site ?? new URL("https://vijayjangir.com");
+  const blogPosts = await getUnifiedBlogPosts();
 
   return new Response(
     buildLlmsTxt({
       baseUrl,
       profile: fallbackPortfolioSnapshot.siteProfile,
       projects: fallbackPortfolioSnapshot.projects,
+      blogPosts,
     }),
     {
       headers: {
+        "Cache-Control": "public, max-age=0, s-maxage=3600",
         "Content-Type": "text/plain; charset=utf-8",
       },
     },

@@ -1,23 +1,17 @@
 import type { APIRoute } from "astro";
 
+import type { BlogPost } from "@/lib/blog";
+import { getUnifiedBlogPosts } from "@/lib/blog";
 import { escapeXml } from "@/src/lib/xml";
-import {
-  getWixBlogLocalPath,
-  getWixBlogs,
-  type WixBlogPost,
-} from "@/src/lib/wix";
 
 export const prerender = false;
 
-const publicRoutes = ["/", "/projects", "/resume", "/blog"];
+const publicRoutes = ["/", "/projects", "/resume", "/blog", "/market-signals"];
 
-type SitemapEntry = { loc: string; lastmod?: string };
+type SitemapEntry = { readonly loc: string; readonly lastmod?: string };
 
 export function buildSitemapEntries(
-  posts: readonly (Pick<WixBlogPost, "slug" | "url"> &
-    Partial<
-      Pick<WixBlogPost, "firstPublishedDate" | "lastPublishedDate">
-    >)[] = [],
+  posts: readonly BlogPost[] = [],
   projectSlugs: readonly string[] = [],
 ): SitemapEntry[] {
   const staticEntries: SitemapEntry[] = publicRoutes.map((route) => ({
@@ -28,25 +22,16 @@ export function buildSitemapEntries(
     loc: `/projects/${slug}`,
   }));
 
-  const blogEntries = posts
-    .map((post): SitemapEntry | null => {
-      const route = getWixBlogLocalPath(post);
+  const blogEntries: SitemapEntry[] = posts.map((post) => {
+    const loc = `/blog/${encodeURIComponent(post.slug)}`;
+    const lastModDate = post.updatedAt ?? post.publishedAt;
+    const lastmod =
+      lastModDate && !Number.isNaN(lastModDate.getTime())
+        ? lastModDate.toISOString()
+        : undefined;
 
-      if (!route) {
-        return null;
-      }
-
-      const lastModified =
-        post.lastPublishedDate ?? post.firstPublishedDate ?? null;
-
-      return {
-        loc: route,
-        ...(lastModified
-          ? { lastmod: new Date(lastModified).toISOString() }
-          : {}),
-      };
-    })
-    .filter((entry): entry is SitemapEntry => entry !== null);
+    return { loc, ...(lastmod ? { lastmod } : {}) };
+  });
 
   return [
     ...new Map(
@@ -62,7 +47,7 @@ export const GET: APIRoute = async ({ site }) => {
   const baseUrl = site ?? new URL("https://vijayjangir.com");
   const { getPortfolioContent } = await import("@/lib/portfolio-content");
   const content = await getPortfolioContent();
-  const posts = await getWixBlogs();
+  const posts = await getUnifiedBlogPosts();
   const publicProjectSlugs = content.projects
     .filter((project) => project.visibility === "public")
     .map((project) => project.slug);

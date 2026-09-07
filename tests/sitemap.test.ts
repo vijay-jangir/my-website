@@ -1,23 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { buildSitemapEntries } from "@/src/pages/sitemap.xml";
+import type { BlogPost } from "@/lib/blog";
+
+vi.mock("astro:content", () => ({ getCollection: vi.fn() }));
+
+const { buildSitemapEntries } = await import("@/src/pages/sitemap.xml");
+
+function makePost(overrides: Partial<BlogPost> = {}): BlogPost {
+  return {
+    slug: "test-post",
+    title: "Test Post",
+    description: "A test blog post.",
+    publishedAt: new Date("2026-06-15T00:00:00.000Z"),
+    source: "local",
+    ...overrides,
+  };
+}
 
 describe("buildSitemapEntries", () => {
-  it("includes local blog detail routes when Wix slugs are available", () => {
+  it("includes blog detail routes from unified posts", () => {
     const entries = buildSitemapEntries([
-      {
-        slug: "astro-caching-notes",
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/astro-caching-notes",
-        },
-      },
-      {
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/platform-review",
-        },
-      },
+      makePost({ slug: "astro-caching-notes" }),
+      makePost({ slug: "platform-review", source: "wix" }),
     ]);
 
     expect(entries.map((entry) => entry.loc)).toEqual(
@@ -46,19 +50,8 @@ describe("buildSitemapEntries", () => {
 
   it("deduplicates repeated routes", () => {
     const entries = buildSitemapEntries([
-      {
-        slug: "astro-caching-notes",
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/astro-caching-notes",
-        },
-      },
-      {
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/astro-caching-notes",
-        },
-      },
+      makePost({ slug: "astro-caching-notes" }),
+      makePost({ slug: "astro-caching-notes", source: "wix" }),
     ]);
 
     expect(
@@ -66,17 +59,13 @@ describe("buildSitemapEntries", () => {
     ).toHaveLength(1);
   });
 
-  it("attaches lastmod from the most recent publish date", () => {
+  it("uses updatedAt for lastmod when available", () => {
     const entries = buildSitemapEntries([
-      {
+      makePost({
         slug: "astro-caching-notes",
-        firstPublishedDate: "2024-01-01T00:00:00.000Z",
-        lastPublishedDate: "2025-03-15T10:30:00.000Z",
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/astro-caching-notes",
-        },
-      },
+        publishedAt: new Date("2024-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2025-03-15T10:30:00.000Z"),
+      }),
     ]);
 
     const blogEntry = entries.find(
@@ -88,20 +77,31 @@ describe("buildSitemapEntries", () => {
     );
   });
 
-  it("omits lastmod when no publish dates exist", () => {
+  it("falls back to publishedAt for lastmod when updatedAt is absent", () => {
     const entries = buildSitemapEntries([
-      {
-        url: {
-          base: "https://example.com",
-          path: "/blog/post/platform-review",
-        },
-      },
+      makePost({
+        slug: "basic-post",
+        publishedAt: new Date("2026-02-10T00:00:00.000Z"),
+      }),
     ]);
 
     const blogEntry = entries.find(
-      (entry) => entry.loc === "/blog/platform-review",
+      (entry) => entry.loc === "/blog/basic-post",
     );
 
-    expect(blogEntry?.lastmod).toBeUndefined();
+    expect(blogEntry?.lastmod).toBe(
+      new Date("2026-02-10T00:00:00.000Z").toISOString(),
+    );
+  });
+
+  it("includes both local and wix posts", () => {
+    const entries = buildSitemapEntries([
+      makePost({ slug: "local-one", source: "local" }),
+      makePost({ slug: "wix-one", source: "wix" }),
+    ]);
+
+    const locs = entries.map((entry) => entry.loc);
+    expect(locs).toContain("/blog/local-one");
+    expect(locs).toContain("/blog/wix-one");
   });
 });

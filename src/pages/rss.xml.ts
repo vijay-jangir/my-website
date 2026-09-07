@@ -1,11 +1,8 @@
 import type { APIRoute } from "astro";
 
+import type { BlogPost } from "@/lib/blog";
+import { getUnifiedBlogPosts } from "@/lib/blog";
 import { escapeXml } from "@/src/lib/xml";
-import {
-  getWixBlogLocalPath,
-  getWixBlogs,
-  type WixBlogPost,
-} from "@/src/lib/wix";
 
 export const prerender = false;
 
@@ -34,52 +31,41 @@ function buildRssChannel(
 }
 
 export function buildRssItems(
-  posts: readonly Pick<
-    WixBlogPost,
-    "slug" | "url" | "title" | "excerpt" | "firstPublishedDate"
-  >[],
+  posts: readonly BlogPost[],
   baseUrl: URL,
-) {
-  return posts
-    .map((post) => {
-      const path = getWixBlogLocalPath(post);
+): string[] {
+  return posts.map((post) => {
+    const localPath = `/blog/${encodeURIComponent(post.slug)}`;
+    const localLink = new URL(localPath, baseUrl).toString();
+    const guidLink = post.canonicalUrl ?? localLink;
+    const title = escapeXml(post.title);
+    const description = escapeXml(post.description);
+    const pubDateTag =
+      post.publishedAt && !Number.isNaN(post.publishedAt.getTime())
+        ? `\n      <pubDate>${post.publishedAt.toUTCString()}</pubDate>`
+        : "";
 
-      if (!path) {
-        return null;
-      }
-
-      const link = escapeXml(new URL(path, baseUrl).toString());
-      const title = escapeXml(post.title);
-      const description = escapeXml(post.excerpt ?? "");
-      const publishedAt = post.firstPublishedDate
-        ? new Date(post.firstPublishedDate)
-        : null;
-      const pubDateTag =
-        publishedAt && !Number.isNaN(publishedAt.getTime())
-          ? `\n      <pubDate>${publishedAt.toUTCString()}</pubDate>`
-          : "";
-
-      return [
-        `    <item>`,
-        `      <title>${title}</title>`,
-        `      <link>${link}</link>`,
-        `      <guid isPermaLink="true">${link}</guid>`,
-        `      <description>${description}</description>${pubDateTag}`,
-        `    </item>`,
-      ].join("\n");
-    })
-    .filter((item): item is string => item !== null);
+    return [
+      `    <item>`,
+      `      <title>${title}</title>`,
+      `      <link>${escapeXml(guidLink)}</link>`,
+      `      <guid isPermaLink="true">${escapeXml(guidLink)}</guid>`,
+      `      <description>${description}</description>${pubDateTag}`,
+      `    </item>`,
+    ].join("\n");
+  });
 }
 
 export const GET: APIRoute = async ({ site }) => {
   const baseUrl = site ?? new URL(FALLBACK_BASE_URL);
-  const posts = await getWixBlogs();
+  const posts = await getUnifiedBlogPosts();
   const items = buildRssItems(posts, baseUrl);
   const mostRecentPost = posts
-    .map((post) =>
-      post.firstPublishedDate ? new Date(post.firstPublishedDate) : null,
+    .map((post) => post.publishedAt)
+    .filter(
+      (date): date is Date =>
+        date instanceof Date && !Number.isNaN(date.getTime()),
     )
-    .filter((date): date is Date => date !== null)
     .sort((left, right) => right.getTime() - left.getTime())[0];
 
   return new Response(buildRssChannel(baseUrl, items, mostRecentPost ?? null), {

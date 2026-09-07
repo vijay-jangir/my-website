@@ -23,15 +23,26 @@ type ResumeLabResponse = {
   message?: string;
 };
 
-type Props = {
-  focusOptions: readonly FocusDefinition[];
+type RephraseProposal = {
+  original: string;
+  proposals: readonly string[];
+  accepted: string | null;
 };
 
-export default function ResumeLab({ focusOptions }: Props) {
+type Props = {
+  focusOptions: readonly FocusDefinition[];
+  llmConfigured?: boolean;
+};
+
+export default function ResumeLab({ focusOptions, llmConfigured }: Props) {
   const [selectedFocuses, setSelectedFocuses] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ResumeLabResponse | null>(null);
+  const [rephraseState, setRephraseState] = useState<
+    Record<number, RephraseProposal>
+  >({});
+  const [rephraseLoading, setRephraseLoading] = useState<number | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,7 +66,65 @@ export default function ResumeLab({ focusOptions }: Props) {
     }
 
     setResult(payload);
+    setRephraseState({});
     setLoading(false);
+  }
+
+  async function handleRephrase(bulletIndex: number, bulletText: string) {
+    if (!result?.analysis) return;
+    setRephraseLoading(bulletIndex);
+
+    try {
+      const response = await fetch("/api/resume/rephrase", {
+        body: JSON.stringify({
+          bulletText,
+          jdAnalysis: {
+            topFocusIds: result.analysis.focusScores.map((f) => f.focusId),
+            skillScores: result.analysis.skillScores,
+          },
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        proposals?: string[];
+        message?: string;
+      };
+
+      if (payload.ok && payload.proposals) {
+        setRephraseState((prev) => ({
+          ...prev,
+          [bulletIndex]: {
+            original: bulletText,
+            proposals: payload.proposals ?? [],
+            accepted: null,
+          },
+        }));
+      } else {
+        setError(payload.message ?? "Rephrase failed.");
+      }
+    } catch {
+      setError("Network error during rephrase.");
+    } finally {
+      setRephraseLoading(null);
+    }
+  }
+
+  function handleAcceptProposal(bulletIndex: number, proposal: string) {
+    setRephraseState((prev) => ({
+      ...prev,
+      [bulletIndex]: { ...prev[bulletIndex], accepted: proposal },
+    }));
+  }
+
+  function handleRejectProposal(bulletIndex: number) {
+    setRephraseState((prev) => {
+      const next = { ...prev };
+      delete next[bulletIndex];
+      return next;
+    });
   }
 
   return (
@@ -186,10 +255,91 @@ export default function ResumeLab({ focusOptions }: Props) {
 
             <div>
               <h3 className="font-semibold">Highlights</h3>
-              <ul className="mt-2 space-y-2 text-slate-600">
-                {result.analysis?.extractedHighlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
+              <ul className="mt-2 space-y-3 text-slate-600">
+                {result.analysis?.extractedHighlights.map(
+                  (highlight, index) => {
+                    const rephrase = rephraseState[index];
+
+                    return (
+                      <li key={highlight}>
+                        <div className="flex items-start gap-2">
+                          <span className="flex-1">
+                            {rephrase?.accepted ?? highlight}
+                            {rephrase?.accepted ? (
+                              <span className="ml-2 text-xs font-semibold text-emerald-600">
+                                (rephrased)
+                              </span>
+                            ) : null}
+                          </span>
+                          {llmConfigured && !rephrase ? (
+                            <button
+                              className="shrink-0 rounded-full border border-slate-200/80 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-[#0e1528] disabled:opacity-50"
+                              disabled={rephraseLoading === index}
+                              onClick={() => handleRephrase(index, highlight)}
+                              type="button"
+                            >
+                              {rephraseLoading === index
+                                ? "Rephrasing..."
+                                : "Rephrase with AI"}
+                            </button>
+                          ) : null}
+                        </div>
+
+                        {rephrase &&
+                        !rephrase.accepted &&
+                        rephrase.proposals.length > 0 ? (
+                          <div className="mt-2 space-y-2 rounded-[1.25rem] border border-blue-200/80 bg-blue-50/50 p-3">
+                            <p className="text-xs font-semibold text-blue-700">
+                              Proposed rephrasings — nothing saved until you
+                              accept
+                            </p>
+                            <div className="space-y-2">
+                              <div className="rounded-lg bg-white/80 p-2 text-xs text-slate-500">
+                                <span className="font-semibold">Original:</span>{" "}
+                                {rephrase.original}
+                              </div>
+                              {rephrase.proposals.map((proposal) => (
+                                <div
+                                  className="flex items-start gap-2 rounded-lg bg-white/80 p-2"
+                                  key={proposal}
+                                >
+                                  <span className="flex-1 text-xs text-[#0e1528]">
+                                    {proposal}
+                                  </span>
+                                  <button
+                                    className="shrink-0 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                                    onClick={() =>
+                                      handleAcceptProposal(index, proposal)
+                                    }
+                                    type="button"
+                                  >
+                                    Accept
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                            <button
+                              className="text-xs font-semibold text-slate-500 transition hover:text-slate-700"
+                              onClick={() => handleRejectProposal(index)}
+                              type="button"
+                            >
+                              Dismiss all
+                            </button>
+                          </div>
+                        ) : null}
+
+                        {rephrase &&
+                        !rephrase.accepted &&
+                        rephrase.proposals.length === 0 ? (
+                          <p className="mt-1 text-xs text-amber-600">
+                            No valid rephrasings available — all candidates
+                            failed validation.
+                          </p>
+                        ) : null}
+                      </li>
+                    );
+                  },
+                )}
               </ul>
             </div>
 

@@ -1,5 +1,6 @@
 ---
 import { isAuthConfigured } from "@/lib/env";
+import { isLlmConfigured } from "@/lib/llm/index";
 import { getContentPlatformStatus } from "@/lib/content-platform";
 import { getPortfolioContent } from "@/lib/portfolio-content";
 import ResumeLab from "@/src/components/admin/ResumeLab";
@@ -186,7 +187,7 @@ setRobotsHeader(Astro.response.headers);
             </div>
           </section>
 
-          <ResumeLab client:load focusOptions={content.focusDefinitions} />
+          <ResumeLab client:load focusOptions={content.focusDefinitions} llmConfigured={isLlmConfigured()} />
         </>
       ) : null
     }

@@ -38,9 +38,9 @@ const nextHref = paginated.hasNext ? `/blog/${paginated.page + 1}` : null;
 ---
 
 <BaseLayout
-  description={`Blog posts from Vijay Jangir — page ${paginated.page} of ${paginated.totalPages}.`}
+  description={`Blog posts from Vijay Jangir, page ${paginated.page} of ${paginated.totalPages}.`}
   siteProfile={content.siteProfile}
-  title={`Blog — Page ${paginated.page} | Vijay Jangir`}
+  title={`Blog | Page ${paginated.page} | Vijay Jangir`}
 >
   <Fragment slot="head">
     {prevHref && <link rel="prev" href={prevHref} />}

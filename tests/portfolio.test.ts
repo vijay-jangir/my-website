@@ -33,6 +33,29 @@ describe("portfolio focus utilities", () => {
     );
   });
 
+  it("filters projects by focus, excluding those with zero weight on selected focus", () => {
+    const projects = searchProjects({ focusIds: ["ai"] });
+
+    expect(projects.length).toBeGreaterThan(0);
+    expect(projects.length).toBeLessThan(
+      fallbackPortfolioSnapshot.projects.filter(
+        (p) => p.visibility === "public",
+      ).length,
+    );
+    for (const project of projects) {
+      expect(project.focusWeights.ai ?? 0).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns all public projects when focus is general", () => {
+    const projects = searchProjects({ focusIds: ["general"] });
+    const publicCount = fallbackPortfolioSnapshot.projects.filter(
+      (p) => p.visibility === "public",
+    ).length;
+
+    expect(projects.length).toBe(publicCount);
+  });
+
   it("filters query search to lexical project matches", () => {
     const projects = searchProjects({
       focusIds: ["backend-engineering"],

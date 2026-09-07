@@ -2,6 +2,7 @@ import { env, isContentBackupConfigured } from "@/lib/env";
 import type { PortfolioSnapshot } from "@/lib/portfolio-types";
 
 const GITHUB_API = "https://api.github.com";
+const BACKUP_FETCH_TIMEOUT_MS = 8000;
 
 type GitHubRepoInfo = {
   default_branch: string;
@@ -158,7 +159,7 @@ export async function loadBackupSnapshot(): Promise<PortfolioSnapshot | null> {
       headers: {
         Accept: "application/json",
       },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(BACKUP_FETCH_TIMEOUT_MS),
     });
 
     if (!response.ok) {

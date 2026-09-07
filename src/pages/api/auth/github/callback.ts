@@ -39,7 +39,8 @@ export const GET: APIRoute = async ({ cookies, request, url }) => {
 
     await persistSession(cookies, profile);
     return Response.redirect(`${origin}/admin`, 302);
-  } catch {
+  } catch (error) {
+    console.warn("[auth] OAuth callback failed:", error);
     clearSession(cookies);
     return Response.redirect(`${origin}/admin?error=oauth_failed`, 302);
   }

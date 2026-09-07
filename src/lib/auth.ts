@@ -121,7 +121,8 @@ export async function getSessionUser(
       name: payload.name,
       role,
     };
-  } catch {
+  } catch (error) {
+    console.warn("[auth] Session verification failed:", error);
     return null;
   }
 }

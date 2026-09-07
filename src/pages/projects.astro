@@ -44,7 +44,7 @@ const itemListJsonLd = JSON.stringify(
 ---
 
 <BaseLayout
-  description="Projects across data platforms, streaming systems, backend engineering, and platform foundations."
+  description="Projects and case studies: AI agents, governed data platforms, access governance, telecom analytics, and developer tooling by Vijay Jangir."
   siteProfile={content.siteProfile}
   title="Projects | Vijay Jangir"
 >
@@ -59,12 +59,12 @@ const itemListJsonLd = JSON.stringify(
       <h1
         class="mt-4 max-w-4xl font-display text-6xl font-semibold leading-[0.96] tracking-[-0.06em] text-[#0e1528] sm:text-7xl"
       >
-        Enterprise data systems I have built.
+        Systems I have built.
       </h1>
       <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-600">
-        A practical index of platform and data work: what problem it solved, my
-        ownership, the system shape, the tradeoffs, and the outcomes that can be
-        shared publicly.
+        AI agents, governed data platforms, access governance, telecom analytics,
+        and developer tooling. Each with the problem, ownership, architecture,
+        tradeoffs, and outcomes that can be shared publicly.
       </p>
 
       <form
@@ -142,16 +142,18 @@ const itemListJsonLd = JSON.stringify(
 
       {
         projects.length === 0 ? (
-          <article class="rounded-[2rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl">
+          <article class="rounded-3xl border border-white/70 bg-white/72 px-6 py-8 shadow-[0_8px_24px_rgba(31,44,75,0.06)] backdrop-blur-xl">
             <p class="text-base leading-8 text-slate-600">
               No projects match that search. Try a simpler term or clear the
               search.
             </p>
           </article>
         ) : (
-          projects.map((project) => (
-            <ProjectCard project={project} skillLabels={skillLabels} />
-          ))
+          <div class="flex flex-col gap-6">
+            {projects.map((project) => (
+              <ProjectCard project={project} skillLabels={skillLabels} />
+            ))}
+          </div>
         )
       }
     </section>

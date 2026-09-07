@@ -86,7 +86,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
       animate="show"
       className="relative mx-auto flex min-h-[calc(100svh-7.5rem)] w-full max-w-[82rem] items-center justify-center overflow-hidden px-4 pb-16 pt-6 text-center"
       id="home"
-      initial="hidden"
+      initial={false}
       variants={heroContainerVariants}
     >
       <SystemsBackdrop />
@@ -94,7 +94,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
         <div className="flex flex-col items-center gap-5">
           <motion.img
             alt={`${siteProfile.name} profile`}
-            className="h-24 w-24 rounded-full border-[5px] border-white object-cover shadow-[0_20px_52px_rgba(31,44,75,0.16)] sm:h-32 sm:w-32"
+            className="h-24 w-24 rounded-full border-[5px] border-white object-cover shadow-[0_28px_80px_rgba(16,24,39,0.18)] sm:h-32 sm:w-32"
             src={siteProfile.profileImageUrl ?? "/profile-pic.jpeg"}
             variants={profileVariants}
           />
@@ -131,7 +131,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
         >
           {siteProfile.currentFocusLabels.map((label) => (
             <motion.span
-              className="rounded-full border border-[#d9e3f5] bg-white/92 px-3.5 py-2 text-xs font-semibold tracking-[0.01em] text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.08)] sm:text-sm"
+              className="rounded-full border border-[#d9e3f5] bg-white/92 px-3.5 py-2 text-xs font-semibold tracking-[0.01em] text-[#0e1528] shadow-[0_8px_24px_rgba(31,44,75,0.06)] sm:text-sm"
               key={label}
               variants={compactItemVariants}
             >
@@ -145,7 +145,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
           variants={staggerVariants}
         >
           <motion.a
-            className="group inline-flex items-center gap-2 rounded-full bg-[#101827] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(16,24,39,0.22)] transition hover:-translate-y-0.5 hover:bg-[#0b1220] sm:text-base"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#101827] px-6 py-3 text-sm font-semibold text-white shadow-[0_28px_80px_rgba(16,24,39,0.18)] transition hover:-translate-y-0.5 hover:bg-[#0b1220] sm:text-base"
             href="/projects"
             variants={compactItemVariants}
           >
@@ -153,7 +153,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
             <ArrowRightIcon className="transition group-hover:translate-x-1" />
           </motion.a>
           <motion.a
-            className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_14px_30px_rgba(31,44,75,0.09)] transition hover:-translate-y-0.5 hover:bg-white sm:text-base"
+            className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-sm font-semibold text-[#0e1528] shadow-[0_8px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:bg-white sm:text-base"
             href="/resume"
             variants={compactItemVariants}
           >
@@ -162,7 +162,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
           </motion.a>
           <motion.a
             aria-label="LinkedIn"
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_8px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
             href={siteProfile.linkedinUrl}
             rel="noreferrer"
             target="_blank"
@@ -172,7 +172,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
           </motion.a>
           <motion.a
             aria-label="GitHub"
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_14px_30px_rgba(31,44,75,0.08)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
+            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-[0_8px_24px_rgba(31,44,75,0.06)] transition hover:-translate-y-0.5 hover:text-[#0e1528]"
             href={siteProfile.githubUrl}
             rel="noreferrer"
             target="_blank"
@@ -183,7 +183,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
         </motion.div>
 
         <motion.div
-          className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-[1.4rem] border border-white/80 bg-slate-200/80 shadow-[0_20px_56px_rgba(31,44,75,0.08)]"
+          className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/80 bg-slate-200/80 shadow-[0_18px_48px_rgba(31,44,75,0.08)]"
           variants={staggerVariants}
         >
           {profileHighlights.slice(0, 4).map((item) => (

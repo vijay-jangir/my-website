@@ -133,7 +133,7 @@ export function SelectedWorkSection({
       title="Systems I have actually built."
     >
       <motion.div
-        className="mt-12 grid gap-px overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-slate-200/80 shadow-[0_24px_70px_rgba(31,44,75,0.08)] lg:grid-cols-3"
+        className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-200/80 shadow-[0_18px_48px_rgba(31,44,75,0.08)] lg:grid-cols-3"
         initial="hidden"
         variants={staggerVariants}
         viewport={{ amount: 0.18, once: true }}
@@ -196,11 +196,12 @@ export function ProcessSection() {
     <HomeSection
       copy="The AI journey starts with discovery. I usually need to understand the data landscape, permissions, and operating constraints before architecture or model choices are worth debating."
       eyebrow="How I work"
+      fullBleed="bg-slate-950 text-white"
       id="process"
       title="Discovery-first delivery for AI and data platforms."
     >
       <motion.div
-        className="mt-12 grid gap-4 lg:grid-cols-5"
+        className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
         initial="hidden"
         variants={staggerVariants}
         viewport={{ amount: 0.18, once: true }}
@@ -208,17 +209,17 @@ export function ProcessSection() {
       >
         {processSteps.map((step) => (
           <motion.article
-            className="flex h-full flex-col rounded-[1.8rem] border border-slate-200/80 bg-white/82 px-5 py-6 shadow-[0_18px_48px_rgba(31,44,75,0.06)]"
+            className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 px-5 py-6"
             key={step.id}
             variants={cardVariants}
           >
-            <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#1f3b73]">
+            <p className="font-mono text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/50">
               {step.number}
             </p>
-            <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[#0e1528]">
+            <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-white">
               {step.title}
             </h3>
-            <p className="mt-4 text-sm leading-7 text-slate-600">
+            <p className="mt-4 text-sm leading-7 text-white/60">
               {step.description}
             </p>
           </motion.article>
@@ -245,7 +246,7 @@ export function TechStackSection({ groups }: TechStackSectionProps) {
       >
         {groups.map((group) => (
           <motion.article
-            className="rounded-[1.8rem] border border-slate-200/80 bg-white/82 px-6 py-6 shadow-[0_18px_48px_rgba(31,44,75,0.06)]"
+            className="rounded-3xl border border-slate-200/80 bg-white/82 px-6 py-6 shadow-[0_8px_24px_rgba(31,44,75,0.06)]"
             key={group.title}
             variants={cardVariants}
           >

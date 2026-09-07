@@ -105,7 +105,8 @@ export default function ResumeLab({ focusOptions, llmConfigured }: Props) {
       } else {
         setError(payload.message ?? "Rephrase failed.");
       }
-    } catch {
+    } catch (error) {
+      console.warn("[resume-lab] Rephrase network error:", error);
       setError("Network error during rephrase.");
     } finally {
       setRephraseLoading(null);

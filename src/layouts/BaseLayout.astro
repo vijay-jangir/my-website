@@ -91,7 +91,7 @@ const pathname = Astro.url.pathname;
     <link
       href={new URL("/rss.xml", siteBase).toString()}
       rel="alternate"
-      title={`${siteProfile.name} — Blog`}
+      title={`${siteProfile.name} | Blog`}
       type="application/rss+xml"
     />
     <meta content={siteProfile.name} property="og:site_name" />
@@ -112,6 +112,15 @@ const pathname = Astro.url.pathname;
     <script is:inline set:html={personJsonLd} type="application/ld+json" />
     <slot name="head" />
     <title>{title}</title>
+    <noscript>
+      <style>
+        [style*="opacity:0"], [style*="opacity: 0"] {
+          opacity: 1 !important;
+          transform: none !important;
+          filter: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body
     class="min-h-screen bg-[radial-gradient(circle_at_12%_0%,rgba(59,130,246,0.11),transparent_26%),radial-gradient(circle_at_90%_4%,rgba(20,184,166,0.10),transparent_24%),linear-gradient(180deg,#f8fafc_0%,#f5f7f6_48%,#ffffff_100%)] font-body text-[#0e1528] antialiased"

@@ -98,8 +98,8 @@ export function parseDraftOutput(raw: string): ParsedDraftOutput {
       tags = Array.isArray(parsed.tags)
         ? parsed.tags.filter((t): t is string => typeof t === "string")
         : [];
-    } catch {
-      // Malformed JSON — keep defaults
+    } catch (error) {
+      console.warn("[blog-draft] Malformed JSON metadata block:", error);
     }
   }
 

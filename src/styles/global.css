@@ -18,6 +18,7 @@
 
   body {
     font-family: var(--site-font-body);
+    overflow-x: clip;
   }
 
   nav {
@@ -67,6 +68,13 @@
 .site-route-nav-item {
   animation: route-nav-item-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(90ms + var(--nav-index, 0) * 42ms);
+}
+
+.full-bleed-breakout {
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+  width: 100dvw;
 }
 
 @media (prefers-reduced-motion: reduce) {

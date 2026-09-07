@@ -115,12 +115,14 @@ describe("GitHub auth allowlist helpers", () => {
       EDITOR_GITHUB_LOGINS: "shared-user",
     });
 
-    await expect(auth.getGitHubProfile("github-access-token")).resolves.toEqual({
-      avatarUrl: "https://avatars.example/shared-user.png",
-      login: "shared-user",
-      name: "Shared User",
-      role: "admin",
-    });
+    await expect(auth.getGitHubProfile("github-access-token")).resolves.toEqual(
+      {
+        avatarUrl: "https://avatars.example/shared-user.png",
+        login: "shared-user",
+        name: "Shared User",
+        role: "admin",
+      },
+    );
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith("https://api.github.com/user", {
       headers: {
@@ -144,7 +146,9 @@ describe("GitHub auth allowlist helpers", () => {
 
     const { auth } = await loadAuthModule();
 
-    await expect(auth.getGitHubProfile("github-access-token")).resolves.toBeNull();
+    await expect(
+      auth.getGitHubProfile("github-access-token"),
+    ).resolves.toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
@@ -232,7 +236,10 @@ describe("session JWT helpers", () => {
       role: "admin",
     });
 
-    envModule.env.adminGithubLogins.splice(0, envModule.env.adminGithubLogins.length);
+    envModule.env.adminGithubLogins.splice(
+      0,
+      envModule.env.adminGithubLogins.length,
+    );
 
     await expect(auth.getSessionUser(cookies)).resolves.toBeNull();
   });
@@ -293,6 +300,8 @@ describe("session and oauth cookies", () => {
     const actualState = auth.issueOAuthState(mismatchedCookies);
 
     expect(auth.verifyOAuthState(matchingCookies, expectedState)).toBe(true);
-    expect(auth.verifyOAuthState(mismatchedCookies, `${actualState}-wrong`)).toBe(false);
+    expect(
+      auth.verifyOAuthState(mismatchedCookies, `${actualState}-wrong`),
+    ).toBe(false);
   });
 });

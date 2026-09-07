@@ -33,7 +33,7 @@ describe("HomePage", () => {
     expect(markup).toContain("AI &amp; LLM");
     expect(markup).toContain("Why Vijay");
     expect(markup).toContain(
-      "12+ years across telecom, retail, and enterprise data — not just demos",
+      "12+ years across telecom, retail, and enterprise data, not just demos",
     );
   });
 

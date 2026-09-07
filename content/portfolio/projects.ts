@@ -311,11 +311,11 @@ export const projects: readonly ProjectDefinition[] = [
     slug: "access-governance-platform",
     title: "Access governance platform",
     summary:
-      "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+      "Sole architect and lead developer of an enterprise access governance platform: centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
     impact:
       "Unified access control across a large telecom enterprise's data infrastructure: attributes from multiple systems of record under one roof, policies authored once and compiled for each enforcement engine, signed bundles shipped to local PDPs for sub-millisecond decisions. Full audit trail and approval workflows for every change.",
     detail:
-      "Designed the entire system from first principles: a control plane with attribute, policy, approval, distribution, and audit services backed by PostgreSQL, plus an enforcement plane of OPA PDPs, Ranger PEP plugins, and OPAL-based bundle delivery. The architecture enforces a strict separation — the control plane is never in the authorization hot path, and enforcement points continue operating when the control plane is unavailable. Ports-and-adapters design means every external dependency (identity providers, data catalogs, approval tools, cloud services) sits behind an adapter interface. Multi-repository workspace with a manifest-driven orchestration CLI.",
+      "Designed the entire system from first principles: a control plane with attribute, policy, approval, distribution, and audit services backed by PostgreSQL, plus an enforcement plane of OPA PDPs, Ranger PEP plugins, and OPAL-based bundle delivery. The architecture enforces a strict separation. The control plane is never in the authorization hot path, and enforcement points continue operating when the control plane is unavailable. Ports-and-adapters design means every external dependency (identity providers, data catalogs, approval tools, cloud services) sits behind an adapter interface. Multi-repository workspace with a manifest-driven orchestration CLI.",
     skillIds: [
       "opa",
       "ranger",
@@ -340,7 +340,7 @@ export const projects: readonly ProjectDefinition[] = [
     publicProof: {
       proofTypes: ["private-enterprise", "sanitized-diagram"],
       architectureShape: [
-        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Control plane with five services: attribute, policy, approval, distribution, and audit. Each has its own PostgreSQL schema, communicating via NATS/JetStream.",
         "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
         "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
         "Distribution service assembles signed bundles containing only the attributes each policy set references (referenced-attribute projection), publishes to a registry, and notifies subscribers.",
@@ -373,9 +373,9 @@ export const projects: readonly ProjectDefinition[] = [
     },
     caseStudy: {
       headline:
-        "Sole architect and lead developer of an enterprise access governance platform — centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
+        "Sole architect and lead developer of an enterprise access governance platform: centralized attribute management, policy authoring for OPA/Ranger/OpenFGA, cryptographically signed bundle distribution, and enforcement that keeps working with the control plane offline.",
       context:
-        "Large enterprises usually accumulate access rules across catalogs, query engines, workflow tools, and custom services. The goal here was to give the organization one governed path for attributes, approvals, policy authoring, distribution, and audit — without making the control plane a runtime dependency for every authorization decision.",
+        "Large enterprises usually accumulate access rules across catalogs, query engines, workflow tools, and custom services. The goal here was to give the organization one governed path for attributes, approvals, policy authoring, distribution, and audit, without making the control plane a runtime dependency for every authorization decision.",
       role: "Sole architect and lead developer",
       timeframe: "2026",
       organization: "Large telecom enterprise",
@@ -385,7 +385,7 @@ export const projects: readonly ProjectDefinition[] = [
         "This was an internal project for a large telecom enterprise. The writeup keeps internal service names, policy data, and system identifiers private while sharing the architecture and operating model in sanitized form.",
       metrics: [],
       architecture: [
-        "Control plane with five services: attribute, policy, approval, distribution, and audit — each with its own PostgreSQL schema, communicating via NATS/JetStream.",
+        "Control plane with five services: attribute, policy, approval, distribution, and audit. Each has its own PostgreSQL schema, communicating via NATS/JetStream.",
         "Attribute service ingests from multiple systems of record via scheduled connectors, with trust states and system-of-record-aware write-back policies.",
         "Policy service lowers authored policies to a canonical IR, then compiles to target-specific artifacts: Rego for OPA, authorization models for OpenFGA, delegating policies for Ranger.",
         "Distribution service assembles signed bundles containing only the attributes each policy set references, publishes to a registry, and notifies subscribers.",

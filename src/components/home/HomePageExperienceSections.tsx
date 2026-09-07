@@ -37,17 +37,17 @@ const differentiators = [
     description:
       "The work spans production data platforms, internal developer systems, and AI workflows that have to survive real operational pressure.",
     title:
-      "12+ years across telecom, retail, and enterprise data — not just demos",
+      "12+ years across telecom, retail, and enterprise data, not just demos",
   },
   {
     description:
       "I do the system design, the service boundaries, the policy model, and the implementation details needed to make the platform actually operate.",
-    title: "Architecture to code — I design the system and build it",
+    title: "Architecture to code: I design the system and build it",
   },
   {
     description:
       "The platform shape starts with access, lineage, and observability so AI and data workflows stay usable after the prototype phase.",
-    title: "Governance-first — authorization, metadata, and audit from day one",
+    title: "Governance-first: authorization, metadata, and audit from day one",
   },
 ] as const;
 

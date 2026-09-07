@@ -17,7 +17,7 @@ function buildRssChannel(
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">`,
     `  <channel>`,
-    `    <title>Vijay Jangir — Blog</title>`,
+    `    <title>Vijay Jangir | Blog</title>`,
     `    <link>${escapeXml(new URL("/blog", baseUrl).toString())}</link>`,
     `    <description>Technical posts and architecture notes on governed data platforms, enterprise AI, streaming, and platform engineering.</description>`,
     `    <language>en-us</language>`,

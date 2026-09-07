@@ -37,3 +37,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vscode
+
+# agents
+.omo
+.omc
+.omx
+.playwright-mcp

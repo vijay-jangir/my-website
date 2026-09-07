@@ -15,7 +15,7 @@ export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
   title:
     "Platform engineer building governed data platforms, AI agents, and access governance systems",
-  location: "India",
+  location: "India (IST, UTC+5:30) · Open to remote",
   timezone: "Asia/Kolkata",
   lastUpdatedLabel: "September 2026",
   contentPromise:

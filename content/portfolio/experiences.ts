@@ -249,4 +249,16 @@ export const experiences: readonly ExperienceDefinition[] = [
       },
     ],
   },
+  {
+    id: "education-btech",
+    company: "University",
+    companyUrl: "",
+    type: "education",
+    description: "Computer Science and Engineering",
+    date: "2010 - 2014",
+    title: "Bachelor of Technology",
+    icon: "🎓",
+    focusWeights: { general: 0.3 },
+    bullets: [],
+  },
 ] as const;

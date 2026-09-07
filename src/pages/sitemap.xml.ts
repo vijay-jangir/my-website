@@ -6,7 +6,7 @@ import { escapeXml } from "@/src/lib/xml";
 
 export const prerender = false;
 
-const publicRoutes = ["/", "/projects", "/resume", "/blog", "/market-signals"];
+const publicRoutes = ["/", "/projects", "/resume", "/blog"];
 
 type SitemapEntry = { readonly loc: string; readonly lastmod?: string };
 

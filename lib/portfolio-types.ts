@@ -123,7 +123,7 @@ export type ExperienceDefinition = {
   title: string;
   company: string;
   companyUrl: string;
-  type: "employment";
+  type: "employment" | "education";
   description: string;
   date: string;
   icon: string;

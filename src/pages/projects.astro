@@ -142,16 +142,18 @@ const itemListJsonLd = JSON.stringify(
 
       {
         projects.length === 0 ? (
-          <article class="rounded-[2rem] border border-white/70 bg-white/72 px-6 py-8 shadow-[0_18px_54px_rgba(31,44,75,0.06)] backdrop-blur-xl">
+          <article class="rounded-3xl border border-white/70 bg-white/72 px-6 py-8 shadow-[0_8px_24px_rgba(31,44,75,0.06)] backdrop-blur-xl">
             <p class="text-base leading-8 text-slate-600">
               No projects match that search. Try a simpler term or clear the
               search.
             </p>
           </article>
         ) : (
-          projects.map((project) => (
-            <ProjectCard project={project} skillLabels={skillLabels} />
-          ))
+          <div class="flex flex-col gap-6">
+            {projects.map((project) => (
+              <ProjectCard project={project} skillLabels={skillLabels} />
+            ))}
+          </div>
         )
       }
     </section>

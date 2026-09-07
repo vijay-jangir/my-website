@@ -17,10 +17,6 @@ export const env = {
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean),
-  editorGithubLogins: (readEnv("EDITOR_GITHUB_LOGINS") ?? "")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean),
   contentBackupRepo: readEnv("CONTENT_BACKUP_REPO"),
   contentBackupBranch: readEnv("CONTENT_BACKUP_BRANCH") ?? "content-backup",
   contentBackupPat: readEnv("CONTENT_BACKUP_PAT"),
@@ -29,6 +25,12 @@ export const env = {
     10,
   ),
 };
+
+if (env.adminGithubLogins.length > 1) {
+  console.warn(
+    `ADMIN_GITHUB_LOGINS contains ${env.adminGithubLogins.length} entries. The site is designed for a single owner.`,
+  );
+}
 
 export function isDatabaseConfigured() {
   return Boolean(env.databaseUrl);

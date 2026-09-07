@@ -9,7 +9,6 @@ const ENV_KEYS = [
   "GITHUB_ID",
   "GITHUB_SECRET",
   "ADMIN_GITHUB_LOGINS",
-  "EDITOR_GITHUB_LOGINS",
   "CONTENT_BACKUP_REPO",
   "CONTENT_BACKUP_BRANCH",
   "CONTENT_BACKUP_PAT",
@@ -68,7 +67,6 @@ describe("lib/env", () => {
       CONTENT_BACKUP_REPO: "owner/repo",
       CONTENT_HISTORY_LIMIT: "25",
       DATABASE_URL: "postgres://user:pass@example.com:5432/app",
-      EDITOR_GITHUB_LOGINS: " Editor.One , editor.two ",
       GITHUB_ID: "github-client-id",
       GITHUB_SECRET: "github-client-secret",
       NEXTAUTH_SECRET: "nextauth-secret",
@@ -87,7 +85,6 @@ describe("lib/env", () => {
       contentBackupRepo: "owner/repo",
       contentHistoryLimit: 25,
       databaseUrl: "postgres://user:pass@example.com:5432/app",
-      editorGithubLogins: ["editor.one", "editor.two"],
       githubId: "github-client-id",
       githubSecret: "github-client-secret",
       nextAuthSecret: "nextauth-secret",
@@ -118,7 +115,6 @@ describe("lib/env", () => {
     expect(env.contentHistoryLimit).toBe(10);
     expect(getContentHistoryLimit()).toBe(10);
     expect(env.adminGithubLogins).toEqual([]);
-    expect(env.editorGithubLogins).toEqual([]);
     expect(isDatabaseConfigured()).toBe(false);
     expect(isContentBackupConfigured()).toBe(false);
   });
@@ -187,15 +183,6 @@ describe("lib/env", () => {
     {
       label: "no admin login is configured",
       overrides: {
-        GITHUB_ID: "github-client-id",
-        GITHUB_SECRET: "github-client-secret",
-        SESSION_SECRET: "session-secret",
-      },
-    },
-    {
-      label: "only editor logins are configured",
-      overrides: {
-        EDITOR_GITHUB_LOGINS: "editor",
         GITHUB_ID: "github-client-id",
         GITHUB_SECRET: "github-client-secret",
         SESSION_SECRET: "session-secret",

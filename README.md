@@ -49,7 +49,6 @@ Private admin setup:
 - `GITHUB_ID`
 - `GITHUB_SECRET`
 - `ADMIN_GITHUB_LOGINS`
-- `EDITOR_GITHUB_LOGINS` (optional)
 
 Portfolio content storage:
 

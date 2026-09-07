@@ -229,13 +229,13 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-async function requireAdmin(cookies: Parameters<typeof getSessionUser>[0]) {
+async function requireOwner(cookies: Parameters<typeof getSessionUser>[0]) {
   const session = await getSessionUser(cookies);
 
-  if (!session || session.role !== "admin") {
+  if (!session || session.role !== "owner") {
     throw new ActionError({
       code: "UNAUTHORIZED",
-      message: "Admin authentication is required.",
+      message: "Owner authentication is required.",
     });
   }
 
@@ -325,7 +325,7 @@ export const server = {
   upsertProfile: defineAction({
     input: siteProfileSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -337,7 +337,7 @@ export const server = {
   createSkill: defineAction({
     input: skillSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -349,7 +349,7 @@ export const server = {
   updateSkill: defineAction({
     input: skillSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -361,7 +361,7 @@ export const server = {
   deleteSkill: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -373,7 +373,7 @@ export const server = {
   createProject: defineAction({
     input: projectSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -385,7 +385,7 @@ export const server = {
   updateProject: defineAction({
     input: projectSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -397,7 +397,7 @@ export const server = {
   deleteProject: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -409,7 +409,7 @@ export const server = {
   createExperience: defineAction({
     input: experienceSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -421,7 +421,7 @@ export const server = {
   updateExperience: defineAction({
     input: experienceSchema,
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -433,7 +433,7 @@ export const server = {
   deleteExperience: defineAction({
     input: z.object({ id: z.string().min(1) }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       return finalizeSnapshot({
         actor: session.login,
@@ -451,7 +451,7 @@ export const server = {
       summaryTemplates: z.array(summaryTemplateSchema).optional(),
     }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const current = await getPortfolioContent();
       const nextSnapshot = input.snapshot
         ? toPortfolioSnapshot(input.snapshot)
@@ -486,7 +486,7 @@ export const server = {
       label: z.string().min(1),
     }),
     handler: async (input, context) => {
-      const session = await requireAdmin(context.cookies);
+      const session = await requireOwner(context.cookies);
       const snapshot = await getPortfolioContent();
       const ext = inferFileExtension(input.file.name, input.file.type);
       const timestamp = new Date().toISOString().replaceAll(":", "-");
@@ -531,7 +531,7 @@ export const server = {
   }),
   listRevisions: defineAction({
     handler: async (_input, context) => {
-      await requireAdmin(context.cookies);
+      await requireOwner(context.cookies);
       const revisions = await listContentRevisions();
       return { revisions };
     },

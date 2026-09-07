@@ -302,7 +302,7 @@ async function expectActionToRejectWithUnauthorized(
 
   await expect(action.orThrow(buildInput(actionName))).rejects.toMatchObject({
     code: "UNAUTHORIZED",
-    message: "Admin authentication is required.",
+    message: "Owner authentication is required.",
   });
 
   expect(getSessionUserMock).toHaveBeenCalledTimes(1);
@@ -333,24 +333,24 @@ describe("content actions authorization", () => {
 
     await expect(server.listRevisions.orThrow()).rejects.toMatchObject({
       code: "UNAUTHORIZED",
-      message: "Admin authentication is required.",
+      message: "Owner authentication is required.",
     });
 
     expect(getSessionUserMock).toHaveBeenCalledTimes(1);
     assertNoDownstreamCalls();
   });
 
-  it("rejects when the session role is not admin", async () => {
+  it("rejects when the session role is not owner", async () => {
     mockState.currentSession = {
-      login: "editor-user",
-      role: "editor",
+      login: "some-user",
+      role: "intruder" as SessionUser["role"],
     };
 
     const { server } = await loadServer();
 
     await expect(server.listRevisions.orThrow()).rejects.toMatchObject({
       code: "UNAUTHORIZED",
-      message: "Admin authentication is required.",
+      message: "Owner authentication is required.",
     });
 
     expect(getSessionUserMock).toHaveBeenCalledTimes(1);
@@ -360,7 +360,7 @@ describe("content actions authorization", () => {
   it("rejects when the backup repo is missing", async () => {
     mockState.currentSession = {
       login: "admin-user",
-      role: "admin",
+      role: "owner" as SessionUser["role"],
     };
     mockState.envState = buildAuthorizedEnv({ contentBackupRepo: undefined });
 
@@ -379,7 +379,7 @@ describe("content actions authorization", () => {
   it("rejects when the backup PAT is missing", async () => {
     mockState.currentSession = {
       login: "admin-user",
-      role: "admin",
+      role: "owner" as SessionUser["role"],
     };
     mockState.envState = buildAuthorizedEnv({ contentBackupPat: undefined });
 
@@ -399,7 +399,7 @@ describe("content actions authorization", () => {
     process.env.NODE_ENV = "production";
     mockState.currentSession = {
       login: "admin-user",
-      role: "admin",
+      role: "owner" as SessionUser["role"],
     };
     mockState.envState = buildAuthorizedEnv({
       databaseUrl: undefined,
@@ -421,7 +421,7 @@ describe("content actions authorization", () => {
     process.env.NODE_ENV = "development";
     mockState.currentSession = {
       login: "admin-user",
-      role: "admin",
+      role: "owner" as SessionUser["role"],
     };
     mockState.envState = buildAuthorizedEnv({
       databaseUrl: undefined,

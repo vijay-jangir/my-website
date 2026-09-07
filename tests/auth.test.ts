@@ -8,7 +8,6 @@ type EnvModule = typeof import("@/lib/env");
 
 const defaultAuthEnv = {
   ADMIN_GITHUB_LOGINS: "admin-user",
-  EDITOR_GITHUB_LOGINS: "editor-user",
   GITHUB_ID: "github-client-id",
   GITHUB_SECRET: "github-client-secret",
   NEXTAUTH_SECRET: "",
@@ -91,36 +90,33 @@ describe("GitHub auth allowlist helpers", () => {
   it("normalizes trimmed logins and rejects unlisted values", async () => {
     const { auth } = await loadAuthModule({
       ADMIN_GITHUB_LOGINS: " Admin-User ",
-      EDITOR_GITHUB_LOGINS: " editor-user ",
     });
 
     expect(auth.isAllowedGitHubLogin("  ADMIN-user  ")).toBe(true);
-    expect(auth.isAllowedGitHubLogin(" editor-USER ")).toBe(true);
     expect(auth.isAllowedGitHubLogin("outsider")).toBe(false);
   });
 
-  it("prefers the admin role when the same login appears in both allowlists", async () => {
+  it("resolves the owner role for an allowed GitHub profile", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       createJsonResponse({
-        avatar_url: "https://avatars.example/shared-user.png",
-        login: "shared-user",
-        name: "Shared User",
+        avatar_url: "https://avatars.example/admin-user.png",
+        login: "admin-user",
+        name: "Admin User",
       }),
     );
 
     vi.stubGlobal("fetch", fetchMock);
 
     const { auth } = await loadAuthModule({
-      ADMIN_GITHUB_LOGINS: "shared-user",
-      EDITOR_GITHUB_LOGINS: "shared-user",
+      ADMIN_GITHUB_LOGINS: "admin-user",
     });
 
     await expect(auth.getGitHubProfile("github-access-token")).resolves.toEqual(
       {
-        avatarUrl: "https://avatars.example/shared-user.png",
-        login: "shared-user",
-        name: "Shared User",
-        role: "admin",
+        avatarUrl: "https://avatars.example/admin-user.png",
+        login: "admin-user",
+        name: "Admin User",
+        role: "owner",
       },
     );
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -159,17 +155,17 @@ describe("session JWT helpers", () => {
     const cookies = createCookies();
 
     await auth.persistSession(cookies, {
-      avatarUrl: "https://avatars.example/editor-user.png",
-      login: "editor-user",
-      name: "Editor User",
-      role: "editor",
+      avatarUrl: "https://avatars.example/admin-user.png",
+      login: "admin-user",
+      name: "Admin User",
+      role: "owner",
     });
 
     await expect(auth.getSessionUser(cookies)).resolves.toEqual({
-      avatarUrl: "https://avatars.example/editor-user.png",
-      login: "editor-user",
-      name: "Editor User",
-      role: "editor",
+      avatarUrl: "https://avatars.example/admin-user.png",
+      login: "admin-user",
+      name: "Admin User",
+      role: "owner",
     });
   });
 
@@ -178,7 +174,7 @@ describe("session JWT helpers", () => {
     const cookies = createCookies();
     const expiredToken = await new SignJWT({
       login: "admin-user",
-      role: "admin",
+      role: "owner",
     })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt(Math.floor(Date.now() / 1000) - 120)
@@ -195,7 +191,7 @@ describe("session JWT helpers", () => {
     const cookies = createCookies();
     const validToken = await auth.createSessionToken({
       login: "admin-user",
-      role: "admin",
+      role: "owner",
     });
 
     cookies.set("vj_session", tamperToken(validToken), { path: "/" });
@@ -208,7 +204,7 @@ describe("session JWT helpers", () => {
     const cookies = createCookies();
     const invalidToken = await new SignJWT({
       name: "Missing Login",
-      role: "admin",
+      role: "owner",
     })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
@@ -223,17 +219,16 @@ describe("session JWT helpers", () => {
   it("re-resolves the role from the live allowlist so removed logins become invalid", async () => {
     const { auth, envModule } = await loadAuthModule({
       ADMIN_GITHUB_LOGINS: "live-admin",
-      EDITOR_GITHUB_LOGINS: "",
     });
     const cookies = createCookies();
 
     await auth.persistSession(cookies, {
       login: "live-admin",
-      role: "admin",
+      role: "owner",
     });
     expect(await auth.getSessionUser(cookies)).toEqual({
       login: "live-admin",
-      role: "admin",
+      role: "owner",
     });
 
     envModule.env.adminGithubLogins.splice(
@@ -252,7 +247,7 @@ describe("session and oauth cookies", () => {
 
     await auth.persistSession(cookies, {
       login: "admin-user",
-      role: "admin",
+      role: "owner",
     });
 
     const header = getSetCookieHeader(cookies, "vj_session");
@@ -271,7 +266,7 @@ describe("session and oauth cookies", () => {
 
     await auth.persistSession(cookies, {
       login: "admin-user",
-      role: "admin",
+      role: "owner",
     });
 
     expect(getSetCookieHeader(cookies, "vj_session")).toContain("Secure");

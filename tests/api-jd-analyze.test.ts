@@ -201,6 +201,7 @@ describe("POST /api/jd/analyze", () => {
       analysis: {
         extractedHighlights: expected.analysis.extractedHighlights,
         focusScores: expected.analysis.focusScores.slice(0, 6),
+        gaps: expected.analysis.gaps,
         skillScores: expected.analysis.skillScores.slice(0, 10),
       },
       ok: true,

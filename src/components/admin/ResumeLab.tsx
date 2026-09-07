@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from "react";
 
-import type { FocusDefinition } from "@/lib/portfolio-types";
+import type { FocusDefinition, JdGap } from "@/lib/portfolio-types";
 
 type ResumeLabResponse = {
   ok: boolean;
   analysis?: {
     focusScores: Array<{ focusId: string; label: string; score: number }>;
+    gaps: JdGap[];
     skillScores: Array<{ skillId: string; label: string; score: number }>;
     extractedHighlights: string[];
   };
@@ -190,6 +191,41 @@ export default function ResumeLab({ focusOptions }: Props) {
                   <li key={highlight}>{highlight}</li>
                 ))}
               </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">
+                Keywords this JD wants that your content does not cover
+              </h3>
+              {result.analysis?.gaps.length ? (
+                <ul className="mt-2 space-y-3 text-slate-600">
+                  {result.analysis.gaps.map((gap) => (
+                    <li
+                      className="rounded-[1.5rem] border border-amber-200/80 bg-amber-50/70 p-3"
+                      key={`${gap.term}-${gap.section}-${gap.classification}`}
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-[#0e1528]">
+                          {gap.term}
+                        </span>
+                        <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          {gap.classification}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          section: {gap.section}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          weighted count: {gap.count.toFixed(1)}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-slate-600">
+                  No coverage gaps detected for this JD.
+                </p>
+              )}
             </div>
 
             <div>

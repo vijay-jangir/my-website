@@ -78,6 +78,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
         JSON.stringify({
           extractedHighlights: analysis.extractedHighlights,
           focusScores: analysis.focusScores,
+          gaps: analysis.gaps,
           skillScores: analysis.skillScores,
         }),
         jdExpiresAt,
@@ -103,6 +104,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     analysis: {
       extractedHighlights: analysis.extractedHighlights,
       focusScores: analysis.focusScores.slice(0, 6),
+      gaps: analysis.gaps,
       skillScores: analysis.skillScores.slice(0, 10),
     },
     ok: true,

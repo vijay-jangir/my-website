@@ -41,35 +41,35 @@ const cardVariants: Variants = {
 const processSteps = [
   {
     description:
-      "Map the data landscape, constraints, and access patterns before writing code.",
+      "Map the data landscape, ownership gaps, and access patterns before writing code.",
     id: "discovery",
     number: "01",
     title: "Discovery",
   },
   {
     description:
-      "Design metadata, authorization, orchestration, and agent workflows as one operating system.",
+      "Design metadata, authorization, orchestration, and agent workflows as one governed system.",
     id: "architecture",
     number: "02",
     title: "Architecture",
   },
   {
     description:
-      "Build with governance, observability, and tests from the first commit — not bolted on later.",
+      "Build with governance, observability, and tests from the first commit.",
     id: "development",
     number: "03",
     title: "Development",
   },
   {
     description:
-      "Ship cloud-native deployments with monitoring, CI/CD, and incremental rollout instead of big-bang handoffs.",
+      "Cloud-native deployment with CI/CD, monitoring, and incremental rollout.",
     id: "delivery",
     number: "04",
     title: "Delivery",
   },
   {
     description:
-      "Keep tuning models, expanding coverage, and closing governance gaps after production use begins.",
+      "Tune models, expand coverage, close governance gaps, improve developer experience.",
     id: "evolution",
     number: "05",
     title: "Evolution",
@@ -78,23 +78,41 @@ const processSteps = [
 
 export const homeTechStackGroupDefinitions = [
   {
-    skillIds: ["python", "java", "scala", "typescript", "sql"],
+    skillIds: ["python", "java", "typescript", "scala", "sql"],
     title: "Languages",
   },
   {
-    skillIds: ["langgraph", "mcp", "rag", "fastapi", "langfuse", "openwebui"],
-    title: "AI / LLM",
+    skillIds: [
+      "langgraph",
+      "mcp",
+      "rag",
+      "context-engineering",
+      "fastapi",
+      "langfuse",
+      "prompt-engineering",
+    ],
+    title: "AI & LLM",
   },
   {
-    skillIds: ["kafka", "flink", "spark", "trino", "dbt", "airflow", "datahub"],
-    title: "Data",
+    skillIds: [
+      "kafka",
+      "flink",
+      "spark",
+      "trino",
+      "dbt",
+      "airflow",
+      "datahub",
+      "hive",
+      "iceberg",
+    ],
+    title: "Data Platform",
   },
   {
-    skillIds: ["kubernetes", "docker", "helm", "grafana", "elastic-stack"],
+    skillIds: ["kubernetes", "docker", "opa", "grafana", "elastic-stack"],
     title: "Infrastructure",
   },
   {
-    skillIds: ["postgres", "mongodb", "hive", "iceberg", "hudi"],
+    skillIds: ["postgres", "mongodb", "hudi", "alluxio"],
     title: "Databases",
   },
   {

@@ -30,7 +30,7 @@ describe("HomePage", () => {
     expect(markup).toContain("Delivery");
     expect(markup).toContain("Evolution");
     expect(markup).toContain("Tech stack");
-    expect(markup).toContain("AI / LLM");
+    expect(markup).toContain("AI &amp; LLM");
     expect(markup).toContain("Why Vijay");
     expect(markup).toContain(
       "12+ years across telecom, retail, and enterprise data — not just demos",

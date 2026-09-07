@@ -143,8 +143,7 @@ export function ContactSection({ siteProfile }: ContactSectionProps) {
         Let’s build data infrastructure that works.
       </h2>
       <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
-        Have a data platform, AI, or governance challenge that needs clear
-        architecture and hands-on delivery? Let’s talk.
+        Have a data platform, AI, or governance challenge? Let's talk.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a

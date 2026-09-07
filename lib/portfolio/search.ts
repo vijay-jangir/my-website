@@ -87,8 +87,19 @@ export function searchProjectsInContent(
     ]),
   ) as Record<string, readonly string[]>;
 
+  const selectedNonGeneralFocusIds = (options.focusIds ?? []).filter(
+    (id) => id !== "general",
+  );
+  const hasFocusFilter = selectedNonGeneralFocusIds.length > 0;
+
   return [...content.projects]
     .filter((project) => project.visibility === "public")
+    .filter((project) => {
+      if (!hasFocusFilter) return true;
+      return selectedNonGeneralFocusIds.some(
+        (focusId) => (project.focusWeights[focusId] ?? 0) > 0,
+      );
+    })
     .map((project) => {
       const baseScore = enrichProjectScore(project, focusVector);
       if (queryTerms.length === 0) {

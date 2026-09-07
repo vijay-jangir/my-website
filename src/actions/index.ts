@@ -337,6 +337,78 @@ function inferFileExtension(fileName: string, mimeType: string) {
   return "bin";
 }
 
+function defineCrudActions<T extends z.ZodType>(config: {
+  readonly deleteFn: (
+    snapshot: PortfolioSnapshot,
+    id: string,
+  ) => PortfolioSnapshot;
+  readonly entityName: string;
+  readonly getLabel: (input: z.infer<T>) => string;
+  readonly schema: T;
+  readonly upsertFn: (
+    snapshot: PortfolioSnapshot,
+    data: z.infer<T>,
+  ) => PortfolioSnapshot;
+}) {
+  const { deleteFn, entityName, getLabel, schema, upsertFn } = config;
+
+  function upsertAction(verb: string) {
+    return defineAction({
+      input: schema,
+      handler: async (input, context) => {
+        const session = await requireOwner(context.cookies);
+        const snapshot = await getPortfolioContent();
+        return finalizeSnapshot({
+          actor: session.login,
+          snapshot: upsertFn(snapshot, input),
+          summary: `${verb} ${entityName} ${getLabel(input)}`,
+        });
+      },
+    });
+  }
+
+  return {
+    create: upsertAction("Saved"),
+    delete: defineAction({
+      input: z.object({ id: z.string().min(1) }),
+      handler: async (input, context) => {
+        const session = await requireOwner(context.cookies);
+        const snapshot = await getPortfolioContent();
+        return finalizeSnapshot({
+          actor: session.login,
+          snapshot: deleteFn(snapshot, input.id),
+          summary: `Deleted ${entityName} ${input.id}`,
+        });
+      },
+    }),
+    update: upsertAction("Updated"),
+  } as const;
+}
+
+const skillActions = defineCrudActions({
+  deleteFn: deleteSkill,
+  entityName: "skill",
+  getLabel: (input) => input.label,
+  schema: skillSchema,
+  upsertFn: upsertSkill,
+});
+
+const projectActions = defineCrudActions({
+  deleteFn: deleteProject,
+  entityName: "project",
+  getLabel: (input) => input.title,
+  schema: projectSchema,
+  upsertFn: upsertProject,
+});
+
+const experienceActions = defineCrudActions({
+  deleteFn: deleteExperience,
+  entityName: "experience",
+  getLabel: (input) => input.company,
+  schema: experienceSchema,
+  upsertFn: upsertExperience,
+});
+
 export const server = {
   upsertProfile: defineAction({
     input: siteProfileSchema,
@@ -350,114 +422,15 @@ export const server = {
       });
     },
   }),
-  createSkill: defineAction({
-    input: skillSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertSkill(snapshot, input),
-        summary: `Saved skill ${input.label}`,
-      });
-    },
-  }),
-  updateSkill: defineAction({
-    input: skillSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertSkill(snapshot, input),
-        summary: `Updated skill ${input.label}`,
-      });
-    },
-  }),
-  deleteSkill: defineAction({
-    input: z.object({ id: z.string().min(1) }),
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: deleteSkill(snapshot, input.id),
-        summary: `Deleted skill ${input.id}`,
-      });
-    },
-  }),
-  createProject: defineAction({
-    input: projectSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertProject(snapshot, input),
-        summary: `Saved project ${input.title}`,
-      });
-    },
-  }),
-  updateProject: defineAction({
-    input: projectSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertProject(snapshot, input),
-        summary: `Updated project ${input.title}`,
-      });
-    },
-  }),
-  deleteProject: defineAction({
-    input: z.object({ id: z.string().min(1) }),
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: deleteProject(snapshot, input.id),
-        summary: `Deleted project ${input.id}`,
-      });
-    },
-  }),
-  createExperience: defineAction({
-    input: experienceSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertExperience(snapshot, input),
-        summary: `Saved experience ${input.company}`,
-      });
-    },
-  }),
-  updateExperience: defineAction({
-    input: experienceSchema,
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: upsertExperience(snapshot, input),
-        summary: `Updated experience ${input.company}`,
-      });
-    },
-  }),
-  deleteExperience: defineAction({
-    input: z.object({ id: z.string().min(1) }),
-    handler: async (input, context) => {
-      const session = await requireOwner(context.cookies);
-      const snapshot = await getPortfolioContent();
-      return finalizeSnapshot({
-        actor: session.login,
-        snapshot: deleteExperience(snapshot, input.id),
-        summary: `Deleted experience ${input.id}`,
-      });
-    },
-  }),
+  createSkill: skillActions.create,
+  updateSkill: skillActions.update,
+  deleteSkill: skillActions.delete,
+  createProject: projectActions.create,
+  updateProject: projectActions.update,
+  deleteProject: projectActions.delete,
+  createExperience: experienceActions.create,
+  updateExperience: experienceActions.update,
+  deleteExperience: experienceActions.delete,
   publishContentSnapshot: defineAction({
     input: z.object({
       focusDefinitions: z.array(focusDefinitionSchema).optional(),

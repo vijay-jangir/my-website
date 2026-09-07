@@ -3,6 +3,10 @@ import { type NeonHttpDatabase, drizzle } from "drizzle-orm/neon-http";
 
 import { env } from "@/lib/env";
 
+// Migration compat: re-export dbQuery so consumers import from @/lib/drizzle
+// instead of @/lib/db. Removed when lib/db.ts is deleted in Task 16.
+export { dbQuery } from "@/lib/db";
+
 let db: NeonHttpDatabase | null = null;
 
 /**

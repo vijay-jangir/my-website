@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { dbQuery } from "@/lib/db";
+import { dbQuery } from "@/lib/drizzle";
 import type {
   JobDescriptionAnalysis,
   ResumeVariant,

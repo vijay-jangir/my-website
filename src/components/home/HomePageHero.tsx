@@ -86,7 +86,7 @@ export default function HomePageHero({ profileHighlights, siteProfile }: Props) 
       animate="show"
       className="relative mx-auto flex min-h-[calc(100svh-7.5rem)] w-full max-w-[82rem] items-center justify-center overflow-hidden px-4 pb-16 pt-6 text-center"
       id="home"
-      initial="hidden"
+      initial={false}
       variants={heroContainerVariants}
     >
       <SystemsBackdrop />

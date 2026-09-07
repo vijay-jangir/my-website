@@ -201,7 +201,7 @@ export function ProcessSection() {
       title="Discovery-first delivery for AI and data platforms."
     >
       <motion.div
-        className="mt-12 grid gap-4 lg:grid-cols-5"
+        className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
         initial="hidden"
         variants={staggerVariants}
         viewport={{ amount: 0.18, once: true }}

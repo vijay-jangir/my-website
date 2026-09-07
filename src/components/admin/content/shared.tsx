@@ -64,9 +64,9 @@ export type EditorContext = {
     payload: PublishResult | null,
     message: string,
   ) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Astro SafeResult union
   runAction: <T = unknown>(
     name: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Astro SafeResult union
     runner: () => Promise<any>,
   ) => Promise<T | null>;
   setError: (message: string | null) => void;

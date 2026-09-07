@@ -6,8 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-import db from "@astrojs/db";
-
 export default defineConfig({
   site: "https://vijayjangir.com",
   output: "server",
@@ -15,7 +13,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react(), db()],
+  integrations: [react()],
   vite: {
     plugins: [tailwindcss(), tsconfigPaths()],
     resolve: {

@@ -1,13 +1,18 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import { type NeonHttpDatabase, drizzle } from "drizzle-orm/neon-http";
 
 import { env } from "@/lib/env";
 
-// Migration compat: re-export dbQuery so consumers import from @/lib/drizzle
-// instead of @/lib/db. Removed when lib/db.ts is deleted in Task 16.
-export { dbQuery } from "@/lib/db";
-
 let db: NeonHttpDatabase | null = null;
+let sqlFn: NeonQueryFunction<false, false> | null = null;
+
+function getSql(): NeonQueryFunction<false, false> | null {
+  if (!env.databaseUrl) return null;
+  if (!sqlFn) {
+    sqlFn = neon(env.databaseUrl);
+  }
+  return sqlFn;
+}
 
 /**
  * Returns a Drizzle ORM instance backed by the Neon HTTP driver,
@@ -22,11 +27,26 @@ export function getDrizzleDb(): NeonHttpDatabase | null {
   }
 
   if (!db) {
-    const sql = neon(env.databaseUrl);
+    const sql = getSql()!;
     db = drizzle({ client: sql });
   }
 
   return db;
+}
+
+/**
+ * Execute a raw parameterized SQL query via the Neon HTTP driver.
+ * Returns pg-compatible `{ rows: T[] }` shape for callers that
+ * still use raw SQL (resume_variants, jd_requests).
+ * Returns null when DATABASE_URL is not configured.
+ */
+export async function dbQuery<
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(text: string, values: unknown[] = []): Promise<{ rows: T[] } | null> {
+  const sql = getSql();
+  if (!sql) return null;
+  const rows = (await sql(text, values)) as T[];
+  return { rows };
 }
 
 /**

@@ -1,12 +1,12 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/db", () => ({
+vi.mock("@/lib/drizzle", () => ({
   dbQuery: vi.fn(),
 }));
 
 import { analyzeJobDescription } from "@/lib/jd";
 import { buildResumeVariant } from "@/lib/portfolio";
-import { dbQuery } from "@/lib/db";
+import { dbQuery } from "@/lib/drizzle";
 import { getResumeVariantByToken, saveResumeVariant } from "@/lib/resume-store";
 
 const mockDbQuery = vi.mocked(dbQuery);

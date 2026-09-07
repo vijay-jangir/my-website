@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const originalDatabaseUrl = process.env.DATABASE_URL;
 
-async function importDbModule() {
+async function importDrizzleModule() {
   vi.resetModules();
-  return import("@/lib/db");
+  return import("@/lib/drizzle");
 }
 
 afterEach(() => {
@@ -19,19 +19,19 @@ afterEach(() => {
   }
 });
 
-describe("lib/db", () => {
-  it("returns null from getDbPool when DATABASE_URL is missing", async () => {
+describe("lib/drizzle", () => {
+  it("returns null from getDrizzleDb when DATABASE_URL is missing", async () => {
     delete process.env.DATABASE_URL;
 
-    const { getDbPool } = await importDbModule();
+    const { getDrizzleDb } = await importDrizzleModule();
 
-    expect(getDbPool()).toBeNull();
+    expect(getDrizzleDb()).toBeNull();
   });
 
-  it("returns null from dbQuery instead of throwing when no pool is configured", async () => {
+  it("returns null from dbQuery instead of throwing when no database is configured", async () => {
     delete process.env.DATABASE_URL;
 
-    const { dbQuery } = await importDbModule();
+    const { dbQuery } = await importDrizzleModule();
 
     await expect(dbQuery("select 1")).resolves.toBeNull();
   });

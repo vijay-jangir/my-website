@@ -1,8 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const ENV_KEYS = [
-  "ASTRO_DB_REMOTE_URL",
-  "ASTRO_DB_APP_TOKEN",
   "DATABASE_URL",
   "WIX_API_KEY",
   "WIX_SITE_ID",
@@ -65,8 +63,6 @@ describe("lib/env", () => {
   it("reads every configured env key and normalizes login lists", async () => {
     setTrackedEnv({
       ADMIN_GITHUB_LOGINS: " Vijay , Admin.User ",
-      ASTRO_DB_APP_TOKEN: "astro-token",
-      ASTRO_DB_REMOTE_URL: "https://astro-db.example.com",
       CONTENT_BACKUP_BRANCH: "preview-backups",
       CONTENT_BACKUP_PAT: "backup-pat",
       CONTENT_BACKUP_REPO: "owner/repo",
@@ -81,17 +77,11 @@ describe("lib/env", () => {
       WIX_SITE_ID: "custom-site-id",
     });
 
-    const {
-      env,
-      isAstroContentDbConfigured,
-      isContentBackupConfigured,
-      isDatabaseConfigured,
-    } = await importEnvModule();
+    const { env, isContentBackupConfigured, isDatabaseConfigured } =
+      await importEnvModule();
 
     expect(env).toEqual({
       adminGithubLogins: ["vijay", "admin.user"],
-      astroDbAppToken: "astro-token",
-      astroDbRemoteUrl: "https://astro-db.example.com",
       contentBackupBranch: "preview-backups",
       contentBackupPat: "backup-pat",
       contentBackupRepo: "owner/repo",
@@ -106,7 +96,6 @@ describe("lib/env", () => {
       wixSiteId: "custom-site-id",
     });
     expect(isDatabaseConfigured()).toBe(true);
-    expect(isAstroContentDbConfigured()).toBe(true);
     expect(isContentBackupConfigured()).toBe(true);
   });
 
@@ -118,7 +107,6 @@ describe("lib/env", () => {
     const {
       env,
       getContentHistoryLimit,
-      isAstroContentDbConfigured,
       isContentBackupConfigured,
       isDatabaseConfigured,
     } = await importEnvModule();
@@ -132,7 +120,6 @@ describe("lib/env", () => {
     expect(env.adminGithubLogins).toEqual([]);
     expect(env.editorGithubLogins).toEqual([]);
     expect(isDatabaseConfigured()).toBe(false);
-    expect(isAstroContentDbConfigured()).toBe(false);
     expect(isContentBackupConfigured()).toBe(false);
   });
 

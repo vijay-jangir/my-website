@@ -4,12 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "node ./scripts/astro-build.mjs",
+    "build": "astro build",
     "preview": "astro preview",
-    "db:seed": "astro db execute ./db/seed.ts",
-    "db:seed:remote": "astro db execute ./db/seed.ts --remote",
-    "db:push:remote": "astro db push --remote",
-    "db:verify:remote": "astro db verify --remote",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
@@ -39,7 +35,6 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
-    "@astrojs/db": "^0.20.1",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@neondatabase/serverless": "^1.1.0",
@@ -49,7 +44,6 @@
     "drizzle-orm": "^0.45.2",
     "framer-motion": "^12.38.0",
     "jose": "^6.2.2",
-    "pg": "^8.20.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "zod": "^4.3.6"
@@ -60,7 +54,6 @@
     "@astrojs/vercel": "^10.0.4",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^24.5.2",
-    "@types/pg": "^8.20.0",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
     "@typescript-eslint/eslint-plugin": "^8.58.0",

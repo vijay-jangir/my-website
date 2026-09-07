@@ -20,10 +20,7 @@ import {
   listContentRevisions,
   publishPortfolioSnapshot,
 } from "@/lib/portfolio-content";
-import {
-  isAstroContentDbConfigured,
-  isContentBackupConfigured,
-} from "@/lib/env";
+import { isDatabaseConfigured, isContentBackupConfigured } from "@/lib/env";
 import type {
   FocusDefinition,
   PortfolioSnapshot,
@@ -250,11 +247,11 @@ async function requireAdmin(cookies: Parameters<typeof getSessionUser>[0]) {
     });
   }
 
-  if (process.env.NODE_ENV === "production" && !isAstroContentDbConfigured()) {
+  if (process.env.NODE_ENV === "production" && !isDatabaseConfigured()) {
     throw new ActionError({
       code: "PRECONDITION_FAILED",
       message:
-        "Remote Astro DB must be configured before production content publishing is enabled.",
+        "DATABASE_URL must be configured before production content publishing is enabled.",
     });
   }
 

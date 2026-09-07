@@ -6,8 +6,6 @@ function readEnv(key: string) {
 }
 
 export const env = {
-  astroDbRemoteUrl: readEnv("ASTRO_DB_REMOTE_URL"),
-  astroDbAppToken: readEnv("ASTRO_DB_APP_TOKEN"),
   databaseUrl: readEnv("DATABASE_URL"),
   wixApiKey: readEnv("WIX_API_KEY"),
   wixSiteId: readEnv("WIX_SITE_ID") ?? "e02544df-019e-47c2-9a69-ebffa6a06dbb",
@@ -34,10 +32,6 @@ export const env = {
 
 export function isDatabaseConfigured() {
   return Boolean(env.databaseUrl);
-}
-
-export function isAstroContentDbConfigured() {
-  return Boolean(env.astroDbRemoteUrl && env.astroDbAppToken);
 }
 
 export function isContentBackupConfigured() {

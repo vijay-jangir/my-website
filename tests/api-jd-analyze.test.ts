@@ -33,7 +33,7 @@ vi.mock("@/lib/resume-store", () => ({
   saveResumeVariant: saveResumeVariantMock,
 }));
 
-vi.mock("@/lib/db", () => ({
+vi.mock("@/lib/drizzle", () => ({
   dbQuery: dbQueryMock,
 }));
 

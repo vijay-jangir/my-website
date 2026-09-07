@@ -7,8 +7,7 @@ type MockActionContext = {
 };
 
 type EnvState = {
-  astroDbAppToken?: string;
-  astroDbRemoteUrl?: string;
+  databaseUrl?: string;
   contentBackupPat?: string;
   contentBackupRepo?: string;
 };
@@ -89,8 +88,7 @@ const originalNodeEnv = process.env.NODE_ENV;
 
 function buildAuthorizedEnv(overrides: Partial<EnvState> = {}): EnvState {
   return {
-    astroDbAppToken: "astro-token",
-    astroDbRemoteUrl: "https://db.example.com",
+    databaseUrl: "postgres://user:pass@db.example.com:5432/test",
     contentBackupPat: "backup-pat",
     contentBackupRepo: "owner/repo",
     ...overrides,
@@ -172,12 +170,7 @@ async function loadServer() {
   }));
 
   vi.doMock("@/lib/env", () => ({
-    isAstroContentDbConfigured: vi.fn(() =>
-      Boolean(
-        mockState.envState.astroDbRemoteUrl &&
-        mockState.envState.astroDbAppToken,
-      ),
-    ),
+    isDatabaseConfigured: vi.fn(() => Boolean(mockState.envState.databaseUrl)),
     isContentBackupConfigured: vi.fn(() =>
       Boolean(
         mockState.envState.contentBackupRepo &&
@@ -402,15 +395,14 @@ describe("content actions authorization", () => {
     assertNoDownstreamCalls();
   });
 
-  it("rejects in production when remote Astro DB config is missing", async () => {
+  it("rejects in production when DATABASE_URL is missing", async () => {
     process.env.NODE_ENV = "production";
     mockState.currentSession = {
       login: "admin-user",
       role: "admin",
     };
     mockState.envState = buildAuthorizedEnv({
-      astroDbAppToken: undefined,
-      astroDbRemoteUrl: undefined,
+      databaseUrl: undefined,
     });
 
     const { server } = await loadServer();
@@ -418,22 +410,21 @@ describe("content actions authorization", () => {
     await expect(server.listRevisions.orThrow()).rejects.toMatchObject({
       code: "PRECONDITION_FAILED",
       message:
-        "Remote Astro DB must be configured before production content publishing is enabled.",
+        "DATABASE_URL must be configured before production content publishing is enabled.",
     });
 
     expect(getSessionUserMock).toHaveBeenCalledTimes(1);
     assertNoDownstreamCalls();
   });
 
-  it("does not require remote Astro DB config outside production", async () => {
+  it("does not require DATABASE_URL outside production", async () => {
     process.env.NODE_ENV = "development";
     mockState.currentSession = {
       login: "admin-user",
       role: "admin",
     };
     mockState.envState = buildAuthorizedEnv({
-      astroDbAppToken: undefined,
-      astroDbRemoteUrl: undefined,
+      databaseUrl: undefined,
     });
     listContentRevisionsMock.mockResolvedValueOnce([{ id: "rev-1" }]);
 

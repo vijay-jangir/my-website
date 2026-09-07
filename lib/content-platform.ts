@@ -1,8 +1,8 @@
 import {
   env,
-  isAstroContentDbConfigured,
   isAuthConfigured,
   isContentBackupConfigured,
+  isDatabaseConfigured,
 } from "@/lib/env";
 
 export function getContentPlatformStatus() {
@@ -10,9 +10,9 @@ export function getContentPlatformStatus() {
     authConfigured: isAuthConfigured(),
     backupConfigured: isContentBackupConfigured(),
     backupRepo: env.contentBackupRepo ?? null,
-    contentDbLabel: isAstroContentDbConfigured()
-      ? "Remote Astro DB (libSQL)"
-      : "Local Astro DB",
-    contentDbMode: isAstroContentDbConfigured() ? "remote" : "local",
+    contentDbLabel: isDatabaseConfigured()
+      ? "Neon Postgres (Drizzle)"
+      : "Not configured",
+    contentDbMode: isDatabaseConfigured() ? "remote" : "none",
   } as const;
 }

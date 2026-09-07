@@ -1,6 +1,6 @@
 # Vijay Jangir Website
 
-Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backed blog, deterministic JD parsing, ATS-safe PDF export, Astro DB-backed portfolio content, and private admin paths that stay off the public signup model.
+Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backed blog, deterministic JD parsing, ATS-safe PDF export, Neon Postgres-backed portfolio content via Drizzle ORM, and private admin paths that stay off the public signup model.
 
 ## What Is In This Repo
 
@@ -10,8 +10,6 @@ Personal portfolio rebuilt on Astro with a Vercel deployment target, a Wix-backe
 - DB-backed portfolio content loader and backup publisher under [`lib/portfolio-content.ts`](./lib/portfolio-content.ts) and [`lib/content-backup.ts`](./lib/content-backup.ts)
 - GitHub allowlist auth flow for private admin surfaces under [`src/lib/auth.ts`](./src/lib/auth.ts)
 - ATS-safe PDF generation under [`src/pages/api/resume/pdf.ts`](./src/pages/api/resume/pdf.ts)
-- Astro DB schema under [`db/config.ts`](./db/config.ts) with seed support in [`db/seed.ts`](./db/seed.ts)
-- Neon-ready schema under [`db/schema.sql`](./db/schema.sql)
 - Legacy Next.js code quarantined under [`legacy-next/`](./legacy-next/)
 
 ## Working Docs
@@ -55,20 +53,11 @@ Private admin setup:
 
 Portfolio content storage:
 
-- `ASTRO_DB_REMOTE_URL`
-- `ASTRO_DB_APP_TOKEN`
+- `DATABASE_URL`
 - `CONTENT_BACKUP_REPO`
 - `CONTENT_BACKUP_PAT`
 - `CONTENT_BACKUP_BRANCH` (optional, default `content-backup`)
 - `CONTENT_HISTORY_LIMIT` (optional, default `10`)
-
-Local-only Astro DB fallback:
-
-- `ASTRO_DATABASE_FILE` is optional. The local build wrapper sets it to `.astro/content.db` automatically when remote libSQL credentials are not configured.
-
-Database-backed variant storage:
-
-- `DATABASE_URL`
 
 ## Commands
 
@@ -90,8 +79,7 @@ npm run vercel:build
 
 ## Deployment Notes
 
-- Local Astro build is green.
-- The build script automatically uses local Astro DB file mode when remote libSQL credentials are absent, and switches to `astro build --remote` when `ASTRO_DB_REMOTE_URL` and `ASTRO_DB_APP_TOKEN` are present.
+- `npm run build` runs `astro build` directly. Content is fetched at request time from Neon Postgres (or falls back to GitHub backup / bundled snapshot).
 - Vercel adapter build is green.
 - A real `vercel build --yes` still requires a valid authenticated Vercel token and linked project settings on the machine running it.
 

@@ -32,13 +32,15 @@ export const siteProfile: SiteProfile = {
     "Case studies describe the problem, my ownership, architecture, constraints, and decisions without exposing internal systems.",
   currentFocusLabels: [
     "Context Engineering",
+    "Multi-Agent Systems",
     "LLM Orchestration",
-    "Agent Orchestration",
     "MCP",
     "RAG",
-    "Prompt Engineering",
-    "Generative AI",
-    "Access governance",
+    "Agent Harness",
+    "AI Observability",
+    "Evals",
+    "Tool Use",
+    "Production AI",
   ],
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
@@ -48,12 +50,12 @@ export const siteProfile: SiteProfile = {
   heroTitleLines: [
     "Platform Engineering.",
     "AI Agents.",
-    "Access Governance.",
+    "Production AI Systems.",
   ],
   heroSubtitle:
-    `${experienceYearsLabel} building context engineering, LLM orchestration, agent harnesses, MCP integrations, RAG systems, and access-governance platforms for enterprise data.`,
+    `${experienceYearsLabel} building multi-agent systems, context engineering, LLM orchestration, MCP integrations, RAG pipelines, AI observability, and governed data platforms for enterprise.`,
   recruiterPitch:
-    "Platform engineer, data engineer, and AI engineer focused on governed data platforms. I build multi-LLM agent runtimes, context engineering workflows, MCP-based tool integrations, retrieval-grounded data systems, access-governance platforms, metadata services, and the orchestration and developer tooling that keep enterprise data infrastructure usable.",
+    "Platform engineer, data engineer, and AI engineer. I build multi-agent systems, agent harnesses, context engineering workflows, MCP-based tool integrations, RAG pipelines with evals, AI observability, access-governance platforms, and the orchestration and developer tooling that keep enterprise data infrastructure production-ready.",
   overview: [
     "I build governed data platforms \u2014 the metadata, authorization, orchestration, and developer tooling that make enterprise data usable. Recently that\u2019s meant multi-LLM agent runtimes, MCP-based tool use, retrieval-grounded schema linking, and context engineering for text-to-SQL at enterprise scale.",
     "The latest project is an access governance platform \u2014 centralized attribute store, policy authoring for multiple PDPs (OPA, Ranger, OpenFGA), signed bundle distribution, and enforcement that runs locally without calling home.",
@@ -957,6 +959,123 @@ export const skillDefinitions: readonly SkillDefinition[] = [
       kafka: 0.6,
     },
   },
+  {
+    id: "multi-agent-systems",
+    label: "Multi-Agent Systems",
+    category: "ai",
+    aliases: [
+      "multi-agent",
+      "multi agent",
+      "agent orchestration",
+      "agent systems",
+      "supervisor pattern",
+    ],
+    highlights: [
+      "Production multi-agent orchestration with supervisor and worker patterns",
+    ],
+    focusWeights: {
+      general: 0.8,
+      ai: 1,
+      "agentic-development": 1,
+      "platform-engineering": 0.5,
+    },
+  },
+  {
+    id: "agent-harness",
+    label: "Agent Harness",
+    category: "ai",
+    aliases: [
+      "agent harness",
+      "agent runtime",
+      "agent framework",
+      "agent infrastructure",
+    ],
+    highlights: [
+      "Custom agent runtime with tool routing, state management, and recovery",
+    ],
+    focusWeights: {
+      general: 0.7,
+      ai: 1,
+      "agentic-development": 1,
+      "backend-engineering": 0.6,
+    },
+  },
+  {
+    id: "evals",
+    label: "AI Evals",
+    category: "ai",
+    aliases: [
+      "evals",
+      "evaluation",
+      "ai evaluation",
+      "model evaluation",
+      "eval framework",
+      "RAGAS",
+    ],
+    highlights: [
+      "Evaluation framework design for production LLM systems",
+    ],
+    focusWeights: { general: 0.7, ai: 1, "agentic-development": 0.8 },
+  },
+  {
+    id: "ai-observability",
+    label: "AI Observability",
+    category: "ai",
+    aliases: [
+      "ai observability",
+      "llm observability",
+      "prompt tracing",
+      "inference monitoring",
+    ],
+    highlights: [
+      "Production observability with Langfuse for LLM pipelines",
+    ],
+    focusWeights: {
+      general: 0.6,
+      ai: 1,
+      "platform-engineering": 0.7,
+    },
+  },
+  {
+    id: "tool-use",
+    label: "Tool Use & Function Calling",
+    category: "ai",
+    aliases: [
+      "tool use",
+      "function calling",
+      "tool calling",
+      "structured outputs",
+    ],
+    highlights: [
+      "MCP-based tool integration and function calling for agent systems",
+    ],
+    focusWeights: {
+      general: 0.6,
+      ai: 1,
+      "agentic-development": 1,
+    },
+  },
+  {
+    id: "production-ai",
+    label: "Production AI",
+    category: "ai",
+    aliases: [
+      "production ai",
+      "production llm",
+      "ai infrastructure",
+      "ai systems",
+      "applied ai",
+    ],
+    highlights: [
+      "Shipping AI systems with guardrails, observability, and cost controls",
+    ],
+    focusWeights: {
+      general: 0.8,
+      ai: 1,
+      "platform-engineering": 0.8,
+      "backend-engineering": 0.6,
+    },
+  },
 ] as const;
 
 export const projects: readonly ProjectDefinition[] = [
@@ -987,6 +1106,12 @@ export const projects: readonly ProjectDefinition[] = [
       "openwebui",
       "dbt",
       "vector-search",
+      "multi-agent-systems",
+      "agent-harness",
+      "evals",
+      "ai-observability",
+      "tool-use",
+      "production-ai",
     ],
     focusWeights: {
       general: 1,
@@ -1278,6 +1403,7 @@ export const projects: readonly ProjectDefinition[] = [
       "java",
       "python",
       "airflow",
+      "production-ai",
     ],
     focusWeights: {
       general: 1,

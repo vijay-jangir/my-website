@@ -10,28 +10,50 @@ import type {
   SummaryTemplate,
 } from "@/lib/portfolio-types";
 
+const CAREER_START_DATE = new Date("2014-09-01T00:00:00.000Z");
+const MILLISECONDS_PER_YEAR = 365.25 * 86_400_000;
+
+export function getExperienceYears(atTime = Date.now()) {
+  return Math.floor(
+    (atTime - CAREER_START_DATE.getTime()) / MILLISECONDS_PER_YEAR,
+  );
+}
+
+const experienceYearsLabel = `${getExperienceYears()}+ years`;
+
 export const siteProfile: SiteProfile = {
   name: "Vijay Jangir",
-   title: "Platform engineer building governed data platforms, AI agents, and access governance systems",
+  title:
+    "Platform engineer building governed data platforms, AI agents, and access governance systems",
   location: "India",
   timezone: "Asia/Kolkata",
   lastUpdatedLabel: "September 2026",
   contentPromise:
     "Case studies describe the problem, my ownership, architecture, constraints, and decisions without exposing internal systems.",
   currentFocusLabels: [
-    "AI agents and LLM orchestration",
-    "Governed data platforms",
+    "Context Engineering",
+    "LLM Orchestration",
+    "Agent Orchestration",
+    "MCP",
+    "RAG",
+    "Prompt Engineering",
+    "Generative AI",
     "Access governance",
-    "Platform engineering",
   ],
   email: "contact@vijayjangir.com",
   githubUrl: "https://github.com/vijay-jangir",
   linkedinUrl: "https://linkedin.com/in/vijayjangir",
   profileImageUrl: "/profile-pic.jpeg",
-  heroLabel:
-    "12 years of platform engineering. Currently building AI agents, LLM orchestration, and access governance systems for enterprise data.",
+  heroLabel: `${experienceYearsLabel} in platform engineering, AI agents, and access governance.`,
+  heroTitleLines: [
+    "Platform Engineering.",
+    "AI Agents.",
+    "Access Governance.",
+  ],
+  heroSubtitle:
+    `${experienceYearsLabel} building context engineering, LLM orchestration, agent harnesses, MCP integrations, RAG systems, and access-governance platforms for enterprise data.`,
   recruiterPitch:
-    "Platform engineer, data engineer, AI engineer \u2014 I wear multiple hats because governed data platforms demand it. I build multi-LLM agent runtimes, MCP-based tool integrations, access governance systems, metadata platforms, and the orchestration and developer tooling that hold enterprise data infrastructure together.",
+    "Platform engineer, data engineer, and AI engineer focused on governed data platforms. I build multi-LLM agent runtimes, context engineering workflows, MCP-based tool integrations, retrieval-grounded data systems, access-governance platforms, metadata services, and the orchestration and developer tooling that keep enterprise data infrastructure usable.",
   overview: [
     "I build governed data platforms \u2014 the metadata, authorization, orchestration, and developer tooling that make enterprise data usable. Recently that\u2019s meant multi-LLM agent runtimes, MCP-based tool use, retrieval-grounded schema linking, and context engineering for text-to-SQL at enterprise scale.",
     "The latest project is an access governance platform \u2014 centralized attribute store, policy authoring for multiple PDPs (OPA, Ranger, OpenFGA), signed bundle distribution, and enforcement that runs locally without calling home.",
@@ -658,13 +680,62 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     },
   },
   {
-    id: "llm-workflows",
-    label: "LLM Workflows",
+    id: "context-engineering",
+    label: "Context Engineering",
     category: "ai",
-    aliases: ["llm", "agent", "agentic", "prompt engineering", "evaluation"],
+    aliases: [
+      "context engineering",
+      "context window design",
+      "schema grounding",
+      "retrieval grounding",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.9,
+      python: 0.3,
+    },
+  },
+  {
+    id: "genai",
+    label: "Generative AI",
+    category: "ai",
+    aliases: ["genai", "generative ai", "generative-ai", "llm systems"],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.7,
+    },
+  },
+  {
+    id: "llm-workflows",
+    label: "LLM Orchestration",
+    category: "ai",
+    aliases: [
+      "llm",
+      "agent",
+      "agentic",
+      "llm orchestration",
+      "llm workflows",
+      "evaluation",
+    ],
     focusWeights: {
       ai: 1,
       "agentic-development": 1,
+    },
+  },
+  {
+    id: "agent-orchestration",
+    label: "Agent Orchestration",
+    category: "ai",
+    aliases: [
+      "agent orchestration",
+      "agent harness",
+      "agent runtime",
+      "agent workflow",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 1,
+      python: 0.3,
     },
   },
   {
@@ -676,6 +747,22 @@ export const skillDefinitions: readonly SkillDefinition[] = [
       ai: 1,
       "agentic-development": 1,
       python: 0.4,
+    },
+  },
+  {
+    id: "rag",
+    label: "RAG",
+    category: "ai",
+    aliases: [
+      "rag",
+      "retrieval augmented generation",
+      "retrieval-augmented generation",
+      "retrieval grounded",
+    ],
+    focusWeights: {
+      ai: 1,
+      "agentic-development": 0.9,
+      python: 0.3,
     },
   },
   {
@@ -692,6 +779,21 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     focusWeights: {
       ai: 0.8,
       "agentic-development": 1,
+    },
+  },
+  {
+    id: "prompt-engineering",
+    label: "Prompt Engineering",
+    category: "ai",
+    aliases: [
+      "prompt engineering",
+      "prompt design",
+      "prompt management",
+      "prompt tuning",
+    ],
+    focusWeights: {
+      ai: 0.9,
+      "agentic-development": 0.8,
     },
   },
   {
@@ -712,6 +814,17 @@ export const skillDefinitions: readonly SkillDefinition[] = [
     focusWeights: {
       ai: 0.5,
       "agentic-development": 0.7,
+    },
+  },
+  {
+    id: "opa",
+    label: "OPA (Open Policy Agent)",
+    category: "platform",
+    aliases: ["opa", "open policy agent", "rego", "policy engine"],
+    focusWeights: {
+      "backend-engineering": 0.6,
+      "platform-engineering": 1,
+      "data-platform": 0.7,
     },
   },
   {
@@ -846,17 +959,22 @@ export const projects: readonly ProjectDefinition[] = [
     detail:
       "My role covered both architecture and hands-on implementation across the full service topology: custom Open WebUI experience, multi-LLM agent runtime, graph subflows, knowledge system, query engine, platform control plane, and supporting services for identity, metadata, query execution, reasoning, and visualization. The text-to-SQL path inside the platform was taken through the full journey - discovery of why naive prompting fails at enterprise scale, retrieval-grounded schema linking, graph orchestration, governed execution, tracing, delivery, and post-launch evaluation.",
     skillIds: [
-      "python",
-      "fastapi",
       "langgraph",
       "mcp",
+      "python",
+      "fastapi",
+      "context-engineering",
+      "rag",
+      "llm-workflows",
+      "agent-orchestration",
+      "prompt-engineering",
+      "genai",
       "langfuse",
       "trino",
       "datahub",
       "openwebui",
       "dbt",
       "vector-search",
-      "llm-workflows",
     ],
     focusWeights: {
       general: 1,
@@ -1140,12 +1258,13 @@ export const projects: readonly ProjectDefinition[] = [
     detail:
       "Designed the entire system from first principles: a control plane with attribute, policy, approval, distribution, and audit services backed by PostgreSQL, plus an enforcement plane of OPA PDPs, Ranger PEP plugins, and OPAL-based bundle delivery. The architecture enforces a strict separation — the control plane is never in the authorization hot path, and enforcement points continue operating when the control plane is unavailable. Ports-and-adapters design means every external dependency (identity providers, data catalogs, approval tools, cloud services) sits behind an adapter interface. Multi-repository workspace with a manifest-driven orchestration CLI.",
     skillIds: [
-      "java",
-      "python",
+      "opa",
+      "ranger",
       "postgres",
       "kubernetes",
-      "opa",
       "datahub",
+      "java",
+      "python",
       "airflow",
     ],
     focusWeights: {
@@ -2459,127 +2578,6 @@ export const projects: readonly ProjectDefinition[] = [
     },
   },
   {
-    id: "portfolio-website",
-    slug: "portfolio-website",
-    title: "Portfolio website",
-    summary:
-      "Built this portfolio as an Astro app with structured projects, focused resume views, and an on-domain blog sourced from Wix.",
-    impact:
-      "Brought projects, experience, resume, and blog content together in one place.",
-    detail:
-      "The site started as a Next.js portfolio and now runs as an Astro/Vercel app with structured content, resume variants, public project pages, and private admin tooling.",
-    skillIds: ["react", "nextjs", "mongodb", "tailwind", "prisma"],
-    focusWeights: {
-      general: 0.5,
-      "backend-engineering": 0.3,
-      "agentic-development": 0.3,
-    },
-    featured: false,
-    visibility: "public",
-    proofLinks: [
-      {
-        label: "GitHub repository",
-        href: "https://github.com/vijay-jangir/my-website",
-        kind: "repo",
-      },
-    ],
-    publicProof: {
-      proofTypes: ["public-repo", "article", "sanitized-diagram"],
-      architectureShape: [
-        "Astro serves static-first public pages and server endpoints.",
-        "Structured portfolio content can come from bundled content, Astro DB, or backup publishing flows.",
-        "React islands are reserved for interactive surfaces such as admin tooling and homepage motion.",
-      ],
-      scaleSignals: [
-        {
-          label: "Public route coverage",
-          value: "Portfolio + resume + blog",
-          detail:
-            "The repository and deployed site show the public content model and user-facing surfaces.",
-        },
-      ],
-      responsibilities: [
-        "Designed the content model, public routes, admin flows, and deployment shape.",
-        "Built structured project pages, resume variants, and the blog section.",
-        "Separated public content from private credentials and admin-only operations.",
-      ],
-      constraints: [
-        "Credentials, unpublished drafts, and admin-only configuration stay out of public pages.",
-        "This project can link to the repository because it is intentionally public.",
-      ],
-      artifacts: [
-        {
-          label: "GitHub repository",
-          type: "public-repo",
-          detail:
-            "Public repository provides inspectable implementation context for the portfolio system.",
-          href: "https://github.com/vijay-jangir/my-website",
-        },
-        {
-          label: "Public site content model",
-          type: "article",
-          detail:
-            "The site itself demonstrates the structured project, resume, and blog model.",
-        },
-      ],
-      confidentialityNotes: [
-        "Not shown here: environment variables, auth secrets, backup targets, and private admin data.",
-      ],
-    },
-    caseStudy: {
-      headline:
-        "Personal website rebuilt into a portfolio, resume, and blog system.",
-      context:
-        "The website needed to move beyond a simple portfolio and become a durable public source for projects, resume variants, technical writing, and future private tooling.",
-      role: "Designed and built the site architecture, content model, and public experience.",
-      timeframe: "Personal project, ongoing",
-      organization: "Personal",
-      team: "Solo project with iterative review",
-      confidentiality:
-        "Repository and public site are open-facing; private credentials and admin surfaces stay out of public content.",
-      metrics: [
-        {
-          label: "Public surfaces",
-          value: "4 core routes",
-          detail:
-            "Home, projects, resume, and blog form the main public reading path.",
-        },
-        {
-          label: "Primary site",
-          value: "Same-domain",
-          detail:
-            "Portfolio, resume, blog index, and local blog detail routes are designed to keep the public story on vijayjangir.com.",
-        },
-      ],
-      architecture: [
-        "Astro serves public pages and API endpoints with a Vercel deployment target.",
-        "Structured portfolio content flows through a bundled snapshot, optional Astro DB, and optional GitHub backup.",
-        "React islands are used only where interaction is useful, such as homepage motion and admin tooling.",
-      ],
-      responsibilities: [
-        "Migrated the active application direction from Next.js to Astro.",
-        "Built deterministic focus-based resume views and PDF generation.",
-        "Added sitemap, robots, metadata, JSON-LD, and llms.txt so people and crawlers can understand the site.",
-      ],
-      decisions: [
-        {
-          label: "Static-first public experience",
-          detail:
-            "The public site avoids making AI or paid services a dependency for normal browsing.",
-        },
-        {
-          label: "Keep Wix as authoring source for now",
-          detail:
-            "The blog integration keeps the existing authoring path while moving discovery toward the primary domain.",
-        },
-      ],
-      lessons: [
-        "A personal site should prove the work quickly, not just list technologies.",
-        "The content model needs to be as intentional as the UI because the site is mostly structured content.",
-      ],
-    },
-  },
-  {
     id: "point-of-interest-proximity-streaming",
     slug: "point-of-interest-proximity-streaming",
     title: "Point-of-interest proximity streaming pipeline",
@@ -3344,9 +3342,9 @@ export const profileHighlights: readonly ProfileHighlight[] = [
   {
     id: "experience-years",
     label: "Experience",
-    value: "10+ years",
+    value: experienceYearsLabel,
     detail:
-      "Hands-on work across telecom, retail, analytics, distributed systems, and platform engineering.",
+      "Hands-on work across AI systems, telecom, retail, analytics, distributed systems, and platform engineering.",
     focusWeights: {
       general: 1,
     },
@@ -3379,13 +3377,14 @@ export const profileHighlights: readonly ProfileHighlight[] = [
     },
   },
   {
-    id: "systems",
-    label: "Core areas",
-    value: "AI, metadata, access governance, orchestration, and data products",
+    id: "ai-stack",
+    label: "AI stack",
+    value: "LangGraph, MCP, RAG, Prompt Engineering, FastAPI, OPA",
     detail:
-      "Strongest where data engineering, platform ownership, access control, orchestration, and user-facing analytics have to work together.",
+      "Daily work spans context engineering, LLM orchestration, agent orchestration, governed retrieval, MCP tool contracts, FastAPI services, and access-governance enforcement.",
     focusWeights: {
       general: 1,
+      ai: 1,
       "backend-engineering": 0.5,
       "platform-engineering": 1,
       "data-platform": 1,
@@ -3408,7 +3407,7 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
     focusIds: ["ai"],
     headline: "AI Engineer for Governed Text-to-Data Systems",
     summary:
-      "This view highlights my current governed conversational data platform work: multi-LLM graph runtime, specialized subgraphs, knowledge retrieval, prompt tracing, metadata grounding, query execution, answer reasoning, result references, and visualization workflows.",
+      "This view highlights my current governed conversational data platform work: context engineering, LLM orchestration, agent subgraphs, MCP-based tools, retrieval-grounded schema linking, prompt tracing, query execution, answer reasoning, and visualization workflows.",
   },
   {
     id: "backend",
@@ -3436,7 +3435,7 @@ export const summaryTemplates: readonly SummaryTemplate[] = [
     focusIds: ["ai", "backend-engineering"],
     headline: "Backend Engineer for AI Data Products",
     summary:
-      "This view combines backend engineering with AI product infrastructure: Python services, graph state contracts, tool APIs, metadata context, prompt tracing, governed query execution, answer reasoning, and operational guardrails.",
+      "This view combines backend engineering with AI product infrastructure: Python services, context engineering, graph state contracts, MCP tool APIs, metadata context, prompt tracing, governed query execution, answer reasoning, and operational guardrails.",
   },
 ] as const;
 

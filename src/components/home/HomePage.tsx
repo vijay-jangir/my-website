@@ -105,6 +105,11 @@ export default function HomePage({
   );
   const featured = featuredProjects.slice(0, 3);
   const experienceSummary = experiences.slice(0, 3);
+  const heroTitleLines =
+    siteProfile.heroTitleLines && siteProfile.heroTitleLines.length > 0
+      ? siteProfile.heroTitleLines
+      : [siteProfile.heroLabel];
+  const heroSubtitle = siteProfile.heroSubtitle ?? siteProfile.recruiterPitch;
 
   function getSkillLabel(skillId: string) {
     return skillLabelById[skillId] ?? skillId;
@@ -145,23 +150,36 @@ export default function HomePage({
             </div>
 
             <motion.h1
-              className="mx-auto mt-8 max-w-[14ch] font-display text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-[#0e1528] sm:mt-10 sm:text-6xl lg:text-7xl"
+              className="mx-auto mt-8 max-w-3xl text-balance font-display text-4xl font-semibold leading-[0.96] tracking-[-0.06em] text-[#0e1528] sm:mt-10 sm:text-5xl lg:text-6xl"
               variants={titleVariants}
             >
-              {siteProfile.heroLabel}
+              {heroTitleLines.map((line, index) => (
+                <span className="block" key={`${line}-${index}`}>
+                  {line}
+                </span>
+              ))}
             </motion.h1>
             <motion.p
-              className="mx-auto mt-6 max-w-[24rem] text-center text-lg leading-8 text-slate-600 sm:hidden"
+              className="mx-auto mt-6 max-w-3xl text-center text-base leading-8 text-slate-600 sm:mt-8 sm:text-xl sm:leading-9"
               variants={riseVariants}
             >
-              {siteProfile.recruiterPitch}
+              {heroSubtitle}
             </motion.p>
-            <motion.p
-              className="mx-auto mt-8 hidden max-w-3xl text-xl leading-9 text-slate-600 sm:block"
-              variants={riseVariants}
+
+            <motion.div
+              className="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-2.5"
+              variants={staggerVariants}
             >
-              {siteProfile.recruiterPitch}
-            </motion.p>
+              {siteProfile.currentFocusLabels.map((label) => (
+                <motion.span
+                  className="rounded-full border border-[#d9e3f5] bg-white/92 px-3.5 py-2 text-xs font-semibold tracking-[0.01em] text-[#0e1528] shadow-[0_10px_24px_rgba(31,44,75,0.08)] sm:text-sm"
+                  key={label}
+                  variants={compactItemVariants}
+                >
+                  {label}
+                </motion.span>
+              ))}
+            </motion.div>
 
             <motion.div
               className="mt-8 flex flex-wrap justify-center gap-3 sm:mt-10"
@@ -256,10 +274,10 @@ export default function HomePage({
                 <p className="mt-5 text-sm leading-7 text-slate-600">
                   {project.caseStudy?.headline ?? project.summary}
                 </p>
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  {project.skillIds.slice(0, 3).map((skillId) => (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {project.skillIds.slice(0, 5).map((skillId) => (
                     <span
-                      className="min-h-14 rounded-[1rem] border border-slate-200 bg-white px-3 py-3 text-xs font-semibold leading-tight text-slate-500"
+                      className="rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold leading-tight text-slate-600"
                       key={skillId}
                     >
                       {getSkillLabel(skillId)}
@@ -294,7 +312,7 @@ export default function HomePage({
           copy="I usually work on systems that already matter in production: heavy data movement, unclear ownership, fragile access paths, and platform work that has to become easier to operate."
           eyebrow="Experience"
           id="experience"
-          title="Built across telecom, retail, and platform teams."
+          title="Built across AI, data platforms, telecom, and retail."
         >
           <motion.div
             className="mt-12 divide-y divide-slate-200/80 rounded-[1.8rem] border border-slate-200/80 bg-white/82 shadow-[0_24px_70px_rgba(31,44,75,0.08)]"

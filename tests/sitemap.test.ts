@@ -44,8 +44,12 @@ describe("buildSitemapEntries", () => {
 
   it("includes public project detail routes", () => {
     expect(
-      buildSitemapEntries([], ["portfolio-website"]).map((entry) => entry.loc),
-    ).toEqual(expect.arrayContaining(["/projects/portfolio-website"]));
+      buildSitemapEntries([], ["access-governance-platform"]).map(
+        (entry) => entry.loc,
+      ),
+    ).toEqual(
+      expect.arrayContaining(["/projects/access-governance-platform"]),
+    );
   });
 
   it("deduplicates repeated routes", () => {

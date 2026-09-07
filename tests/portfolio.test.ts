@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { fallbackPortfolioSnapshot } from "@/content/portfolio";
 import {
   buildResumeVariant,
+  getExperienceYears,
   parseFocusIds,
   parseFocusIdsInContent,
   searchProjects,
@@ -38,9 +39,7 @@ describe("portfolio focus utilities", () => {
       query: "portfolio nextjs wix",
     });
 
-    expect(projects.map((project) => project.id)).toEqual([
-      "portfolio-website",
-    ]);
+    expect(projects).toEqual([]);
   });
 
   it("returns no projects for a query with no lexical matches", () => {
@@ -130,5 +129,48 @@ describe("content-aware focus parsing", () => {
         sortOrder: 2,
       },
     ]);
+  });
+
+  it("computes experience years from the September 2014 career start", () => {
+    expect(getExperienceYears(new Date("2026-09-07T00:00:00.000Z").getTime())).toBe(
+      12,
+    );
+    expect(
+      fallbackPortfolioSnapshot.profileHighlights.find(
+        (highlight) => highlight.id === "experience-years",
+      )?.value,
+    ).toBe(`${getExperienceYears()}+ years`);
+  });
+
+  it("ships explicit AI and governance skill definitions in bundled content", () => {
+    expect(
+      fallbackPortfolioSnapshot.skillDefinitions
+        .filter((skill) =>
+          [
+            "context-engineering",
+            "agent-orchestration",
+            "rag",
+            "prompt-engineering",
+            "genai",
+            "opa",
+          ].includes(skill.id),
+        )
+        .map((skill) => skill.label),
+    ).toEqual([
+      "Context Engineering",
+      "Generative AI",
+      "Agent Orchestration",
+      "RAG",
+      "Prompt Engineering",
+      "OPA (Open Policy Agent)",
+    ]);
+  });
+
+  it("keeps the homepage project list focused on client work instead of the site itself", () => {
+    expect(
+      fallbackPortfolioSnapshot.projects.some(
+        (project) => project.id === "portfolio-website",
+      ),
+    ).toBe(false);
   });
 });

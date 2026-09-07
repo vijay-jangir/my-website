@@ -167,6 +167,8 @@ export type SiteProfile = {
   linkedinUrl: string;
   profileImageUrl?: string;
   heroLabel: string;
+  heroTitleLines?: readonly string[];
+  heroSubtitle?: string;
   recruiterPitch: string;
   overview: string[];
 };

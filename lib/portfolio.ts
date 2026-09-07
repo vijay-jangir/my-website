@@ -26,6 +26,8 @@ type PortfolioContentInput = Pick<
 
 const fallbackContent = fallbackPortfolioSnapshot;
 
+export { getExperienceYears } from "@/content/portfolio";
+
 export const focusDefinitionMap = Object.fromEntries(
   fallbackContent.focusDefinitions.map((focus) => [focus.id, focus]),
 ) as Record<FocusId, (typeof fallbackContent.focusDefinitions)[number]>;

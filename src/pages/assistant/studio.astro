@@ -239,12 +239,12 @@ const suggestions = recommendTopics(input);
 <script>
   const triggers = document.querySelectorAll("[data-draft-trigger]");
   const draftPanel = document.getElementById("draft-panel");
-  const draftForm = document.getElementById("draft-form") as HTMLFormElement | null;
-  const draftTitle = document.getElementById("draft-title") as HTMLInputElement | null;
-  const draftKeywords = document.getElementById("draft-keywords") as HTMLInputElement | null;
-  const draftFocus = document.getElementById("draft-focus") as HTMLInputElement | null;
+  const draftForm = document.getElementById("draft-form");
+  const draftTitle = document.getElementById("draft-title");
+  const draftKeywords = document.getElementById("draft-keywords");
+  const draftFocus = document.getElementById("draft-focus");
   const draftTopicLabel = document.getElementById("draft-topic-label");
-  const draftSubmit = document.getElementById("draft-submit") as HTMLButtonElement | null;
+  const draftSubmit = document.getElementById("draft-submit");
   const draftStatus = document.getElementById("draft-status");
   const draftResult = document.getElementById("draft-result");
   const draftResultPath = document.getElementById("draft-result-path");
@@ -278,13 +278,13 @@ const suggestions = recommendTopics(input);
     draftError.classList.add("hidden");
 
     const formData = new FormData(draftForm);
-    const keywordsRaw = (formData.get("keywords") as string) ?? "";
+    const keywordsRaw = String(formData.get("keywords") ?? "");
 
     const payload = {
-      title: formData.get("title") as string,
-      ownerNotes: formData.get("ownerNotes") as string,
+      title: String(formData.get("title") ?? ""),
+      ownerNotes: String(formData.get("ownerNotes") ?? ""),
       keywords: keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean),
-      focusArea: (formData.get("focusArea") as string) || undefined,
+      focusArea: String(formData.get("focusArea") ?? "") || undefined,
     };
 
     try {

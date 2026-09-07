@@ -116,7 +116,7 @@ setRobotsHeader(Astro.response.headers);
         }
 
         const s = data.signals;
-        const sections: string[] = [];
+        const sections = [];
 
         sections.push(`
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -143,7 +143,7 @@ setRobotsHeader(Astro.response.headers);
 
         if (s.topSkills.length > 0) {
           const skillRows = s.topSkills.map(
-            (sk: { label: string; count: number; avgScore: number }) =>
+            (sk) =>
               `<tr class="border-t border-slate-100"><td class="py-2 pr-4 text-sm text-[#0e1528]">${sk.label}</td><td class="py-2 pr-4 text-sm text-slate-600 text-right">${sk.count}</td><td class="py-2 text-sm text-slate-600 text-right">${sk.avgScore}</td></tr>`
           ).join("");
           sections.push(`
@@ -156,7 +156,7 @@ setRobotsHeader(Astro.response.headers);
 
         if (s.recurringGaps.length > 0) {
           const gapRows = s.recurringGaps.map(
-            (g: { term: string; count: number }) =>
+            (g) =>
               `<tr class="border-t border-slate-100"><td class="py-2 pr-4 text-sm text-[#0e1528]">${g.term}</td><td class="py-2 text-sm text-slate-600 text-right">${g.count}</td></tr>`
           ).join("");
           sections.push(`
@@ -169,7 +169,7 @@ setRobotsHeader(Astro.response.headers);
 
         if (s.recommendations.length > 0) {
           const recItems = s.recommendations.map(
-            (r: string) => `<li class="text-sm leading-7 text-slate-600">${r}</li>`
+            (r) => `<li class="text-sm leading-7 text-slate-600">${r}</li>`
           ).join("");
           sections.push(`
             <div class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_18px_54px_rgba(31,44,75,0.07)] backdrop-blur-xl">
@@ -186,7 +186,7 @@ setRobotsHeader(Astro.response.headers);
     }
 
     async function publishSignals() {
-      const btn = document.getElementById("publish-btn") as HTMLButtonElement | null;
+      const btn = document.getElementById("publish-btn");
       if (!btn) return;
 
       btn.disabled = true;

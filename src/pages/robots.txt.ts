@@ -36,6 +36,7 @@ export function buildRobotsTxt(baseUrl: URL): string {
     ...aiCrawlerUserAgents.flatMap((userAgent) => [
       `User-agent: ${userAgent}`,
       "Allow: /",
+      ...disallowedPaths.map((path) => `Disallow: ${path}`),
       "",
     ]),
     `Sitemap: ${sitemapUrl}`,
